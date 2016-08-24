@@ -1280,6 +1280,7 @@ vlan internal allocation policy ascending
 !
 !
 !
+vtp mode transparent
 !
 !
 vlan 146
@@ -1449,6 +1450,7 @@ vlan internal allocation policy ascending
 !
 !
 !
+vtp mode transparent
 !
 !
 !
@@ -1576,9 +1578,6 @@ no aaa new-model
 !
 !
 !
-vlan 146
- name native
-!
 !
 !
 no ip domain-lookup
@@ -1595,7 +1594,10 @@ vlan internal allocation policy ascending
 ! 
 !
 !
+vtp mode transparent
 !
+!vlan 146
+ name native
 !
 !
 !
@@ -1746,8 +1748,11 @@ vlan internal allocation policy ascending
 !
 !
 !
+vtp mode transparent
 !
 !
+vlan 146
+ name native
 !
 !
 !
