@@ -1596,7 +1596,8 @@ vlan internal allocation policy ascending
 !
 vtp mode transparent
 !
-!vlan 146
+!
+vlan 146
  name native
 !
 !
