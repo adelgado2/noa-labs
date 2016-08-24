@@ -1292,6 +1292,7 @@ vlan internal allocation policy ascending
 interface GigabitEthernet0/0
  media-type rj45
  negotiation auto
+ spanning-tree link-type point-to-point
 !
 interface GigabitEthernet0/1
  switchport trunk encapsulation dot1q
@@ -1299,6 +1300,7 @@ interface GigabitEthernet0/1
  switchport mode dynamic desirable
  media-type rj45
  negotiation auto
+ spanning-tree link-type point-to-point
 !
 interface GigabitEthernet0/2
  switchport trunk encapsulation dot1q
@@ -1306,6 +1308,7 @@ interface GigabitEthernet0/2
  switchport mode dynamic desirable
  media-type rj45
  negotiation auto
+ spanning-tree link-type point-to-point
 !
 interface GigabitEthernet0/3
  switchport trunk encapsulation dot1q
@@ -1313,6 +1316,7 @@ interface GigabitEthernet0/3
  switchport mode dynamic desirable
  media-type rj45
  negotiation auto
+ spanning-tree link-type point-to-point
 !
 interface GigabitEthernet1/0
  switchport trunk encapsulation dot1q
@@ -1320,28 +1324,28 @@ interface GigabitEthernet1/0
  switchport mode dynamic desirable
  media-type rj45
  negotiation auto
+ spanning-tree link-type point-to-point
 !
 interface GigabitEthernet1/1
  switchport trunk encapsulation dot1q
  switchport trunk native vlan 146
  switchport mode dynamic desirable
  media-type rj45
- speed 1000
- duplex full
- no negotiation auto
+ negotiation auto
+ spanning-tree link-type point-to-point
 !
 interface GigabitEthernet1/2
  switchport trunk encapsulation dot1q
  switchport trunk native vlan 146
  switchport mode dynamic desirable
  media-type rj45
- speed 1000
- duplex full
- no negotiation auto
+ negotiation auto
+ spanning-tree link-type point-to-point
 !
 interface GigabitEthernet1/3
  media-type rj45
  negotiation auto
+ spanning-tree link-type point-to-point
 !
 ip forward-protocol nd
 !
@@ -1454,36 +1458,39 @@ vlan internal allocation policy ascending
 interface GigabitEthernet0/0
  media-type rj45
  negotiation auto
+ spanning-tree link-type point-to-point
 !
 interface GigabitEthernet0/1
  media-type rj45
  negotiation auto
+ spanning-tree link-type point-to-point
 !
 interface GigabitEthernet0/2
  media-type rj45
  negotiation auto
+ spanning-tree link-type point-to-point
 !
 interface GigabitEthernet0/3
  media-type rj45
  negotiation auto
+ spanning-tree link-type point-to-point
 !
 interface GigabitEthernet1/0
  media-type rj45
  negotiation auto
+ spanning-tree link-type point-to-point
 !
 interface GigabitEthernet1/1
  switchport trunk native vlan 146
  media-type rj45
- speed 1000
- duplex full
- no negotiation auto
+ negotiation auto
+ spanning-tree link-type point-to-point
 !
 interface GigabitEthernet1/2
  switchport trunk native vlan 146
  media-type rj45
- speed 1000
- duplex full
- no negotiation auto
+ negotiation auto
+ spanning-tree link-type point-to-point
 !
 ip forward-protocol nd
 !
@@ -1595,32 +1602,39 @@ vlan internal allocation policy ascending
 interface GigabitEthernet0/0
  media-type rj45
  negotiation auto
+ spanning-tree link-type point-to-point
 !
 interface GigabitEthernet0/1
  switchport trunk native vlan 146
  media-type rj45
  negotiation auto
+ spanning-tree link-type point-to-point
 !
 interface GigabitEthernet0/2
  switchport trunk native vlan 146
  media-type rj45
  negotiation auto
+ spanning-tree link-type point-to-point
 !
 interface GigabitEthernet0/3
  media-type rj45
  negotiation auto
+ spanning-tree link-type point-to-point
 !
 interface GigabitEthernet1/0
  media-type rj45
  negotiation auto
+ spanning-tree link-type point-to-point
 !
 interface GigabitEthernet1/1
  media-type rj45
  negotiation auto
+ spanning-tree link-type point-to-point
 !
 interface GigabitEthernet1/2
  media-type rj45
  negotiation auto
+ spanning-tree link-type point-to-point
 !
 ip forward-protocol nd
 !
@@ -1732,32 +1746,39 @@ vlan internal allocation policy ascending
 interface GigabitEthernet0/0
  media-type rj45
  negotiation auto
+ spanning-tree link-type point-to-point
 !
 interface GigabitEthernet0/1
  media-type rj45
  negotiation auto
+ spanning-tree link-type point-to-point
 !
 interface GigabitEthernet0/2
  media-type rj45
  negotiation auto
+ spanning-tree link-type point-to-point
 !
 interface GigabitEthernet0/3
  switchport trunk native vlan 146
  media-type rj45
  negotiation auto
+ spanning-tree link-type point-to-point
 !
 interface GigabitEthernet1/0
  switchport trunk native vlan 146
  media-type rj45
  negotiation auto
+ spanning-tree link-type point-to-point
 !
 interface GigabitEthernet1/1
  media-type rj45
  negotiation auto
+ spanning-tree link-type point-to-point
 !
 interface GigabitEthernet1/2
  media-type rj45
  negotiation auto
+ spanning-tree link-type point-to-point
 !
 ip forward-protocol nd
 !
