@@ -1282,6 +1282,8 @@ vlan internal allocation policy ascending
 !
 !
 !
+vlan 146
+ name native
 !
 !
 !
@@ -1450,6 +1452,8 @@ vlan internal allocation policy ascending
 !
 !
 !
+vlan 146
+ name native
 !
 !
 !
@@ -1572,6 +1576,8 @@ no aaa new-model
 !
 !
 !
+vlan 146
+ name native
 !
 !
 !
@@ -1716,6 +1722,8 @@ no aaa new-model
 !
 !
 !
+vlan 146
+ name native
 !
 !
 !
