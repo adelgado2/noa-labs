@@ -1002,6 +1002,7 @@ interface GigabitEthernet1/0
 interface GigabitEthernet1/1
  media-type rj45
  negotiation auto
+ spanning-tree link-type point-to-point
 !
 interface GigabitEthernet1/2
  media-type rj45
