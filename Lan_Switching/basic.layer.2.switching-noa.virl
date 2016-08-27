@@ -688,6 +688,7 @@ interface GigabitEthernet0/0
  media-type rj45
  negotiation auto
  spanning-tree link-type point-to-point
+ shutdown
 !
 interface GigabitEthernet0/1
  media-type rj45
@@ -836,6 +837,7 @@ interface GigabitEthernet0/0
  media-type rj45
  negotiation auto
  spanning-tree link-type point-to-point
+ shutdown
 !
 interface GigabitEthernet0/1
  media-type rj45
@@ -978,6 +980,7 @@ interface GigabitEthernet0/0
  media-type rj45
  negotiation auto
  spanning-tree link-type point-to-point
+ shutdown
 !
 interface GigabitEthernet0/1
  media-type rj45
@@ -1120,6 +1123,7 @@ interface GigabitEthernet0/0
  media-type rj45
  negotiation auto
  spanning-tree link-type point-to-point
+ shutdown
 !
 interface GigabitEthernet0/1
  media-type rj45
