@@ -2,7 +2,7 @@
 <topology xmlns="http://www.cisco.com/VIRL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="0.9" simulationEngine="OPENSTACK" xsi:schemaLocation="http://www.cisco.com/VIRL https://raw.github.com/CiscoVIRL/schema/v0.9/virl.xsd">
     <node name="R1" type="SIMPLE" subtype="IOSv" location="57,131">
         <extensions><entry key="config" type="String">!
-! Last configuration change at 17:29:03 UTC Mon Sep 12 2016
+! Last configuration change at 20:09:13 UTC Mon Sep 12 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -62,7 +62,7 @@ redundancy
 !
 !
 interface GigabitEthernet0/0
- no ip address
+ ip address 10.255.0.157 255.255.0.0
  shutdown
  duplex auto
  speed auto
@@ -126,7 +126,7 @@ end</entry></extensions><interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R2" type="SIMPLE" subtype="IOSv" location="58,197">
         <extensions><entry key="config" type="String">!
-! Last configuration change at 17:28:56 UTC Mon Sep 12 2016
+! Last configuration change at 20:09:01 UTC Mon Sep 12 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -186,7 +186,7 @@ redundancy
 !
 !
 interface GigabitEthernet0/0
- no ip address
+ ip address 10.255.0.159 255.255.0.0
  shutdown
  duplex auto
  speed auto
@@ -250,7 +250,7 @@ end</entry></extensions><interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R3" type="SIMPLE" subtype="IOSv" location="59,270">
         <extensions><entry key="config" type="String">!
-! Last configuration change at 17:28:58 UTC Mon Sep 12 2016
+! Last configuration change at 20:09:10 UTC Mon Sep 12 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -310,7 +310,7 @@ redundancy
 !
 !
 interface GigabitEthernet0/0
- no ip address
+ ip address 10.255.0.160 255.255.0.0
  shutdown
  duplex auto
  speed auto
@@ -374,7 +374,7 @@ end</entry></extensions><interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R4" type="SIMPLE" subtype="IOSv" location="58,345">
         <extensions><entry key="config" type="String">!
-! Last configuration change at 17:29:23 UTC Mon Sep 12 2016
+! Last configuration change at 20:09:29 UTC Mon Sep 12 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -434,7 +434,7 @@ redundancy
 !
 !
 interface GigabitEthernet0/0
- no ip address
+ ip address 10.255.0.161 255.255.0.0
  shutdown
  duplex auto
  speed auto
@@ -498,7 +498,7 @@ end</entry></extensions><interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R5" type="SIMPLE" subtype="IOSv" location="47,417">
         <extensions><entry key="config" type="String">!
-! Last configuration change at 17:28:59 UTC Mon Sep 12 2016
+! Last configuration change at 20:09:13 UTC Mon Sep 12 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -558,7 +558,7 @@ redundancy
 !
 !
 interface GigabitEthernet0/0
- no ip address
+ ip address 10.255.0.162 255.255.0.0
  shutdown
  duplex auto
  speed auto
@@ -622,7 +622,7 @@ end</entry></extensions><interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R6" type="SIMPLE" subtype="IOSv" location="49,474">
         <extensions><entry key="config" type="String">!
-! Last configuration change at 17:29:03 UTC Mon Sep 12 2016
+! Last configuration change at 20:09:20 UTC Mon Sep 12 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -682,7 +682,7 @@ redundancy
 !
 !
 interface GigabitEthernet0/0
- no ip address
+ ip address 10.255.0.163 255.255.0.0
  shutdown
  duplex auto
  speed auto
@@ -746,7 +746,7 @@ end</entry></extensions><interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R7" type="SIMPLE" subtype="IOSv" location="43,552">
         <extensions><entry key="config" type="String">!
-! Last configuration change at 17:29:04 UTC Mon Sep 12 2016
+! Last configuration change at 20:09:35 UTC Mon Sep 12 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -806,7 +806,7 @@ redundancy
 !
 !
 interface GigabitEthernet0/0
- no ip address
+ ip address 10.255.0.164 255.255.0.0
  shutdown
  duplex auto
  speed auto
@@ -870,7 +870,7 @@ end</entry></extensions><interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R8" type="SIMPLE" subtype="IOSv" location="43,618">
         <extensions><entry key="config" type="String">!
-! Last configuration change at 17:29:06 UTC Mon Sep 12 2016
+! Last configuration change at 20:09:37 UTC Mon Sep 12 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -930,7 +930,7 @@ redundancy
 !
 !
 interface GigabitEthernet0/0
- no ip address
+ ip address 10.255.0.165 255.255.0.0
  shutdown
  duplex auto
  speed auto
@@ -994,7 +994,7 @@ end</entry></extensions><interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R9" type="SIMPLE" subtype="IOSv" location="37,675">
         <extensions><entry key="config" type="String">!
-! Last configuration change at 17:29:18 UTC Mon Sep 12 2016
+! Last configuration change at 20:09:38 UTC Mon Sep 12 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -1054,7 +1054,7 @@ redundancy
 !
 !
 interface GigabitEthernet0/0
- no ip address
+ ip address 10.255.0.166 255.255.0.0
  shutdown
  duplex auto
  speed auto
@@ -1118,7 +1118,7 @@ end</entry></extensions><interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R10" type="SIMPLE" subtype="IOSv" location="32,741">
         <extensions><entry key="config" type="String">!
-! Last configuration change at 17:29:00 UTC Mon Sep 12 2016
+! Last configuration change at 20:09:04 UTC Mon Sep 12 2016
 !
 version 15.6
 service timestamps debug datetime msec
@@ -1178,7 +1178,7 @@ redundancy
 !
 !
 interface GigabitEthernet0/0
- no ip address
+ ip address 10.255.0.158 255.255.0.0
  shutdown
  duplex auto
  speed auto
@@ -1241,7 +1241,7 @@ no scheduler allocate
 end</entry></extensions><interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="SW1" type="SIMPLE" subtype="IOSvL2" location="346,347"><extensions><entry key="config" type="String">!
-! Last configuration change at 17:28:58 UTC Mon Sep 12 2016
+! Last configuration change at 20:08:26 UTC Mon Sep 12 2016
 !
 version 15.2
 no service timestamps debug uptime
@@ -1296,31 +1296,41 @@ interface GigabitEthernet0/0
  negotiation auto
 !
 interface GigabitEthernet0/1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
  media-type rj45
  negotiation auto
  spanning-tree link-type point-to-point
 !
 interface GigabitEthernet0/2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
  media-type rj45
  negotiation auto
  spanning-tree link-type point-to-point
 !
 interface GigabitEthernet0/3
+ shutdown
  media-type rj45
  negotiation auto
  spanning-tree link-type point-to-point
 !
 interface GigabitEthernet1/0
+ shutdown
  media-type rj45
  negotiation auto
  spanning-tree link-type point-to-point
 !
 interface GigabitEthernet1/1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
  media-type rj45
  negotiation auto
  spanning-tree link-type point-to-point
 !
 interface GigabitEthernet1/2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
  media-type rj45
  negotiation auto
  spanning-tree link-type point-to-point
@@ -1390,7 +1400,7 @@ end</entry></extensions>
         <interface id="6" name="GigabitEthernet1/3"/>
     </node>
     <node name="SW2" type="SIMPLE" subtype="IOSvL2" location="580,343"><extensions><entry key="config" type="String">!
-! Last configuration change at 17:29:02 UTC Mon Sep 12 2016
+! Last configuration change at 20:08:23 UTC Mon Sep 12 2016
 !
 version 15.2
 no service timestamps debug uptime
@@ -1445,31 +1455,41 @@ interface GigabitEthernet0/0
  negotiation auto
 !
 interface GigabitEthernet0/1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
  media-type rj45
  negotiation auto
  spanning-tree link-type point-to-point
 !
 interface GigabitEthernet0/2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
  media-type rj45
  negotiation auto
  spanning-tree link-type point-to-point
 !
 interface GigabitEthernet0/3
+ shutdown
  media-type rj45
  negotiation auto
  spanning-tree link-type point-to-point
 !
 interface GigabitEthernet1/0
+ shutdown
  media-type rj45
  negotiation auto
  spanning-tree link-type point-to-point
 !
 interface GigabitEthernet1/1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
  media-type rj45
  negotiation auto
  spanning-tree link-type point-to-point
 !
 interface GigabitEthernet1/2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
  media-type rj45
  negotiation auto
  spanning-tree link-type point-to-point
@@ -1533,7 +1553,7 @@ end</entry></extensions>
         <interface id="5" name="GigabitEthernet1/2"/>
     </node>
     <node name="SW3" type="SIMPLE" subtype="IOSvL2" location="339,520"><extensions><entry key="config" type="String">!
-! Last configuration change at 17:29:11 UTC Mon Sep 12 2016
+! Last configuration change at 20:08:24 UTC Mon Sep 12 2016
 !
 version 15.2
 no service timestamps debug uptime
@@ -1587,31 +1607,41 @@ interface GigabitEthernet0/0
  negotiation auto
 !
 interface GigabitEthernet0/1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
  media-type rj45
  negotiation auto
  spanning-tree link-type point-to-point
 !
 interface GigabitEthernet0/2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
  media-type rj45
  negotiation auto
  spanning-tree link-type point-to-point
 !
 interface GigabitEthernet0/3
+ shutdown
  media-type rj45
  negotiation auto
  spanning-tree link-type point-to-point
 !
 interface GigabitEthernet1/0
+ shutdown
  media-type rj45
  negotiation auto
  spanning-tree link-type point-to-point
 !
 interface GigabitEthernet1/1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
  media-type rj45
  negotiation auto
  spanning-tree link-type point-to-point
 !
 interface GigabitEthernet1/2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
  media-type rj45
  negotiation auto
  spanning-tree link-type point-to-point
@@ -1675,7 +1705,7 @@ end</entry></extensions>
         <interface id="5" name="GigabitEthernet1/2"/>
     </node>
     <node name="SW4" type="SIMPLE" subtype="IOSvL2" location="580,519"><extensions><entry key="config" type="String">!
-! Last configuration change at 17:29:02 UTC Mon Sep 12 2016
+! Last configuration change at 20:08:22 UTC Mon Sep 12 2016
 !
 version 15.2
 no service timestamps debug uptime
@@ -1730,31 +1760,41 @@ interface GigabitEthernet0/0
  negotiation auto
 !
 interface GigabitEthernet0/1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
  media-type rj45
  negotiation auto
  spanning-tree link-type point-to-point
 !
 interface GigabitEthernet0/2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
  media-type rj45
  negotiation auto
  spanning-tree link-type point-to-point
 !
 interface GigabitEthernet0/3
+ shutdown
  media-type rj45
  negotiation auto
  spanning-tree link-type point-to-point
 !
 interface GigabitEthernet1/0
+ shutdown
  media-type rj45
  negotiation auto
  spanning-tree link-type point-to-point
 !
 interface GigabitEthernet1/1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
  media-type rj45
  negotiation auto
  spanning-tree link-type point-to-point
 !
 interface GigabitEthernet1/2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
  media-type rj45
  negotiation auto
  spanning-tree link-type point-to-point
