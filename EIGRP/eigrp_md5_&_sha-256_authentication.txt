@@ -1,0 +1,201 @@
+R1 - R4:
+
+!
+router eigrp MULTI-AF
+ address-family ipv4 unicast autonomous-system 100
+  network 150.1.0.0 0.0.255.255
+  network 155.1.0.0 0.0.255.255
+!
+
+R5:
+
+!
+router eigrp MULTI-AF
+ address-family ipv4 unicast autonomous-system 100
+  network 150.1.0.0 0.0.255.255
+  network 155.1.0.0 0.0.255.255
+   af-interface Tunnel0
+    no split-horizon
+!
+
+R1, R3, R5 - R10:
+
+!
+router eigrp 100
+ network 150.1.0.0 0.0.255.255
+ network 155.1.0.0 0.0.255.255
+!
+
+!
+key chain MD5_KEYS
+ key 1
+  key-string MD5_PASS
+  accept-lifetime 19:00:00 Nov 2 2016 infinite
+  send-lifetime 19:00:00 Nov 2 2016 infinite
+!
+
+R6:
+
+!
+interface GigabitEthernet0/1.67   
+  no ip authentication mode eigrp 1 md5
+  no ip authentication key-chain eigrp 1 MD5_KEYS
+  ip authentication mode eigrp 100 md5
+  ip authentication key-chain eigrp 100 MD5_KEYS
+!
+interface GigabitEthernet0/1.146
+  no ip authentication mode eigrp 1 md5
+  no ip authentication key-chain eigrp 1 MD5_KEYS
+  ip authentication mode eigrp 100 md5
+  ip authentication key-chain eigrp 100 MD5_KEYS
+!
+
+R7:
+
+!
+interface GigabitEthernet0/1.37   
+  no ip authentication mode eigrp 1 md5
+  no ip authentication key-chain eigrp 1 MD5_KEYS
+  ip authentication mode eigrp 100 md5
+  ip authentication key-chain eigrp 100 MD5_KEYS
+!
+interface GigabitEthernet0/1.67   
+  no ip authentication mode eigrp 1 md5
+  no ip authentication key-chain eigrp 1 MD5_KEYS
+  ip authentication mode eigrp 100 md5
+  ip authentication key-chain eigrp 100 MD5_KEYS
+!
+interface GigabitEthernet0/1.79
+  no ip authentication mode eigrp 1 md5
+  no ip authentication key-chain eigrp 1 MD5_KEYS
+  ip authentication mode eigrp 100 md5
+  ip authentication key-chain eigrp 100 MD5_KEYS
+!
+
+R8:
+
+!
+interface GigabitEthernet0/1.58   
+  no ip authentication mode eigrp 1 md5
+  no ip authentication key-chain eigrp 1 MD5_KEYS
+  ip authentication mode eigrp 100 md5
+  ip authentication key-chain eigrp 100 MD5_KEYS
+!
+interface GigabitEthernet0/1.108
+  no ip authentication mode eigrp 1 md5
+  no ip authentication key-chain eigrp 1 MD5_KEYS
+  ip authentication mode eigrp 100 md5
+  ip authentication key-chain eigrp 100 MD5_KEYS
+!
+
+R9:
+
+!
+interface GigabitEthernet0/1.79  
+  no ip authentication mode eigrp 1 md5
+  no ip authentication key-chain eigrp 1 MD5_KEYS
+  ip authentication mode eigrp 100 md5
+  ip authentication key-chain eigrp 100 MD5_KEYS
+!
+
+R10:
+
+!
+interface GigabitEthernet0/1.108   
+  no ip authentication mode eigrp 1 md5
+  no ip authentication key-chain eigrp 1 MD5_KEYS
+  ip authentication mode eigrp 100 md5
+  ip authentication key-chain eigrp 100 MD5_KEYS
+!
+
+R1:
+
+!
+router eigrp MULTI-AF
+ address-family ipv4 unicast autonomous-system 100
+  af-interface GigabitEthernet0/1.146
+    authentication key-chain MD5_KEYS
+     authentication mode md5
+!
+
+
+R3:
+
+!
+router eigrp MULTI-AF
+ address-family ipv4 unicast autonomous-system 100
+  af-interface GigabitEthernet0/1.37
+    authentication key-chain MD5_KEYS
+     authentication mode md5
+!
+
+R5:
+
+!
+router eigrp MULTI-AF
+ address-family ipv4 unicast autonomous-system 100
+  af-interface GigabitEthernet0/1.58
+    authentication key-chain MD5_KEYS
+     authentication mode md5
+!
+
+R1 - r5:
+
+!
+router eigrp MULTI-AF
+ address-family ipv4 unicast autonomous-system 100
+  af-interface Tunnel0
+   authentication mode hmac-sha-256 7 SHA_KEY
+!
+
+R4 - R5:
+
+!
+router eigrp MULTI-AF
+ address-family ipv4 unicast autonomous-system 100
+  af-interface default
+   authentication mode hmac-sha-256 7 SHA_DEFAULT
+!
+ 
+
+tclsh
+
+foreach X {
+ 155.1.13.1 
+ 155.1.146.1
+ 155.1.0.1
+ 150.1.1.1
+ 155.1.0.2
+ 150.1.2.2
+ 155.1.13.3
+ 155.1.37.3
+ 155.1.0.3
+ 150.1.3.3
+ 155.1.45.4
+ 155.1.0.4
+ 150.1.4.4
+ 155.1.5.5
+ 155.1.45.5
+ 155.1.58.5
+ 155.1.0.5
+ 150.1.5.5
+ 155.1.67.6
+ 155.1.146.6
+ 150.1.6.6
+ 155.1.7.7
+ 155.1.37.7
+ 155.1.67.7
+ 155.1.79.7
+ 150.1.7.7
+ 155.1.8.8
+ 155.1.58.8
+ 155.1.108.8
+ 150.1.8.8
+ 155.1.9.9
+ 155.1.79.9
+ 150.1.9.9
+ 155.1.10.10
+ 155.1.108.10
+ 150.1.10.10
+} { ping $X}
+
