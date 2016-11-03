@@ -1,0 +1,24 @@
+R1-R3:
+
+!
+router eigrp 100
+ network 155.1.0.0 0.0.0.255
+!
+
+R4:
+
+!
+router eigrp 100
+ network 155.1.0.0 0.0.0.255
+ neighbor 155.1.0.5 0.0.0.0 Tunnel 0
+!
+
+R5:
+
+!
+router eigrp MULTI-AF
+ address-family ipv4 unicast autonomous-system 100
+  network 155.1.0.0 0.0.0.255
+  neighbor 155.1.0.4 Tunnel 0
+!
+ 

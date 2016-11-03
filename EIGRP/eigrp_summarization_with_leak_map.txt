@@ -1,0 +1,99 @@
+R4, R5:
+
+!
+router eigrp 100
+ network 155.1.0.0 0.0.0.255
+ network 155.1.45.0 0.0.0.255
+!
+
+R1, R3, R6, R7:
+
+!
+router eigrp MULTI-AF
+ address-family ipv4 unicast autonomous-system 200
+  network 155.1.0.0 0.0.255.255
+!
+
+R4:
+
+!
+interface Loopback40
+ ip address 4.0.0.4 255.255.255.0
+!
+interface Loopback41
+ ip address 4.0.1.4 255.255.255.0
+!
+ip prefix-list LOOPBACKS seq 10 permit 4.0.0.0/24
+ip prefix-list LOOPBACKS seq 20 permit 4.0.1.0/24
+!
+route-map LOOPBACKS permit 10
+  match ip address prefix-list LOOPBACKS
+
+!
+router eigrp 100
+ redistribute connected route-map LOOPBACKS
+
+!
+
+!
+int tu0
+ ip summary-address eigrp 100 0.0.0.0 0.0.0.0
+int gi0/1.45
+ ip summary-address eigrp 100 0.0.0.0 0.0.0.0
+!
+
+!
+ip prefix-list LEAK permit 4.0.0.0/24
+!
+route-map LEAK-MAP permit 10
+  match ip address prefix-list LEAK
+
+!
+
+!
+int tu0
+ no ip summary-address eigrp 100 0.0.0.0 0.0.0.0
+ ip summary-address eigrp 100 0.0.0.0 0.0.0.0 leak-map LEAK-MAP
+!
+
+R6:
+
+!
+interface Loopback60
+ ip address 6.0.0.6 255.255.255.0
+!
+interface Loopback61
+ ip address 6.0.1.6 255.255.255.0
+!
+ip prefix-list LOOPBACKS seq 10 permit 6.0.0.0/24
+ip prefix-list LOOPBACKS seq 20 permit 6.0.1.0/24
+!
+route-map LOOPBACKS permit 10
+  match ip address prefix-list LOOPBACKS
+
+!
+router eigrp MULTI-AF
+ address-family ipv4 unicast autonomous-system 200
+  af-interface Gi0/1.146
+   summary-address 0.0.0.0 0.0.0.0 
+  af-interface Gi0/1.67
+   summary-address 0.0.0.0 0.0.0.0 
+  topology base
+   redistribute connected route-map LOOPBACKS
+
+!
+
+!
+!
+ip prefix-list LEAK permit 6.0.0.0/24
+!
+route-map LEAK-MAP permit 10
+  match ip address prefix-list LEAK
+
+!
+router eigrp MULTI-AF
+ address-family ipv4 unicast autonomous-system 200
+  af-interface Gi0/1.146
+   no summary-address 0.0.0.0 0.0.0.0 
+   summary-address 0.0.0.0 0.0.0.0 leak-map LEAK-MAP
+!

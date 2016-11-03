@@ -1,0 +1,49 @@
+R4:
+
+!
+interface Loopback1
+ ip address 160.1.4.4 255.255.255.0
+!
+
+!
+router eigrp 100
+ network 155.1.45.0 0.0.0.255
+ network 155.1.58.0 0.0.0.255
+ network 160.1.4.0 0.0.0.255
+!
+
+!
+interface Gi0/1.45
+ ip summary-address eigrp 100 0.0.0.0 0.0.0.0
+!
+
+
+R5:
+
+!
+interface Loopback1
+ ip address 160.1.5.5 255.255.255.0
+!
+
+!
+router eigrp 100
+ network 155.1.45.0 0.0.0.255
+ network 155.1.58.0 0.0.0.255
+ network 160.1.5.0 0.0.0.255
+!
+ 
+!
+interface Gi0/1.58
+ ip summary-address eigrp 100 160.1.4.0 255.255.254.0
+!
+
+!
+ip route 160.1.4.0 255.255.254.0 155.1.45.4
+!
+
+R8:
+
+!
+router eigrp 100
+ network 155.1.58.0 0.0.0.255
+!

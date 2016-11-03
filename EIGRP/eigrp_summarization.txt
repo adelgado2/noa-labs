@@ -1,0 +1,151 @@
+R1 - R5:
+
+!
+router eigrp 100
+ network 155.1.0.0 0.0.255.255
+ network 150.1.0.0 0.0.255.255 
+!
+
+R6 - R10:
+
+!
+router eigrp MULTI-AF
+ address-family ipv4 unicast autonomous-system 100
+  network 155.1.0.0 0.0.255.255
+  network 150.1.0.0 0.0.255.255
+!
+
+R5:
+
+!
+interface Tunnel0
+ no ip split-horizon eigrp 100
+!
+
+R4:
+
+!
+interface Loopback40
+ ip address 4.0.0.4 255.255.255.0
+interface Loopback41
+ ip address 4.0.1.4 255.255.255.0
+interface Loopback42
+ ip address 4.0.2.4 255.255.255.0
+interface Loopback43
+ ip address 4.0.3.4 255.255.255.0
+!
+
+!
+ip prefix-list LOOPBACKS seq 10 permit 4.0.0.4/24
+ip prefix-list LOOPBACKS seq 20 permit 4.0.1.4/24
+ip prefix-list LOOPBACKS seq 30 permit 4.0.2.4/24
+ip prefix-list LOOPBACKS seq 40 permit 4.0.3.4/24
+!
+
+!
+route-map LOOPBACKS permit 10
+ match ip address prefix-list LOOPBACKS
+!
+
+!
+router eigrp 100
+ redistribute connected route-map LOOPBACKS
+!
+
+!
+int gigabitEthernet 0/1.45
+ ip summary-address eigrp 100 4.0.0.0 255.255.252.0
+!
+int tu0
+ ip summary-address eigrp 100 4.0.0.0 255.255.252.0
+!
+
+R6:
+
+!
+interface Loopback60
+ ip address 6.0.0.6 255.255.255.0
+interface Loopback61
+ ip address 6.0.1.6 255.255.255.0
+interface Loopback62
+ ip address 6.0.2.6 255.255.255.0
+interface Loopback63
+ ip address 6.0.3.6 255.255.255.0
+!
+
+!
+ip prefix-list LOOPBACKS seq 10 permit 6.0.0.6/24
+ip prefix-list LOOPBACKS seq 20 permit 6.0.1.6/24
+ip prefix-list LOOPBACKS seq 30 permit 6.0.2.6/24
+ip prefix-list LOOPBACKS seq 40 permit 6.0.3.6/24
+!
+
+!
+route-map LOOPBACKS permit 10
+ match ip address prefix-list LOOPBACKS
+!
+
+
+!
+router eigrp MULTI-AF
+ address-family ipv4 unicast autonomous-system 100
+  af-interface Gi0/1.146
+   summary-address 6.0.0.0 255.255.252.0
+  af-interface Gi0/1.67
+   summary-address 6.0.0.0 255.255.252.0
+  topology base
+   redistribute connected route-map LOOPBACKS
+!
+
+
+
+tclsh
+
+foreach X {
+ 155.1.13.1 
+ 155.1.146.1
+ 155.1.0.1
+ 150.1.1.1
+ 155.1.0.2
+ 150.1.2.2
+ 155.1.13.3
+ 155.1.37.3
+ 155.1.0.3
+ 150.1.3.3
+ 155.1.45.4
+ 155.1.0.4
+ 150.1.4.4
+ 155.1.5.5
+ 155.1.45.5
+ 155.1.58.5
+ 155.1.0.5
+ 150.1.5.5
+ 155.1.67.6
+ 155.1.146.6
+ 150.1.6.6
+ 155.1.7.7
+ 155.1.37.7
+ 155.1.67.7
+ 155.1.79.7
+ 150.1.7.7
+ 155.1.8.8
+ 155.1.58.8
+ 155.1.108.8
+ 150.1.8.8
+ 155.1.9.9
+ 155.1.79.9
+ 150.1.9.9
+ 155.1.10.10
+ 155.1.108.10
+ 150.1.10.10
+ 4.0.0.4
+ 4.0.1.4
+ 4.0.2.4
+ 4.0.3.4
+ 6.0.0.6
+ 6.0.1.6
+ 6.0.2.6
+ 6.0.3.6
+} { ping $X}
+ 
+

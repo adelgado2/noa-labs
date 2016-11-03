@@ -1,0 +1,52 @@
+R1-R4:
+
+!
+router eigrp 100
+ network 155.1.0.0 0.0.0.255
+!
+
+!
+no ntp server 155.1.0.5 source tunnel0
+ntp server 155.1.0.5 source tunnel0 
+!
+
+!
+interface tunnel0
+ ip authentication mode eigrp 100 md5
+ ip authentication key-chain eigrp 100 KEY_ROTATION
+!
+
+R5:
+
+!
+router eigrp MULTI-AF
+ address-family ipv4 unicast autonomous-system 100
+  network 155.1.0.0 0.0.0.255
+  af-interface Tunnel0
+   authentication mode md5
+   authentication key-chain KEY_ROTATION
+!
+
+!
+ntp master 1
+!
+
+R1 - R5:
+
+!
+key chain KEY_ROTATION
+ key 10
+  key-string CISCO10
+   accept-lifetime 00:10:00 Jan 1 1993 00:05:00 Jan 1 2030
+   send-lifetime 00:00:00 Jan 1 1993 00:05:00 Jan 1 2030
+ key 20
+  key-string CISCO20
+   accept-lifetime 00:05:00 Jan 1 2030 infinite 
+   send-lifetime 00:00:00 Jan 1 2030 infinite
+!
+
+R5: (outside conf t)
+!
+clock set 23:59:00 Dec 31 2029
+!
+
