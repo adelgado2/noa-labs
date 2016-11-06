@@ -1,0 +1,20 @@
+R5, R8:
+
+!
+router eigrp 100
+ network 150.1.0.0 0.0.255.255
+ network 155.1.58.0 0.0.0.255
+ metric weights 0 0 0 1 0 0
+!
+
+R7, R9:
+
+!
+router eigrp MULTI-AF
+ address-family ipv4 unicast autonomous-system 200
+  network 150.1.0.0 0.0.255.255 
+  network 155.1.79.0 0.0.0.255
+  metric weights 0 0 0 1 0 0 0  
+!
+
+Otro enlace: http://www.cisco.com/c/en/us/products/collateral/ios-nx-os-software/enhanced-interior-gateway-routing-protocol-eigrp/whitepaper_C11-720525.html

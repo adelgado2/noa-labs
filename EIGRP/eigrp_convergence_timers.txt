@@ -1,0 +1,24 @@
+R1-R6:
+
+Para todas las interfaces que participen en EIGRP:
+
+!
+ ip hello-interval eigrp 100 1
+ ip hold-time eigrp 100 3
+!
+
+R7-R10:
+
+Para todas las interfaces que participen en EIGRP:
+
+!
+ ip hello-interval eigrp 100 10
+ ip hold-time eigrp 100 30
+!
+
+All:
+
+!
+router eigrp 100
+ timers active-time 1
+!

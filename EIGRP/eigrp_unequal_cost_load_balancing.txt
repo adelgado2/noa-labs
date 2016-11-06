@@ -1,0 +1,10 @@
+All routers:
+
+!
+router eigrp 100
+ network 150.1.0.0 0.0.255.255
+ network 155.1.0.0 0.0.255.255
+ metric weights 0 0 0 1 0 0 
+!
+
+Resto en lab. y libreta.
