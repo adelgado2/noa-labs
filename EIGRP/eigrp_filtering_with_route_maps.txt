@@ -1,0 +1,56 @@
+R4:
+
+!
+interface Loopback1
+ ip address 160.1.4.4 255.255.255.255
+!
+interface Loopback2
+ ip address 170.1.4.4 255.255.255.255
+!
+
+!
+ip prefix-list L1 seq 10 permit 160.1.4.4/32
+!
+
+!
+ip prefix-list L2 seq 10 permit 170.1.4.4/32
+!
+
+!
+route-map ADD-TAG permit 10
+ match ip address prefix-list L1
+ set tag 4
+route-map ADD-TAG permit 20
+ match ip address prefix-list L2
+!
+
+!
+router eigrp 100
+ redistribute connected route-map ADD-TAG
+!
+
+R2:
+
+!
+route-map DENY-TAG-4 deny 10
+ match tag 4
+route-map DENY-TAG-4 permit 20
+!
+
+!
+router eigrp 100
+ distribute-list route-map DENY-TAG-4 in 
+!
+
+R3:
+
+!
+route-map DENY-METRIC-RANGE deny 10
+ match metric 130000 +- 10000
+route-map DENY-METRIC-RANGE permit 20
+!
+
+!
+router eigrp 100
+ distribute-list route-map DENY-METRIC-RANGE in
+!
