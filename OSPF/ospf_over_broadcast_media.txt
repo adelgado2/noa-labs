@@ -1,0 +1,35 @@
+R6:
+
+!
+router ospf 1
+ network 150.1.6.6 0.0.0.0 area 67
+ network 155.1.67.6 0.0.0.0 area 67
+!
+
+R7:
+
+!
+router ospf 1
+ network 155.1.67.0 0.0.0.255 area 67
+ network 155.1.79.0 0.0.0.255 area 79
+!
+
+R9:
+
+!
+router ospf 1
+!
+
+!
+interface GigabitEthernet0/1.79
+ ip ospf 1 area 79
+interface Loopback0
+ ip ospf 1 area 79
+!
+
+tclsh 
+
+foreach X {
+ 150.1.6.6
+ 150.1.9.9
+} { ping $X}
