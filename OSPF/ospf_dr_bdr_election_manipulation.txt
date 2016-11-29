@@ -1,0 +1,52 @@
+R1, R2, R3, R4:
+
+!
+interface tunnel0
+ ip ospf 1 area 0 
+ ip ospf network broadcast
+ ip ospf priority 0
+!
+
+!
+interface Loopback0
+ ip ospf 1 area 0
+!
+
+R6:
+
+!
+interface Loopback0
+ ip ospf 1 area 0
+interface GigabitEthernet0/1.146
+ ip ospf 1 area 0
+ ip ospf priority 100
+!
+
+R4:
+
+!
+interface GigabitEthernet0/1.146
+ ip ospf 1 area 0
+ ip ospf priority 0
+!
+
+R1:
+
+!
+interface GigabitEthernet0/1.146
+ ip ospf 1 area 0
+ ip ospf priority 50
+!
+
+R5:
+
+!
+interface tunnel0
+ ip ospf 1 area 0 
+ ip ospf network broadcast
+!
+
+!
+interface Loopback0
+ ip ospf 1 area 0
+!

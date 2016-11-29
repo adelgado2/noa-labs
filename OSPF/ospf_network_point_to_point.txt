@@ -1,0 +1,32 @@
+R6:
+
+!
+interface GigabitEthernet0/1.67
+ ip ospf 1 area 0
+ ip ospf network point-to-point
+interface Loopback0 
+ ip ospf 1 area 0
+!
+
+R7:
+
+!
+interface GigabitEthernet0/1.67
+ ip ospf 1 area 0
+ ip ospf network point-to-point
+interface GigabitEthernet0/1.79
+ ip ospf 1 area 0
+ ip ospf network point-to-point 
+interface Loopback0 
+ ip ospf 1 area 0 
+!
+
+R9:
+
+!
+interface GigabitEthernet0/1.79
+ ip ospf 1 area 0
+ ip ospf network point-to-point
+interface Loopback0 
+ ip ospf 1 area 0 
+!

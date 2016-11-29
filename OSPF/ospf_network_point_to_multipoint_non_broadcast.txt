@@ -1,0 +1,36 @@
+R1, R2, R3, R4:
+
+!
+interface tunnel0
+ ip ospf network point-to-multipoint non-broadcast
+ ip ospf 1 area 12345
+interface Loopback0
+ ip ospf 1 area 12345
+!
+
+R5:
+
+!
+interface tunnel0
+ ip ospf network point-to-multipoint non-broadcast
+ ip ospf 1 area 12345
+interface Loopback0
+ ip ospf 1 area 12345
+interface GigabitEthernet0/1.58
+ ip ospf 1 area 0
+!
+
+!
+router ospf 1
+ neighbor 155.1.0.1 
+ neighbor 155.1.0.2
+ neighbor 155.1.0.3
+ neighbor 155.1.0.4
+!
+
+R8:
+
+!
+interface GigabitEthernet0/1.58
+ ip ospf 1 area 0
+!
