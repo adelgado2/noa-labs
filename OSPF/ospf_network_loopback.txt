@@ -1,0 +1,38 @@
+R7:
+
+!
+interface Loopback160
+ ip address 160.1.7.7 255.255.255.0
+interface Loopback170
+ ip address 170.1.7.7 255.255.255.0
+ ip ospf network point-to-point
+!
+
+!
+interface GigabitEthernet0/1.79
+ ip ospf 1 area 0
+interface Loopback160
+ ip ospf 1 area 0
+interface Loopback170
+ ip ospf 1 area 0
+!
+
+R9:
+
+!
+interface Loopback160
+ ip address 160.1.9.9 255.255.255.0
+interface Loopback170
+ ip address 170.1.9.9 255.255.255.0
+ ip ospf network point-to-point
+!
+
+!
+interface GigabitEthernet0/1.79
+ ip ospf 1 area 0
+interface Loopback160
+ ip ospf 1 area 0
+interface Loopback170
+ ip ospf 1 area 0
+!
+
