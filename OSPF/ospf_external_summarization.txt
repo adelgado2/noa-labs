@@ -1,0 +1,51 @@
+R9:
+
+!
+interface Loopback100
+ ip address 160.1.9.100 255.255.255.255
+interface Loopback200
+ ip address 160.1.9.200 255.255.255.255
+!
+
+!
+ip prefix-list CONN-ROUTES seq 10 permit 160.1.9.100/32
+ip prefix-list CONN-ROUTES seq 20 permit 160.1.9.200/32
+!
+
+!
+route-map CONN-ROUTES permit 10
+ match ip address prefix-list CONN-ROUTES
+route-map CONN-ROUTES deny 20
+!
+
+!
+router ospf 1
+ redistribute connected subnets route-map CONN-ROUTES metric 50
+ summary-address 160.1.9.0 255.255.255.0
+!
+
+R10:
+
+!
+interface Loopback100
+ ip address 160.1.10.100 255.255.255.255
+interface Loopback200
+ ip address 160.1.10.200 255.255.255.255
+!
+
+!
+ip prefix-list CONN-ROUTES seq 10 permit 160.1.10.100/32
+ip prefix-list CONN-ROUTES seq 20 permit 160.1.10.200/32
+!
+
+!
+route-map CONN-ROUTES permit 10
+ match ip address prefix-list CONN-ROUTES
+route-map CONN-ROUTES deny 20
+!
+
+!
+router ospf 1
+ redistribute connected subnets route-map CONN-ROUTES metric-type 1 metric 100
+ summary-address 160.1.10.0 255.255.255.0
+!
