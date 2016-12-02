@@ -1,0 +1,69 @@
+R5:
+
+!
+ip prefix-list R8-LOOPBACK seq 10 deny 150.1.8.8/32
+ip prefix-list R8-LOOPBACK seq 20 permit 0.0.0.0/0 le 32
+!
+
+!
+router ospf 1
+ area 3 nssa
+ area 3 nssa translate type7 suppress-fa
+ area 3 filter-list prefix R8-LOOPBACK out
+!
+
+
+
+
+R8:
+
+!
+interface Loopback100
+ ip address 160.1.8.8 255.255.255.255
+!
+
+!
+ip prefix-list CONN-ROUTES seq 10 permit 160.1.8.8/32
+!
+
+!
+route-map CONN-ROUTES permit 10
+ match ip address prefix-list CONN-ROUTES
+route-map CONN-ROUTES deny 20
+!
+
+
+!
+router ospf 1
+ area 3 nssa 
+ redistribute connected subnets route-map CONN-ROUTES
+!
+
+R10:
+
+!
+router ospf 1 
+ area 3 nssa
+!
+
+R4:
+
+!
+interface Loopback100
+ ip address 160.1.4.4 255.255.255.255
+!
+
+!
+ip prefix-list CONN-ROUTES seq 10 permit 160.1.4.4/32
+!
+
+!
+route-map CONN-ROUTES permit 10
+ match ip address prefix-list CONN-ROUTES
+route-map CONN-ROUTES deny 20
+!
+
+!
+router ospf 1
+ redistribute connected subnets route-map CONN-ROUTES
+!

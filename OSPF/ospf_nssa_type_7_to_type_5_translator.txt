@@ -1,0 +1,31 @@
+R6:
+
+!
+interface GigabitEthernet0/1.67
+ shut
+interface Loopback100
+ ip address 160.1.6.6 255.255.255.255
+!
+
+!
+ip prefix-list CONN-ROUTES seq 10 permit 160.1.6.6/32
+!
+
+!
+route-map CONN-ROUTES permit 10
+ match ip address prefix-list CONN-ROUTES
+route-map CONN-ROUTES deny 20
+!
+
+!
+router ospf 1
+ area 1 nssa
+ redistribute connected subnets route-map CONN-ROUTES
+!
+
+R1 y R4:
+
+!
+router ospf 1
+ area 1 nssa
+!
