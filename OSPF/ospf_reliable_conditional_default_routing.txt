@@ -1,0 +1,30 @@
+R8:
+
+!
+ip sla 1 
+ icmp-echo 155.1.108.10 source-ip 155.1.108.8 
+!
+ip sla schedule 1 life forever start-time now 
+!
+
+!
+track 1 ip sla 1
+!
+
+!
+ip route 170.1.1.1 255.255.255.255 null0 track 1
+!
+
+!
+ip prefix-list CONDITION seq 10 permit 170.1.1.1/32
+!
+
+!
+route-map CONDITION permit 10
+ match ip address prefix-list CONDITION 
+!
+
+!
+router ospf 1
+ default-information originate route-map CONDITION
+!

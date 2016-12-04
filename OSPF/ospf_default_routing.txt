@@ -1,0 +1,18 @@
+R6:
+
+!
+ip route 0.0.0.0 0.0.0.0 null0
+!
+
+!
+router ospf 1
+ default-information originate metric 60
+!
+
+R4:
+
+!
+router ospf 1
+ default-information originate always metric 40 metric-type 1
+!
+

@@ -1,0 +1,12 @@
+R5, R8, R10:
+
+!
+ip prefix-list DENY-LO-R1R2 seq 10 deny 150.1.1.1/32
+ip prefix-list DENY-LO-R1R2 seq 20 deny 150.1.2.2/32
+ip prefix-list DENY-LO-R1R2 seq 30 permit 0.0.0.0/0 le 32
+!
+
+!
+router ospf 1
+ distribute-list prefix DENY-LO-R1R2 in
+!

@@ -1,0 +1,38 @@
+R5, R8, R10:
+
+!
+router ospf 1
+ area 3 nssa
+!
+
+R10:
+
+!
+interface Loopback100
+ ip address 160.1.10.10 255.255.255.255
+!
+
+!
+ip prefix-list LO-100 seq 10 permit 160.1.10.10/32
+!
+
+!
+route-map LO-100 permit 10
+ match ip address prefix-list LO-100
+route-map LO-100 deny 20
+!
+
+!
+router ospf 1
+ redistribute connected subnets route-map LO-100
+!
+
+R5:
+
+!
+router ospf 1
+ !summary-address 160.1.10.10 255.255.255.255 nssa-only
+ summary-address 160.1.10.10 255.255.255.255 not-advertise
+!
+
+! Probado con ambos, consiguen el mismo resultado.

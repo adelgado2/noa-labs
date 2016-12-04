@@ -1,0 +1,24 @@
+R5:
+
+!
+interface GigabitEthernet0/1.45
+ shut
+!
+
+!
+ip prefix-list VLAN-146 seq 10 permit 155.1.146.0/24
+!
+ip prefix-list R4 seq 10 permit 155.1.0.4/32
+!
+
+!
+route-map VLAN-146 deny 10
+ match ip address prefix-list VLAN-146
+ match ip next-hop prefix-list R4 
+route-map VLAN-146 permit 20
+!
+
+!
+router ospf 1
+ distribute-list route-map VLAN-146 in
+!

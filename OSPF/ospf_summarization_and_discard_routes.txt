@@ -1,0 +1,27 @@
+R3, R5:
+
+!
+ip prefix-list DENY-LO-R7R9 seq 10 deny 150.1.7.7/32
+ip prefix-list DENY-LO-R7R9 seq 20 deny 150.1.9.9/32
+ip prefix-list DENY-LO-R7R9 seq 30 permit 0.0.0.0/0 le 32
+!
+
+!
+router ospf 1
+ distribute-list prefix DENY-LO-R7R9 in
+!
+
+R7:
+
+!
+router ospf 1
+ default-information originate always
+!
+
+R3:
+
+!
+router ospf 1
+ area 2 range 150.1.0.0 255.255.240.0 
+ no discard-route internal
+!

@@ -1,0 +1,24 @@
+R4:
+
+!
+interface Loopback100
+ ip address 160.1.4.4 255.255.255.255
+!
+
+!
+ip prefix-list LO-100 seq 10 permit 160.1.4.4/32
+!
+
+!
+route-map LO-100 permit 10
+ match ip address prefix-list LO-100
+route-map LO-100 deny 20
+!
+
+!
+router ospf 1
+ redistribute connected subnets route-map LO-100
+ max-lsa 5000
+ redistribute maximum-prefix 500
+!
+
