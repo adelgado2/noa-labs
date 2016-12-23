@@ -1,0 +1,30 @@
+R4:
+
+!
+router eigrp 100
+ network 150.1.4.4 0.0.0.0
+!
+router bgp 100
+ neighbor 150.1.5.5 remote-as 100
+ neighbor 150.1.5.5 update-source Loopback0
+!
+
+R5:
+
+!
+router eigrp 100
+ network 150.1.5.5 0.0.0.0
+!
+router bgp 100
+ neighbor 150.1.4.4 remote-as 100
+ neighbor 150.1.4.4 update-source Loopback0
+!
+
+!
+access-list 100 permit tcp host 150.1.5.5 host 150.1.4.4
+access-list 100 permit tcp host 150.1.4.4 host 150.1.5.5
+!
+
+!
+debug ip packet 100
+!

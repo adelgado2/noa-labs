@@ -1,0 +1,54 @@
+R7:
+
+!
+router eigrp 100
+ network 155.1.79.7 0.0.0.0
+!
+
+!
+router bgp 100
+ neighbor 155.1.79.9 remote-as 54
+!
+
+R8:
+
+!
+router eigrp 100
+ network 155.1.108.8 0.0.0.0
+!
+
+!
+router bgp 100
+ neighbor 155.1.108.10 remote-as 54
+!
+
+R9:
+
+!
+router bgp 54
+ neighbor 155.1.79.7 remote-as 100
+!
+
+R10:
+
+!
+router bgp 54
+ neighbor 155.1.108.8 remote-as 100
+!
+
+tclsh
+
+foreach X {
+28.119.16.1
+28.119.17.1
+112.0.0.1
+113.0.0.1
+114.0.0.1
+115.0.0.1
+116.0.0.1
+117.0.0.1
+118.0.0.1
+119.0.0.1
+} { ping $X source Loopback0 }
+
+Nota: La parte de R9 y R10 ya estaba configurada en las configs de INE.
