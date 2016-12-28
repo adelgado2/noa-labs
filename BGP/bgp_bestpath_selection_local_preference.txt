@@ -1,0 +1,19 @@
+R6:
+
+!
+ip as-path access-list 1 permit _254$
+!
+
+!
+route-map FROM-R7 permit 10
+ match as-path 1
+ set local-preference 200
+route-map FROM-R7 permit 20
+!
+
+!
+router bgp 100
+ neighbor 155.1.67.7 route-map FROM-R7 in
+!
+
+clear ip bgp * soft

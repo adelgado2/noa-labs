@@ -1,0 +1,72 @@
+R2, R3, R5, R8:
+
+!
+router bgp 200
+ bgp bestpath as-path ignore
+!
+
+! Hidden command
+
+R7:
+
+!
+ip as-path access-list 1 permit _54$
+!
+route-map TO-R3 permit 10
+ match as-path 1 
+ set origin incomplete
+route-map TO-R3 permit 20
+!
+router bgp 300
+ neighbor 155.1.37.3 route-map TO-R3 out
+!
+
+do clear ip bgp * soft
+
+R1:
+
+!
+ip as-path access-list 1 permit _54$
+!
+route-map TO-R3 permit 10
+ match as-path 1 
+ set origin igp
+route-map TO-R3 permit 20
+!
+router bgp 100
+ neighbor 155.1.13.3 route-map TO-R3 out
+!
+
+do clear ip bgp * soft
+
+R4:
+
+!
+ip as-path access-list 1 permit _54$
+!
+route-map TO-R5 permit 10
+ match as-path 1 
+ set origin igp
+route-map TO-R5 permit 20
+!
+router bgp 100
+ neighbor 155.1.45.5 route-map TO-R5 out
+!
+
+do clear ip bgp * soft
+
+R8:
+
+!
+ip as-path access-list 1 permit _54$
+!
+route-map FROM-R10 permit 10
+ match as-path 1 
+ set origin incomplete
+route-map FROM-R10 permit 20
+!
+router bgp 200
+ neighbor 155.1.108.10 route-map FROM-R10 in
+!
+
+do clear ip bgp * soft

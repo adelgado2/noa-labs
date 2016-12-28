@@ -1,0 +1,21 @@
+R4:
+
+!
+interface Loopback1
+ ip address 1.2.3.4 255.255.255.255
+!
+router bgp 100
+ network 1.2.3.4 mask 255.255.255.255
+ bgp router-id 150.1.4.4
+!
+
+R6:
+
+!
+interface Loopback1
+ ip address 1.2.3.4 255.255.255.255
+!
+router bgp 100
+ network 1.2.3.4 mask 255.255.255.255
+ bgp router-id 6.6.6.6
+!

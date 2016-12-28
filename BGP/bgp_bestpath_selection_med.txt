@@ -1,0 +1,47 @@
+R6:
+
+!
+interface GigabitEthernet0/1.67
+ shutdown
+!
+
+R5:
+
+!
+ip as-path access-list 1 permit _54$
+!
+
+!
+route-map TO-R4 permit 10
+ match as-path 1
+ set metric 0
+route-map TO-R4 permit 20
+!
+
+!
+router bgp 200
+ neighbor 155.1.45.4 route-map TO-R4 out
+!
+
+clear ip bgp * soft
+
+
+R3:
+
+!
+ip as-path access-list 1 permit _54$
+!
+
+!
+route-map TO-R1 permit 10
+ match as-path 1
+ set metric 200
+route-map TO-R1 permit 20
+!
+
+!
+router bgp 200
+ neighbor 155.1.13.1 route-map TO-R1 out
+!
+
+do clear ip bgp * soft

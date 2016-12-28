@@ -1,0 +1,39 @@
+R3:
+
+!
+ip as-path access-list 1 permit _254$
+!
+
+!
+route-map TO-R1 permit 10
+ match as-path 1
+ set as-path prepend 200 200 200
+route-map TO-R1 permit 20
+!
+
+!
+router bgp 200
+ neighbor 155.1.13.1 route-map TO-R1 out
+!
+
+clear ip bgp * soft
+
+R5:
+
+!
+ip as-path access-list 1 permit _254$
+!
+
+!
+route-map TO-R4 permit 10
+ match as-path 1
+ set as-path prepend 200 200 200
+route-map TO-R4 permit 20
+!
+
+!
+router bgp 200
+ neighbor 155.1.45.4 route-map TO-R4 out
+!
+
+clear ip bgp * soft

@@ -1,0 +1,28 @@
+R7:
+
+!
+ip as-path access-list 1 permit _54$
+ip as-path access-list 2 permit _254$
+!
+
+!
+route-map FROM-R3 permit 10
+ match as-path 1 
+ set weight 100
+route-map FROM-R3 permit 20 
+!
+
+!
+route-map FROM-R6 permit 10
+ match as-path 2
+ set weight 100
+route-map FROM-R6 permit 20 
+!
+
+!
+router bgp 300
+ neighbor 155.1.37.3 route-map FROM-R3 in
+ neighbor 155.1.67.6 route-map FROM-R6 in
+!
+
+clear ip bgp * soft

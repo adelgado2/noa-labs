@@ -1,0 +1,78 @@
+R6:
+
+!
+interface Loopback1
+ ip address 1.2.3.4 255.255.255.255
+!
+router bgp 100
+ network 1.2.3.4 mask 255.255.255.255
+!
+
+R7:
+
+!
+interface Loopback1
+ ip address 1.2.3.4 255.255.255.255
+!
+ip prefix-list LOOPBACK1 seq 5 permit 1.2.3.4/32
+!
+router bgp 300
+ network 1.2.3.4 mask 255.255.255.255
+!
+
+!
+route-map TO-R3 permit 10
+ match ip address prefix-list LOOPBACK1
+ set metric 0
+route-map TO-R3 permit 20 
+!
+
+!
+router bgp 300
+ neighbor 155.1.37.3 route-map TO-R3 out
+!
+
+do clear ip bgp * soft
+
+R1:
+
+!
+ip prefix-list LOOPBACK1 seq 5 permit 1.2.3.4/32
+!
+route-map TO-R3 permit 10
+ match ip prefix-list LOOPBACK1
+ set metric 200
+route-map TO-R3 permit 20 
+!
+
+!
+router bgp 100
+ neighbor 155.1.13.3 route-map TO-R3 out
+!
+
+do clear ip bgp * soft
+
+R4:
+
+!
+ip prefix-list LOOPBACK1 seq 5 permit 1.2.3.4/32
+!
+route-map TO-R5 permit 10
+ match ip address prefix-list LOOPBACK1
+ set metric 200
+route-map TO-R5 permit 20 
+!
+
+!
+router bgp 100
+ neighbor 155.1.45.5 route-map TO-R5 out
+!
+
+do clear ip bgp * soft
+
+R3, R2, R5, R8:
+
+!
+router bgp 200
+ bgp always-compare-med
+!
