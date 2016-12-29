@@ -1,0 +1,47 @@
+R5:
+
+!
+route-map ATTR_MAP
+ set community none
+!
+
+!
+router bgp 200
+ neighbor 155.1.58.8 send-community both
+ neighbor 155.1.0.3 send-community both
+ neighbor 155.1.0.2 send-community both
+ aggregate-address 112.0.0.0 248.0.0.0 as-set summary-only attribute-map ATTR_MAP
+!
+
+R8:
+
+!
+ip prefix-list ROUTE permit 112.0.0.0/8
+!
+route-map MARK-COMM permit 10
+ match ip address prefix-list ROUTE
+ set community no-export
+route-map MARK-COMM permit 20 
+!
+router bgp 200
+ neighbor 155.1.58.5 send-community both
+ neighbor 155.1.23.3 send-community both
+ neighbor 155.1.108.10 route-map MARK-COMM in
+!
+ 
+R2:
+
+!
+router bgp 200
+ neighbor 155.1.0.5 send-community both
+ neighbor 155.1.23.3 send-community both
+!
+
+R3:
+
+!
+router bgp 200
+ neighbor 155.1.0.5 send-community both
+ neighbor 155.1.58.8 send-community both
+ neighbor 155.1.23.2 send-community both
+!

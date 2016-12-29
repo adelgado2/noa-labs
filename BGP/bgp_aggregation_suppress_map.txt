@@ -1,0 +1,44 @@
+R2:
+
+!
+interface Loopback1
+ ip address 10.0.0.1 255.255.255.0
+interface Loopback2
+ ip address 10.0.1.1 255.255.255.0
+interface Loopback3
+ ip address 10.0.2.1 255.255.255.0
+interface Loopback4
+ ip address 10.0.3.1 255.255.255.0
+!
+
+!
+ip prefix-list NOT-ADVERTISE seq 5 permit 10.0.0.0/24
+ip prefix-list NOT-ADVERTISE seq 10 permit 10.0.1.0/24
+ip prefix-list NOT-ADVERTISE seq 15 permit 10.0.3.0/24
+!
+
+!
+route-map NOT-ADVERTISE permit 10
+ match ip address prefix-list NOT-ADVERTISE
+! 
+
+
+!
+router bgp 200
+ network 10.0.0.0 mask 255.255.255.0
+ network 10.0.1.0 mask 255.255.255.0
+ network 10.0.2.0 mask 255.255.255.0
+ network 10.0.3.0 mask 255.255.255.0
+ aggregate-address 10.0.0.0 255.255.252.0 suppress-map NOT-ADVERTISE
+!
+
+
+La lógica del route-map tb se puede hacer al revés: (da el mismo resultado)
+
+ip prefix-list NET_2 permit 10.0.2.0/24
+!
+route-map SUPPRESS_MAP deny 10
+ match ip address prefix-list NET_2
+!
+route-map SUPPRESS_MAP permit 100
+!

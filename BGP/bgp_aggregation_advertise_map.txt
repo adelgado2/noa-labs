@@ -1,0 +1,58 @@
+R2:
+
+!
+interface Loopback1
+ ip address 222.22.0.1 255.255.255.0
+!
+interface Loopback2
+ ip address 222.22.1.1 255.255.255.0
+!
+router bgp 200
+ network 222.22.0.0 mask 255.255.255.0
+ network 222.22.1.0 mask 255.255.255.0
+!
+
+R7:
+
+!
+interface Loopback1
+ ip address 222.22.3.1 255.255.255.0
+!
+router bgp 300
+ network 222.22.3.0 mask 255.255.255.0
+!
+
+R4:
+
+!
+ip as-path access-list 1 deny _300_
+ip as-path access-list 1 permit .* 
+!
+
+!
+route-map ADV-MAP permit 10
+ match as-path 1
+!
+
+!
+router bgp 100
+ aggregate-address 222.22.0.0 255.255.252.0 as-set advertise-map ADV-MAP
+!
+ 
+R6:
+
+!
+ip as-path access-list 1 deny _300_
+ip as-path access-list 1 permit .* 
+!
+
+!
+route-map ADV-MAP permit 10
+ match as-path 1
+!
+
+
+!
+router bgp 100
+ aggregate-address 222.22.0.0 255.255.252.0 as-set advertise-map ADV-MAP
+!

@@ -1,0 +1,21 @@
+R2:
+
+!
+interface Loopback1
+ ip address 10.0.0.1 255.255.255.0
+interface Loopback2
+ ip address 10.0.1.1 255.255.255.0
+interface Loopback3
+ ip address 10.0.2.1 255.255.255.0
+interface Loopback4
+ ip address 10.0.3.1 255.255.255.0
+!
+
+!
+router bgp 200
+ network 10.0.0.0 mask 255.255.255.0
+ network 10.0.1.0 mask 255.255.255.0
+ network 10.0.2.0 mask 255.255.255.0
+ network 10.0.3.0 mask 255.255.255.0
+ aggregate-address 10.0.0.0 255.255.252.0 
+!
