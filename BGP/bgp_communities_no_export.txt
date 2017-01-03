@@ -1,0 +1,37 @@
+R2:
+
+!
+route-map SET-COMM permit 10
+ set community no-export
+!
+router bgp 200
+ neighbor 192.10.1.254 route-map SET-COMM in
+ neighbor 155.1.0.5 send-community both
+ neighbor 155.1.23.3 send-community both
+!
+
+R5:
+
+!
+router bgp 200
+ neighbor 155.1.0.2 send-community both
+ neighbor 155.1.0.3 send-community both
+ neighbor 155.1.58.8 send-community both
+!
+
+R3:
+
+!
+router bgp 200
+ neighbor 155.1.0.5 send-community both
+ neighbor 155.1.23.2 send-community both
+ neighbor 155.1.58.8 send-community both
+!
+
+R8:
+
+!
+router bgp 200
+ neighbor 155.1.23.3 send-community both
+ neighbor 155.1.58.5 send-community both
+!

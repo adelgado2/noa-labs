@@ -1,0 +1,83 @@
+R2:
+
+!
+interface Loopback1
+ ip address 10.0.0.1 255.255.255.0
+!
+interface Loopback2
+ ip address 10.0.1.1 255.255.255.0
+!
+interface Loopback3
+ ip address 10.0.2.1 255.255.255.0
+!
+interface Loopback4
+ ip address 10.0.3.1 255.255.255.0
+!
+router bgp 200
+ network 10.0.0.0 mask 255.255.255.0
+ network 10.0.1.0 mask 255.255.255.0
+ network 10.0.2.0 mask 255.255.255.0
+ network 10.0.3.0 mask 255.255.255.0
+ aggregate-address 10.0.0.0 255.255.252.0 summary-only
+!
+
+R7:
+
+!
+ip prefix-list SOURCE permit 10.0.0.0/22
+!
+ip prefix-list ROUTE-SOURCE permit 155.1.37.3/32
+!
+ip prefix-list ORIGINATED_ROUTES permit 10.0.1.0/24
+!
+route-map ORIGINATE permit 10
+ set ip address prefix-list ORIGINATED_ROUTES
+!
+route-map LEARNED_PATH permit 10
+ match ip address prefix-list SOURCE
+ match ip route-source prefix-list ROUTE-SOURCE 
+!
+route-map DENY_INJECT_PREFIX deny 10
+ match ip address prefix-list ORIGINATED_ROUTES
+!
+route-map DENY_INJECT_PREFIX permit 100
+! 
+router bgp 300
+ bgp inject-map ORIGINATE exist-map LEARNED_PATH
+ neighbor 155.1.67.6 route-map DENY_INJECT_PREFIX out
+ neighbor 155.1.37.3 route-map DENY_INJECT_PREFIX out
+!
+ 
+clear ip bgp * soft 
+show ip bgp injected-paths 
+
+R8:
+ 
+
+!
+ip prefix-list SOURCE permit 10.0.0.0/22
+!
+ip prefix-list ROUTE-SOURCE permit 155.1.23.3/32
+!
+ip prefix-list ORIGINATED_ROUTES permit 10.0.2.0/24
+!
+route-map ORIGINATE permit 10
+ set ip address prefix-list ORIGINATED_ROUTES
+!
+route-map LEARNED_PATH permit 10
+ match ip address prefix-list SOURCE
+ match ip route-source prefix-list ROUTE-SOURCE 
+!
+route-map DENY_INJECT_PREFIX deny 10
+ match ip address prefix-list ORIGINATED_ROUTES
+!
+route-map DENY_INJECT_PREFIX permit 100
+! 
+router bgp 200
+ bgp inject-map ORIGINATE exist-map LEARNED_PATH
+ neighbor 155.1.23.3 route-map DENY_INJECT_PREFIX out
+ neighbor 155.1.58.5 route-map DENY_INJECT_PREFIX out
+!
+ 
+do clear ip bgp * soft 
+do show ip bgp injected-paths 

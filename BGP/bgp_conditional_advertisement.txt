@@ -1,0 +1,21 @@
+R3:
+
+!
+ip as-path access-list 1 permit _254$
+!
+ip prefix-list pl-exist-1 seq 5 permit 155.1.13.0/24
+!
+route-map ADV-1 permit 10
+ match as-path 1
+!
+route-map EXIST-1
+ match ip address prefix-list pl-exist-1
+!
+router bgp 200
+ network 155.1.13.0 mask 255.255.255.0
+ neighbor 155.1.37.7 advertise-map ADV-1 non-exist-map EXIST-1 
+! 
+
+do clear ip bgp * soft
+
+! Para probar shut interfaz en R3 y R1 por naturaleza lab! 

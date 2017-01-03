@@ -1,0 +1,42 @@
+R4:
+
+!
+no router bgp 100
+!
+route-map SET-COMM permit 10
+ set community local-AS
+!
+router bgp 65014
+ network 150.1.4.4 mask 255.255.255.255
+ bgp confederation identifier 100
+ neighbor 155.1.146.1 remote-as 65014
+ neighbor 155.1.45.5 remote-as 200
+!
+
+R1:
+
+!
+no router bgp 100
+!
+router bgp 65014
+ bgp confederation identifier 100
+ bgp confederation peers 65006 
+ neighbor 155.1.13.3 remote-as 200
+ neighbor 155.1.146.4 remote-as 65014
+ neighbor 155.1.146.6 remote-as 65006
+!
+ 
+R6:
+
+!
+no router bgp 100
+!
+router bgp 65006
+ bgp confederation identifier 100
+ bgp confederation peers 65014 
+ neighbor 155.1.146.1 remote-as 65014
+ neighbor 155.1.67.7 remote-as 300
+!
+
+Notas: Con dos vecinos no hace falta RR, y entre subconfederaciones RR no aplica.
+       bgp confederation peers indicas tus vecinos eBGP suconfederación, no hace falta los iBGP subconfed.

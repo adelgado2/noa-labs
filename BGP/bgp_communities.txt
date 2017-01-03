@@ -1,0 +1,70 @@
+R4:
+
+!
+ip community-list 1 permit 100:200
+!
+route-map SET-LP permit 10
+ match community 1
+ set local-preference 200
+route-map SET-LP permit 20 
+!
+ip bgp new-format 
+!
+router bgp 100
+ neighbor 155.1.45.5 route-map SET-LP in 
+ neighbor 155.1.45.5 send-community both
+ neighbor 155.1.146.1 send-community both
+!
+
+
+R5:
+
+!
+ip as-path access-list 1 permit _60$
+!
+
+!
+route-map SET-COMM permit 10
+ match as-path 1
+ set community 100:200
+!
+ip bgp new-format 
+!
+router bgp 200
+ neighbor 155.1.45.4 route-map SET-COMM out
+ neighbor 155.1.45.4 send-community both
+!
+
+R6:
+
+!
+ip community-list 1 permit 100:200
+!
+route-map SET-LP permit 10
+ match community 1
+ set local-preference 200
+route-map SET-LP permit 20 
+!
+router bgp 100
+ neighbor 155.1.146.1 send-community both 
+ neighbor 155.1.67.7 route-map SET-LP in
+!
+ip bgp new-format 
+!
+R1:
+
+!
+ip community-list 1 permit 100:200
+!
+route-map SET-LP permit 10
+ match community 1
+ set local-preference 200
+route-map SET-LP permit 20 
+!
+router bgp 100
+ neighbor 155.1.146.4 send-community both 
+ neighbor 155.1.146.6 send-community both 
+ neighbor 155.1.13.3 route-map SET-LP in
+!
+ip bgp new-format 
+!

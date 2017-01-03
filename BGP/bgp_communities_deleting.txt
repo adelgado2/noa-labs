@@ -1,0 +1,69 @@
+R2:
+
+!
+ip bgp new-format
+!
+route-map SET-COMM permit 10
+ set community 254:200 200:254 200:123
+!
+ 
+!
+router bgp 200
+ neighbor 192.10.1.254 route-map SET-COMM in 
+ neighbor 155.1.23.3 send-community both
+ neighbor 155.1.0.5 send-community both
+!
+
+R7:
+
+!
+ip bgp new-format
+!
+ip community-list expanded CUSTOM permit 200:[0-9]+_
+!Tb. vale, pero no tan específica ip community-list expanded CUSTOM permit 200:.*_
+!
+route-map ADD-COMM permit 10
+ set community 300:200 additive
+ set comm-list CUSTOM delete
+!
+router bgp 300
+ neighbor 155.1.67.6 route-map ADD-COMM out  
+ neighbor 155.1.67.6 send-community both
+ neighbor 155.1.37.3 send-community both
+ neighbor 155.1.79.9 send-community both
+ neighbor 155.1.79.9 route-map ADD-COMM out 
+!
+ 
+R3:
+
+!
+ip bgp new-format
+!
+router bgp 200 
+ neighbor 155.1.0.5 send-community both
+ neighbor 155.1.13.1 send-community both
+ neighbor 155.1.23.2 send-community both
+ neighbor 155.1.37.7 send-community both
+ neighbor 155.1.58.8 send-community both
+!
+
+R5:
+
+!
+ip bgp new-format
+!
+router bgp 200 
+ neighbor 155.1.0.2 send-community both
+ neighbor 155.1.0.3 send-community both
+ neighbor 155.1.45.4 send-community both
+ neighbor 155.1.58.8 send-community both
+!
+
+R6:
+
+!
+ip bgp new-format
+!
+router bgp 100
+ neighbor 155.1.67.7 send-community both
+!

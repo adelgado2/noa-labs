@@ -1,0 +1,19 @@
+R2:
+
+!
+ip as-path access-list 1 permit 254$
+!
+
+!
+route-map SET-COMM permit 10
+ match as-path 1
+ set community no-export
+route-map SET-COMM permit 20
+!
+ip bgp new-format
+!
+router bgp 200
+ neighbor 155.1.23.3 route-map SET-COMM in
+ neighbor 155.1.0.5 route-map SET-COMM in
+ neighbor 192.10.1.254 route-map SET-COMM in
+!
