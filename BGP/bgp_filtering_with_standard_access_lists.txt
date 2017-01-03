@@ -1,0 +1,23 @@
+R2:
+
+!
+ip access-list standard 1 
+ deny 222.22.2.0 0.0.0.0
+ permit any
+!
+router bgp 200
+ neighbor 192.10.1.254 distribute-list 1 in
+!
+
+R7:
+
+!
+ip access-list standard 1 
+ permit 0.0.0.1 254.255.255.255
+!
+route-map FROM-R9 permit 10
+ match ip address 1
+!
+router bgp 300
+ neighbor 155.1.79.9 route-map FROM-R9 in
+!

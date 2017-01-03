@@ -1,0 +1,114 @@
+R1:
+
+!
+interface Loopback1
+ ip address 1.1.1.1 255.255.255.0
+!
+router bgp 100
+ network 1.1.1.0 mask 255.255.255.0
+!
+
+R2:
+
+!
+interface Loopback1
+ ip address 2.2.2.2 255.255.255.0
+!
+router bgp 200
+ network 2.2.2.0 mask 255.255.255.0
+!
+
+R3: 
+
+!
+interface Loopback1
+ ip address 3.3.3.3 255.255.255.0
+!
+router bgp 200
+ network 3.3.3.0 mask 255.255.255.0
+!
+
+R4:
+
+!
+interface Loopback1
+ ip address 4.4.4.4 255.255.255.0
+!
+router bgp 100
+ network 4.4.4.0 mask 255.255.255.0
+!
+
+R5:
+
+!
+interface Loopback1
+ ip address 5.5.5.5 255.255.255.0
+!
+router bgp 200
+ network 5.5.5.0 mask 255.255.255.0
+!
+
+R6:
+
+!
+interface Loopback1
+ ip address 6.6.6.6 255.255.255.0
+!
+router bgp 100
+ network 6.6.6.0 mask 255.255.255.0
+!
+
+R7:
+
+!
+ip as-path access-list 1 permit ^$
+!
+route-map TO-R6 permit 10
+ match as-path 1
+!
+router bgp 300 
+ neighbor 155.1.67.6 route-map TO-R6 out
+!
+
+do clear ip bgp * soft
+
+R8:
+
+!
+ip as-path access-list 1 permit _54$
+!
+route-map FROM-R10 permit 10
+ match as-path 1
+ set local-preference 200
+route-map FROM-R10 permit 20 
+!
+router bgp 200 
+ neighbor 155.1.108.10 route-map FROM-R10 in
+!
+
+R3:
+
+!
+ip as-path access-list 2 deny ^54_
+ip as-path access-list 2 deny _54$
+ip as-path access-list 2 permit _54_
+!
+route-map FROM-R7 permit 10
+ match as-path 2
+ set local-preference 300
+route-map FROM-R7 permit 20 
+!
+
+!
+ip as-path access-list 1 permit _254$
+!
+route-map TO-R1 deny 10
+ match as-path 1
+route-map TO-R1 permit 20
+!
+router bgp 200
+ neighbor 155.1.13.1 route-map TO-R1 out
+ neighbor 155.1.37.7 route-map FROM-R7 in
+!
+
+do clear ip bgp * soft

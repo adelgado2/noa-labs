@@ -1,0 +1,27 @@
+R2:
+
+!
+ip prefix-list FROM-R10 seq 5 deny 222.22.2.0/24
+ip prefix-list FROM-R10 seq 10 permit 0.0.0.0/0 le 32
+!
+router bgp 200
+ neighbor 192.10.1.254 prefix-list FROM-R10 in
+!
+
+R7:
+
+!
+ip prefix-list FROM-R9 seq 10 permit 0.0.0.0/0 le 22
+!
+route-map FROM-R9 permit 10
+ match ip address prefix-list FROM-R9
+!
+router bgp 300 
+ neighbor 155.1.79.9 route-map FROM-R9 in
+!
+
+
+Otra forma de crear la prefix-list:
+
+ip prefix-list FROM-R9 seq 10 deny 0.0.0.0/22 le 32
+ip prefix-list FROM-R9 seq 10 permit 0.0.0.0/0 le 22

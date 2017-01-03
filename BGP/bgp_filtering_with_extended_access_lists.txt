@@ -1,0 +1,14 @@
+
+R7:
+
+!
+ip access-list extended FROM-R9
+ deny ip 0.0.0.0 255.255.254.255 255.255.252.0 0.0.3.255
+ permit ip any any
+!
+route-map FROM-R9 permit 10
+ match ip address FROM-R9
+!
+router bgp 300
+ neighbor 155.1.79.9 route-map FROM-R9 in
+!
