@@ -1,0 +1,14 @@
+R1:
+
+!
+interface Loopback1
+ ip address 1.1.1.1 255.255.255.0
+!
+router bgp 100
+ network 1.1.1.0 mask 255.255.255.0
+ neighbor 155.1.13.3 advertisement-interval 0
+!
+
+R2, R3, R5, R8:
+router bgp 200
+ bgp dampening 4 750 2000 16

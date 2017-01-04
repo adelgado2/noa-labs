@@ -1,23 +1,43 @@
 R4:
 
 !
-no router bgp
+no router bgp 100
 router bgp 146
  network 150.1.4.4 mask 255.255.255.255
+ neighbor 155.1.146.1 remote-as 146
+ neighbor 155.1.45.5 remote-as 200
+ neighbor 155.1.45.5 local-as 100 no-prepend replace-as dual-as
 !
 
 R6:
 
 !
-no router bgp
+no router bgp 100
 router bgp 146
  network 150.1.6.6 mask 255.255.255.255
+ neighbor 155.1.67.7 remote-as 300
+ neighbor 155.1.67.7 local-as 100 no-prepend replace-as
+ neighbor 155.1.146.1 remote-as 146
 !
 
 R1:
 
 !
-no router bgp 
+no router bgp 100
 router bgp 146
  network 150.1.1.1 mask 255.255.255.255
+ neighbor 155.1.146.4 remote-as 146
+ neighbor 155.1.146.6 remote-as 146
+ neighbor 155.1.146.4 route-reflector-client
+ neighbor 155.1.146.6 route-reflector-client
+ neighbor 155.1.13.3 remote-as 200
+ neighbor 155.1.13.3 local-as 100 no-prepend replace-as
+!
+
+R5:
+
+!
+router bgp 200
+ no neighbor 155.1.45.4 remote-as 100
+ neighbor 155.1.45.4 remote-as 146
 !

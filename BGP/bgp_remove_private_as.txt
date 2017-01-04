@@ -1,0 +1,46 @@
+R7:
+
+!
+interface Loopback1
+ ip address 7.7.7.7 255.255.255.0
+!
+no router bgp 300
+router bgp 65089
+ network 155.1.67.0 mask 255.255.255.0
+ network 7.7.7.0 mask 255.255.255.0
+ aggregate-address 155.1.0.0 255.255.0.0 summary-only
+ neighbor 155.1.37.3 remote-as 200
+ neighbor 155.1.67.6 remote-as 100
+!
+
+R3:
+
+!
+router bgp 200
+ no neighbor 155.1.37.7 remote-as 300
+ neighbor 155.1.37.7 remote-as 65089
+!
+
+R6:
+
+!
+router bgp 100
+ no neighbor 155.1.67.7 remote-as 300
+ neighbor 155.1.67.7 remote-as 65089
+!
+
+R2:
+
+!
+router bgp 200
+ neighbor 192.10.1.254 remove-private-as
+!
+
+R8:
+
+!
+router bgp 200
+ neighbor 155.1.108.10 remove-private-as 
+!
+
+! En virl probado keyword all en R8 con un vecino entre R7 y R3 en shut.
