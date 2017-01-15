@@ -1,0 +1,51 @@
+R5: (PE)
+
+!
+interface GigabitEthernet0/1.58
+ ip vrf forwarding VPN_B
+ ip address 155.1.58.5 255.255.255.0
+!
+router rip 
+ version 2
+ address-family ipv4 vrf VPN_B
+ redistribute bgp 100 metric transparent
+ network 155.1.0.0
+!
+router bgp 100
+ address-family ipv4 vrf VPN_B
+  redistribute rip 
+!
+
+R8: (CE)
+
+!
+router rip 
+ version 2
+ network 150.1.0.0
+ network 155.1.0.0
+!
+
+R6: (PE)
+
+!
+router rip
+ version 2
+ address-family ipv4 vrf VPN_B
+  redistribute bgp 100 metric transparent
+  network 155.1.0.0
+  network 192.168.6.0
+!
+router bgp 100
+ address-family ipv4 vrf VPN_B
+  redistribute rip
+!
+
+R7: (CE)
+
+!
+router rip
+ version 2
+ address-family ipv4 vrf VPN_B
+  network 155.1.0.0
+  network 192.168.7.0
+!

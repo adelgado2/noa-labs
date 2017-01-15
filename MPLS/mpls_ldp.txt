@@ -1,0 +1,60 @@
+R4:
+
+!
+router ospf 1
+ mpls ldp autoconfig
+!
+ip access-list standard 1
+ permit 150.1.5.5
+ permit 150.1.4.4
+ permit 150.1.6.6
+!
+mpls ip
+mpls ldp router-id Loopback0 force
+mpls ldp password required for 1
+mpls ldp neighbor 150.1.5.5 password 0 CISCO 
+mpls ldp neighbor 150.1.6.6 password 0 CISCO 
+!
+interface GigabitEthernet0/1.146
+ mpls ldp discovery transport-address interface
+!
+
+R5:
+
+!
+ip access-list standard 1
+ permit 150.1.5.5
+ permit 150.1.4.4
+ permit 150.1.6.6
+!
+mpls ip
+mpls ldp router-id Loopback0 force
+mpls ldp password required for 1
+mpls ldp neighbor 150.1.4.4 password 0 CISCO 
+mpls ldp neighbor 150.1.6.6 password 0 CISCO 
+!
+interface GigabitEthernet0/1.45
+ mpls ip
+!
+interface Tunnel0
+ mpls ip
+!
+
+R6:
+
+!
+ip access-list standard 1
+ permit 150.1.5.5
+ permit 150.1.4.4
+ permit 150.1.6.6
+!
+mpls ip
+mpls ldp router-id Loopback0 force
+mpls ldp password required for 1
+mpls ldp neighbor 150.1.4.4 password 0 CISCO 
+mpls ldp neighbor 150.1.5.5 password 0 CISCO 
+!
+interface GigabitEthernet0/1.146
+ mpls ip
+ mpls ldp discovery transport-address interface
+!

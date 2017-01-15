@@ -1,0 +1,11 @@
+R4, R5, R6:
+
+!
+ip access-list standard pfx-filter
+ permit host 150.1.5.5
+ permit host 150.1.4.4
+ permit host 150.1.6.6
+!
+no mpls ldp advertise-labels
+mpls ldp advertise-labels for pfx-filter
+!

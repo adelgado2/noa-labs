@@ -1,0 +1,70 @@
+R5:
+
+!
+vrf definition VPN_A
+ rd 150.1.5.5:1
+  address-family ipv4 unicast
+   route-target import 1:1
+   route-target export 1:1
+!
+vrf definition VPN_B
+ rd 150.1.5.5:2
+  address-family ipv4 unicast
+   route-target import 2:1
+   route-target export 2:1
+!   
+interface GigabitEthernet0/1.58
+ vrf forwarding VPN_A
+ encapsulation dot1Q 58
+ ip address 155.1.58.5 255.255.255.0
+!
+interface GigabitEthernet0/1.5 
+ vrf forwarding VPN_B
+ encapsulation dot1Q 5
+ ip address 155.1.5.5 255.255.255.0
+!
+router bgp 200
+ no bgp default ipv4-unicast 
+ neighbor 150.1.4.4 remote-as 200
+ neighbor 150.1.4.4 update-source Loopback0
+ 
+ address-family vpnv4 
+  neighbor 150.1.4.4 activate
+!
+
+R6:
+
+!
+ip vrf VPN_A
+   route-target import 1:1
+   route-target export 1:1
+!
+ip vrf VPN_B
+   route-target import 2:1
+   route-target export 2:1
+!
+router bgp 200
+ no bgp default ipv4-unicast 
+ neighbor 150.1.4.4 remote-as 200
+ neighbor 150.1.4.4 update-source Loopback0
+ 
+ address-family vpnv4 
+  neighbor 150.1.4.4 activate
+!
+
+R4:
+
+!
+router bgp 200
+ no bgp default ipv4-unicast
+ neighbor 150.1.5.5 remote-as 200
+ neighbor 150.1.5.5 update-source Loopback0
+ neighbor 150.1.6.6 remote-as 200
+ neighbor 150.1.6.6 update-source Loopback0 
+ 
+ address-family vpnv4
+  neighbor 150.1.5.5 activate
+  neighbor 150.1.5.5 route-reflector-client
+  neighbor 150.1.6.6 activate
+  neighbor 150.1.6.6 route-reflector-client
+!

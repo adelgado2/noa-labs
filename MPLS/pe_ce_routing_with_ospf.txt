@@ -1,0 +1,50 @@
+R5: (PE)
+
+!
+interface GigabitEthernet0/1.58
+ ip vrf forwarding VPN_A
+ ip address 155.1.58.5 255.255.255.0
+!
+router ospf 100 vrf VPN_A
+ domain-id 0.0.0.105
+ redistribute bgp 100 metric-type 2 subnets 
+ network 155.1.58.5 0.0.0.0 area 1
+!
+router bgp 100
+ address-family ipv4 vrf VPN_A 
+  redistribute ospf 100 match internal external 2
+!  
+  
+R8: (CE)
+
+!
+interface Loopback100
+ ip address 172.16.8.8 255.255.255.0 
+!
+router ospf 1
+ network 155.1.58.8 0.0.0.0 area 1
+ network 172.16.8.0 0.0.0.255 area 1
+!
+
+R6: (PE)
+
+!
+router ospf 100 vrf VPN_A
+ domain-id 0.0.0.106
+ redistribute bgp 100 metric-type 2 subnets 
+ network 155.1.67.6 0.0.0.0 area 1
+ summary-address 172.16.0.0 255.255.0.0
+!
+router bgp 100
+ address-family ipv4 vrf VPN_A 
+  redistribute ospf 100 match internal external 2
+!  
+
+R7: (CE)
+
+!
+router ospf 1 vrf VPN_A
+ capability vrf-lite
+ network 155.1.67.7 0.0.0.0 area 1
+ network 172.16.7.0 0.0.0.255 area 1
+!

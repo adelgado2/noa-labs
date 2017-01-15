@@ -1,0 +1,47 @@
+R5: (PE)
+
+!
+interface Loopback101
+ ip vrf forwarding VPN_A
+ ip address 172.16.5.5 255.255.255.255
+ ip ospf prefix-suppression
+end
+
+R8: (CE)
+
+!
+interface GigabitEthernet0/1.78
+ encapsulation dot1q 78
+ ip address 155.1.78.8 255.255.255.0
+!
+router ospf 100
+ network 0.0.0.0 255.255.255.255 area 1
+!
+
+R6: (PE)
+
+!
+interface Loopback102
+ ip vrf forwarding VPN_A
+ ip address 192.168.6.6 255.255.255.255
+ ip ospf prefix-suppression
+end
+
+R7: (CE)
+
+!
+!
+interface GigabitEthernet0/1.67
+ encapsulation dot1Q 67
+ ip vrf forwarding VPN_A
+ ip address 155.1.67.7 255.255.255.0
+!
+interface GigabitEthernet0/1.78
+ ip vrf forwarding VPN_A
+ encapsulation dot1q 78
+ ip address 155.1.78.7 255.255.255.0
+!
+router ospf 100 vrf VPN_A
+ capability vrf-lite
+ network 0.0.0.0 255.255.255.255 area 1
+!
