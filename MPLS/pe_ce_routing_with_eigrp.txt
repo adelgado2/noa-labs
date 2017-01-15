@@ -1,0 +1,63 @@
+R5: (PE)
+
+!
+router eigrp 10
+ address-family ipv4 vrf VPN_A
+  redistribute bgp 100 metric 10000 100 255 1 1500
+  network 155.1.58.5 0.0.0.0
+  autonomous-system 10
+!
+router bgp 100
+ address-family ipv4 vrf VPN_A
+  redistribute eigrp 10
+!
+
+R8: (CE)
+
+!
+router eigrp 10
+ network 155.1.0.0 0.0.255.255
+ network 150.1.0.0 0.0.255.255
+!
+!
+interface GigabitEthernet0/1.78
+ encapsulation dot1Q 78
+ ip address 155.1.78.8 255.255.255.0
+ delay 10000
+!
+ 
+R6: (PE)
+
+!
+router eigrp 10
+ address-family ipv4 vrf VPN_A
+  redistribute bgp 100 metric 10000 100 255 1 1500
+  network 155.1.67.6 0.0.0.0
+  autonomous-system 10
+!
+router bgp 100
+ address-family ipv4 vrf VPN_A
+  redistribute eigrp 10
+!
+
+R7: (CE)
+
+!
+interface GigabitEthernet0/1.67
+ ip vrf forwarding VPN_A
+ encapsulation dot1Q 67
+ ip address 155.1.67.7 255.255.255.0
+ no shutdown
+!
+interface GigabitEthernet0/1.78
+ ip vrf forwarding VPN_A
+ encapsulation dot1Q 78
+ ip address 155.1.78.7 255.255.255.0
+ delay 10000
+!
+router eigrp 10
+ address-family ipv4 vrf VPN_A
+  network 155.1.0.0 0.0.255.255
+  network 150.1.0.0 0.0.255.255
+  autonomous-system 10
+!

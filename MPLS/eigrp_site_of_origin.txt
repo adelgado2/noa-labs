@@ -1,0 +1,39 @@
+R5: (PE)
+
+!
+route-map SITE-OF-ORIGIN permit 10
+ set extcommunity soo 100:1
+!
+interface GigabitEthernet0/1.58
+ ip vrf sitemap SITE-OF-ORIGIN
+!
+
+R8: (CE)
+
+!
+route-map SITE-OF-ORIGIN permit 10
+ set extcommunity soo 100:1
+!
+interface GigabitEthernet0/1.78
+ ip vrf sitemap SITE-OF-ORIGIN
+!
+
+R6: (PE)
+
+!
+route-map SITE-OF-ORIGIN permit 10
+ set extcommunity soo 100:2
+!
+interface GigabitEthernet0/1.67
+ ip vrf sitemap SITE-OF-ORIGIN
+!
+
+R7:
+
+!
+route-map SITE-OF-ORIGIN permit 10
+ set extcommunity soo 100:2
+!
+interface GigabitEthernet0/1.78
+ ip vrf sitemap SITE-OF-ORIGIN
+!

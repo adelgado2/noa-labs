@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes'?>
 <topology xmlns="http://www.cisco.com/VIRL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="0.9" simulationEngine="OPENSTACK" xsi:schemaLocation="http://www.cisco.com/VIRL https://raw.github.com/CiscoVIRL/schema/v0.9/virl.xsd">
     <node name="R1" type="SIMPLE" subtype="IOSv" location="57,131"><extensions><entry key="config" type="String">!
-! Last configuration change at 00:26:13 UTC Sun Jan 15 2017
+! Last configuration change at 22:11:35 UTC Sat Jan 14 2017
 !
 version 15.6
 no service timestamps debug uptime
@@ -95,7 +95,7 @@ interface Tunnel0
  tunnel protection ipsec profile DMVPN_PROFILE
 !
 interface GigabitEthernet0/0
- ip address 10.255.12.103 255.255.0.0
+ no ip address
  shutdown
  duplex auto
  speed auto
@@ -177,7 +177,7 @@ end</entry></extensions>
         <interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R2" type="SIMPLE" subtype="IOSv" location="58,197"><extensions><entry key="config" type="String">!
-! Last configuration change at 00:26:33 UTC Sun Jan 15 2017
+! Last configuration change at 22:11:51 UTC Sat Jan 14 2017
 !
 version 15.6
 no service timestamps debug uptime
@@ -271,7 +271,7 @@ interface Tunnel0
  tunnel protection ipsec profile DMVPN_PROFILE
 !
 interface GigabitEthernet0/0
- ip address 10.255.12.105 255.255.0.0
+ no ip address
  shutdown
  duplex auto
  speed auto
@@ -348,7 +348,7 @@ end</entry></extensions>
         <interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R3" type="SIMPLE" subtype="IOSv" location="59,270"><extensions><entry key="config" type="String">!
-! Last configuration change at 00:26:41 UTC Sun Jan 15 2017
+! Last configuration change at 22:11:00 UTC Sat Jan 14 2017
 !
 version 15.6
 no service timestamps debug uptime
@@ -442,7 +442,7 @@ interface Tunnel0
  tunnel protection ipsec profile DMVPN_PROFILE
 !
 interface GigabitEthernet0/0
- ip address 10.255.12.106 255.255.0.0
+ no ip address
  shutdown
  duplex auto
  speed auto
@@ -529,7 +529,7 @@ end</entry></extensions>
         <interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R4" type="SIMPLE" subtype="IOSv" location="58,345"><extensions><entry key="config" type="String">!
-! Last configuration change at 00:26:38 UTC Sun Jan 15 2017
+! Last configuration change at 22:11:26 UTC Sat Jan 14 2017
 !
 version 15.6
 no service timestamps debug uptime
@@ -628,7 +628,7 @@ interface Tunnel0
  tunnel protection ipsec profile DMVPN_PROFILE
 !
 interface GigabitEthernet0/0
- ip address 10.255.12.107 255.255.0.0
+ no ip address
  shutdown
  duplex auto
  speed auto
@@ -750,7 +750,7 @@ end</entry></extensions>
         <interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R5" type="SIMPLE" subtype="IOSv" location="47,417"><extensions><entry key="config" type="String">!
-! Last configuration change at 00:26:30 UTC Sun Jan 15 2017
+! Last configuration change at 22:22:35 UTC Sat Jan 14 2017
 !
 version 15.6
 no service timestamps debug uptime
@@ -846,6 +846,7 @@ interface Loopback0
 interface Loopback101
  ip vrf forwarding VPN_A
  ip address 172.16.5.5 255.255.255.255
+ ip ospf prefix-suppression
 !
 interface Tunnel0
  ip address 155.1.0.5 255.255.255.0
@@ -863,7 +864,7 @@ interface Tunnel0
  tunnel protection ipsec profile DMVPN_PROFILE
 !
 interface GigabitEthernet0/0
- ip address 10.255.12.108 255.255.0.0
+ no ip address
  shutdown
  duplex auto
  speed auto
@@ -900,8 +901,8 @@ interface GigabitEthernet0/1.100
 !
 router ospf 100 vrf VPN_A
  area 1 sham-link 172.16.5.5 192.168.6.6
- redistribute bgp 100 subnets route-map RED-BGP-TO-OSPF
- network 155.1.58.5 0.0.0.0 area 1
+ redistribute bgp 100 subnets
+ network 0.0.0.0 255.255.255.255 area 1
 !
 router ospf 1
  router-id 150.1.5.5
@@ -933,7 +934,7 @@ router bgp 100
  exit-address-family
  !
  address-family ipv4 vrf VPN_A
-  network 172.16.5.5 mask 255.255.255.255
+  redistribute connected
   redistribute static
   redistribute ospf 100
  exit-address-family
@@ -953,20 +954,12 @@ no ip http secure-server
 !
 ip prefix-list LO101 seq 5 permit 172.16.5.0/24
 !
-ip prefix-list SHAM-LO seq 5 permit 172.16.5.5/32
-ip prefix-list SHAM-LO seq 10 permit 192.168.6.6/32
-!
 route-map VPN_A_EXPORT permit 10
  match ip address prefix-list LO101
  set extcommunity rt 100:55
 !
 route-map VPN_A_EXPORT permit 20
  set extcommunity rt 100:1
-!
-route-map RED-BGP-TO-OSPF deny 10
- match ip address prefix-list SHAM-LO
-!
-route-map RED-BGP-TO-OSPF permit 20
 !
 !
 mpls ldp router-id Loopback0 force
@@ -1029,7 +1022,7 @@ end</entry></extensions>
         <interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R6" type="SIMPLE" subtype="IOSv" location="49,474"><extensions><entry key="config" type="String">!
-! Last configuration change at 00:26:37 UTC Sun Jan 15 2017
+! Last configuration change at 22:10:46 UTC Sat Jan 14 2017
 !
 version 15.6
 no service timestamps debug uptime
@@ -1113,9 +1106,10 @@ interface Loopback0
 interface Loopback102
  ip vrf forwarding VPN_A
  ip address 192.168.6.6 255.255.255.255
+ ip ospf prefix-suppression
 !
 interface GigabitEthernet0/0
- ip address 10.255.12.109 255.255.0.0
+ no ip address
  shutdown
  duplex auto
  speed auto
@@ -1148,8 +1142,8 @@ interface GigabitEthernet0/1.146
 router ospf 100 vrf VPN_A
  area 1 sham-link 192.168.6.6 172.16.5.5
  summary-address 172.16.0.0 255.255.0.0
- redistribute bgp 100 subnets route-map RED-BGP-TO-OSPF
- network 155.1.67.6 0.0.0.0 area 1
+ redistribute bgp 100 subnets
+ network 0.0.0.0 255.255.255.255 area 1
 !
 router ospf 1
  router-id 150.1.6.6
@@ -1182,7 +1176,6 @@ router bgp 100
  exit-address-family
  !
  address-family ipv4 vrf VPN_A
-  network 192.168.6.6 mask 255.255.255.255
   redistribute connected
   redistribute static
   redistribute ospf 100
@@ -1204,20 +1197,12 @@ ip route vrf VPN_A 192.168.7.0 255.255.255.0 GigabitEthernet0/1.76 155.1.76.7
 !
 ip prefix-list LO102 seq 5 permit 192.168.6.0/24
 !
-ip prefix-list SHAM-LO seq 5 permit 172.16.5.5/32
-ip prefix-list SHAM-LO seq 10 permit 192.168.6.6/32
-!
 route-map VPN_B_EXPORT permit 10
  match ip address prefix-list LO102
  set extcommunity rt 100:66
 !
 route-map VPN_B_EXPORT permit 20
  set extcommunity rt 100:2
-!
-route-map RED-BGP-TO-OSPF deny 10
- match ip address prefix-list SHAM-LO
-!
-route-map RED-BGP-TO-OSPF permit 20
 !
 !
 mpls ldp router-id Loopback0 force
@@ -1280,7 +1265,7 @@ end</entry></extensions>
         <interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R7" type="SIMPLE" subtype="IOSv" location="43,552"><extensions><entry key="config" type="String">!
-! Last configuration change at 00:26:54 UTC Sun Jan 15 2017
+! Last configuration change at 22:11:24 UTC Sat Jan 14 2017
 !
 version 15.6
 no service timestamps debug uptime
@@ -1359,7 +1344,7 @@ interface Loopback102
  ip address 192.168.7.7 255.255.255.0
 !
 interface GigabitEthernet0/0
- ip address 10.255.12.110 255.255.0.0
+ no ip address
  shutdown
  duplex auto
  speed auto
@@ -1484,7 +1469,7 @@ end</entry></extensions>
         <interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R8" type="SIMPLE" subtype="IOSv" location="43,618"><extensions><entry key="config" type="String">!
-! Last configuration change at 00:26:55 UTC Sun Jan 15 2017
+! Last configuration change at 22:11:36 UTC Sat Jan 14 2017
 !
 version 15.6
 no service timestamps debug uptime
@@ -1553,7 +1538,7 @@ interface Loopback100
  ip address 172.16.8.8 255.255.255.0
 !
 interface GigabitEthernet0/0
- ip address 10.255.12.111 255.255.0.0
+ no ip address
  shutdown
  duplex auto
  speed auto
@@ -1656,7 +1641,7 @@ end</entry></extensions>
         <interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R9" type="SIMPLE" subtype="IOSv" location="37,675"><extensions><entry key="config" type="String">!
-! Last configuration change at 00:27:07 UTC Sun Jan 15 2017
+! Last configuration change at 22:12:47 UTC Sat Jan 14 2017
 !
 version 15.6
 no service timestamps debug uptime
@@ -1722,7 +1707,7 @@ interface Loopback0
  ipv6 address 2001:150:9:9::9/128
 !
 interface GigabitEthernet0/0
- ip address 10.255.12.112 255.255.0.0
+ no ip address
  shutdown
  duplex auto
  speed auto
@@ -1799,7 +1784,7 @@ end</entry></extensions>
         <interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R10" type="SIMPLE" subtype="IOSv" location="32,741"><extensions><entry key="config" type="String">!
-! Last configuration change at 00:26:26 UTC Sun Jan 15 2017
+! Last configuration change at 22:12:09 UTC Sat Jan 14 2017
 !
 version 15.6
 no service timestamps debug uptime
@@ -1865,7 +1850,7 @@ interface Loopback0
  ipv6 address 2001:150:10:10::10/128
 !
 interface GigabitEthernet0/0
- ip address 10.255.12.104 255.255.0.0
+ no ip address
  shutdown
  duplex auto
  speed auto
@@ -1943,7 +1928,7 @@ end</entry></extensions>
     </node>
     <node name="SW1" type="SIMPLE" subtype="IOSvL2" location="346,347">
         <extensions><entry key="config" type="String">!
-! Last configuration change at 00:25:56 UTC Sun Jan 15 2017
+! Last configuration change at 21:58:17 UTC Sat Jan 14 2017
 !
 version 15.2
 service timestamps debug datetime msec
@@ -2065,7 +2050,6 @@ banner login `
 line con 0
 line aux 0
 line vty 0 4
- login
 !
 !
 end</entry></extensions><interface id="0" name="GigabitEthernet0/1"/>
@@ -2078,7 +2062,7 @@ end</entry></extensions><interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="SW2" type="SIMPLE" subtype="IOSvL2" location="580,343">
         <extensions><entry key="config" type="String">!
-! Last configuration change at 00:26:12 UTC Sun Jan 15 2017
+! Last configuration change at 21:58:40 UTC Sat Jan 14 2017
 !
 version 15.2
 service timestamps debug datetime msec
@@ -2196,7 +2180,6 @@ banner login `
 line con 0
 line aux 0
 line vty 0 4
- login
 !
 !
 end</entry></extensions><interface id="0" name="GigabitEthernet0/1"/>
@@ -2208,7 +2191,7 @@ end</entry></extensions><interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="SW3" type="SIMPLE" subtype="IOSvL2" location="339,520">
         <extensions><entry key="config" type="String">!
-! Last configuration change at 00:26:18 UTC Sun Jan 15 2017
+! Last configuration change at 21:59:13 UTC Sat Jan 14 2017
 !
 version 15.2
 service timestamps debug datetime msec
@@ -2326,7 +2309,6 @@ banner login `
 line con 0
 line aux 0
 line vty 0 4
- login
 !
 !
 end</entry></extensions><interface id="0" name="GigabitEthernet0/1"/>
@@ -2338,7 +2320,7 @@ end</entry></extensions><interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="SW4" type="SIMPLE" subtype="IOSvL2" location="580,519">
         <extensions><entry key="config" type="String">!
-! Last configuration change at 00:26:20 UTC Sun Jan 15 2017
+! Last configuration change at 21:58:53 UTC Sat Jan 14 2017
 !
 version 15.2
 service timestamps debug datetime msec
@@ -2456,7 +2438,6 @@ banner login `
 line con 0
 line aux 0
 line vty 0 4
- login
 !
 !
 end</entry></extensions><interface id="0" name="GigabitEthernet0/1"/>

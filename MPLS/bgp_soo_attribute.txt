@@ -1,0 +1,47 @@
+R5: (PE)
+
+!
+router bgp 100
+ address-family ipv4 vrf VPN_A
+  neighbor 155.1.58.8 soo 100:1
+!
+
+R8: (CE)
+
+!
+interface GigabitEthernet0/1.78
+ no ip ospf cost 9999
+ no delay 10000
+!
+router bgp 78
+ neighbor 155.1.78.7 remote-as 78
+ neighbor 155.1.78.7 update-source GigabitEthernet0/1.78
+ !
+ address-family ipv4
+  neighbor 155.1.78.7 activate
+  neighbor 155.1.78.7 soo 100:1
+!
+ 
+R6: (PE) 
+
+!
+router bgp 100
+ address-family ipv4 vrf VPN_A
+  neighbor 155.1.67.7 soo 100:2
+!
+
+R7: (CE)
+
+!
+interface GigabitEthernet0/1.78
+ no ip ospf cost 9999
+ no delay 10000
+!
+router bgp 78
+ neighbor 155.1.78.8 remote-as 78
+ neighbor 155.1.78.8 update-source GigabitEthernet0/1.78
+ !
+ address-family ipv4
+  neighbor 155.1.78.8 activate
+  neighbor 155.1.78.8 soo 100:2
+!

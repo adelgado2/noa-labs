@@ -1,0 +1,65 @@
+R5: (PE)
+
+!
+no router eigrp 100
+!
+interface GigabitEthernet0/1.58
+ no ip vrf sitemap EIGRP_SOO
+!
+router bgp 100
+ address-family ipv4 vrf VPN_A
+  neighbor 155.1.58.8 remote-as 78
+  neighbor 155.1.58.8 activate
+  neighbor 155.1.58.8 as-override
+!
+
+R8: (CE)
+
+!
+router eigrp 100
+!
+interface GigabitEthernet0/1.78
+ no ip vrf sitemap EIGRP_SOO
+!
+router bgp 78
+ neighbor 155.1.58.5 remote-as 100
+ 
+ address-family ipv4 unicast 
+  neighbor 155.1.58.5 activate
+  network 150.1.8.8 mask 255.255.255.255
+!
+
+R6: (PE)
+
+!
+no router eigrp 100
+!
+interface GigabitEthernet0/1.67
+ no shutdown
+ no ip vrf sitemap EIGRP_SOO
+!
+router bgp 100
+ address-family ipv4 vrf VPN_A
+  neighbor 155.1.67.7 remote-as 78
+  neighbor 155.1.67.7 activate
+  neighbor 155.1.67.7 as-override
+!
+
+R7: (CE)
+
+!
+no router eigrp 100
+!
+interface GigabitEthernet0/1.78
+ no ip vrf sitemap EIGRP_SOO
+!
+interface GigabitEthernet0/1.67
+ no shutdown
+!
+router bgp 78
+ neighbor 155.1.67.6 remote-as 100
+ 
+ address-family ipv4 unicast
+  neighbor 155.1.67.6 activate
+  network 150.1.7.7 mask 255.255.255.255
+!
