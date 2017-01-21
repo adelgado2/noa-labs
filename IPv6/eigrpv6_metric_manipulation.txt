@@ -1,0 +1,6 @@
+R1, R2, R8, R5:
+
+!
+ipv6 router eigrp 100
+ metric weights 0 0 0 1 0 0 
+!

@@ -1,0 +1,31 @@
+R5:
+
+!
+ipv6 unicast-routing
+!
+interface Gi0/1
+ no shut
+!
+interface GigabitEthernet0/1.58
+ encapsulation dot1q 58
+ ipv6 address fc00:1:1:58::5/64
+ ipv6 address fc00:1:1:85::5/64
+ ipv6 nd prefix FC00:1:1:58::/64 14400 14400 no-autoconfig
+ ipv6 nd prefix FC00:1:1:85::/64 14400 14400
+ ipv6 nd ra lifetime 60
+ ipv6 nd ra interval 40
+ no ipv6 nd suppress-ra    ! Ya está por defecto
+!
+
+R8:
+
+!
+ipv6 unicast-routing
+!
+interface Gi0/1
+ no shut
+!
+interface GigabitEthernet0/1.58
+ encapsulation dot1q 58
+ ipv6 address autoconfig
+!

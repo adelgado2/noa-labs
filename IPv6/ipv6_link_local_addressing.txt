@@ -1,0 +1,30 @@
+R1:
+
+!
+interface GigabitEthernet0/1.146
+ ipv6 address FE80::1 link-local
+!
+
+R4:
+
+!
+interface GigabitEthernet0/1.146
+ encapsulation dot1q 146
+ ipv6 address FE80::4 link-local
+ no shut
+!
+int gi0/1 
+ no shut
+!
+
+R6:
+
+!
+interface GigabitEthernet0/1.146
+ encapsulation dot1q 146 
+ ipv6 address FE80::6 link-local
+ no shut
+!
+int gi0/1 
+ no shut
+!

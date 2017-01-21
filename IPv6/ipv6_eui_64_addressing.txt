@@ -1,0 +1,29 @@
+R1:
+
+!
+interface GigabitEthernet0/1.146
+ encapsulation dot1q 146
+ ipv6 address 2001:155:1:146::/64 eui-64
+!
+
+R4:
+
+!
+int gi0/1
+ no shut
+!
+interface GigabitEthernet0/1.146
+ encapsulation dot1q 146
+ ipv6 address 2001:155:1:146::/64 eui-64
+!
+
+R6:
+
+!
+int gi0/1
+ no shut
+!
+interface GigabitEthernet0/1.146
+ encapsulation dot1q 146
+ ipv6 address 2001:155:1:146::/64 eui-64
+!

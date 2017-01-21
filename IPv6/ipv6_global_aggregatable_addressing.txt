@@ -1,0 +1,20 @@
+R1:
+
+!
+interface Tunnel0
+ ipv6 address 2001:155:1:1234::1/64
+!
+
+R2:
+
+!
+interface Tunnel0
+ ipv6 address 2001:155:1:1234::2/64
+!
+
+R5:
+
+!
+interface Tunnel0
+ ipv6 address 2001:155:1:1234::5/64
+!

@@ -1,0 +1,39 @@
+R1:
+
+!
+interface Loopback1
+ ipv6 address fc00:1:1:1::1/64
+ ipv6 eigrp 100
+!
+
+!
+ipv6 router eigrp 100
+ eigrp router-id 150.1.1.1
+!
+
+R2:
+
+!
+interface Loopback1
+ ipv6 address fc00:1:1:2::2/64
+ ipv6 eigrp 100
+!
+
+!
+ipv6 router eigrp 100
+ eigrp router-id 150.1.2.2
+!
+
+R8:
+
+!
+ipv6 router eigrp 100
+ eigrp router-id 150.1.8.8
+!
+
+R5:
+
+!
+interface GigabitEthernet0/1.58
+ ipv6 summary-address eigrp 100 FC00:1:1:0::/62
+!

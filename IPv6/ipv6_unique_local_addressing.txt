@@ -1,0 +1,47 @@
+R4:
+
+!
+interface Gi0/1
+ no shut
+!
+interface GigabitEthernet0/1.45
+ encapsulation dot1q 45
+ ipv6 address fc00:155:0:45::4/64
+ no shut
+!
+
+R5:
+
+!
+interface Gi0/1
+ no shut
+!
+interface GigabitEthernet0/1.45
+ encapsulation dot1q 45
+ ipv6 address fc00:155:0:45::5/64
+ no shut
+!
+
+R3:
+
+!
+interface Gi0/1
+ no shut
+!
+interface GigabitEthernet0/1.37
+ encapsulation dot1q 37
+ ipv6 address fc00:155:0:37::3/64
+ no shut
+!
+
+R7:
+
+!
+interface Gi0/1
+ no shut
+!
+interface GigabitEthernet0/1.37
+ encapsulation dot1q 37
+ ipv6 address fc00:155:0:37::7/64
+ no shut
+!

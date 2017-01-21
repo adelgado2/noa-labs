@@ -1,0 +1,76 @@
+! En algunas IOS hace falta
+!
+ipv6 router eigrp 100 
+ no shutdown
+!
+
+R1:
+
+!
+ipv6 unicast-routing
+!
+key chain KEY
+ key 1
+  key-string CISCO
+  accept-lifetime 16:49:00 february 21 2017 infinite 
+  send-lifetime 16:49:00 february 21 2017 infinite 
+!
+interface Lo0
+ ipv6 eigrp 100
+!
+interface Tunnel0
+ ipv6 eigrp 100
+ ipv6 authentication mode eigrp 100 md5
+ ipv6 authentication key-chain eigrp 100 KEY
+!
+ipv6 router eigrp 100
+ eigrp router-id 150.1.1.1
+!
+
+R2:
+
+!
+ipv6 unicast-routing
+!
+key chain KEY
+ key 1
+  key-string CISCO
+  accept-lifetime 16:49:00 february 21 2017 infinite 
+  send-lifetime 16:49:00 february 21 2017 infinite 
+!
+interface Lo0
+ ipv6 eigrp 100
+!
+interface Tunnel0
+ ipv6 eigrp 100
+ ipv6 authentication mode eigrp 100 md5
+ ipv6 authentication key-chain eigrp 100 KEY
+!
+ipv6 router eigrp 100
+ eigrp router-id 150.1.2.2
+!
+
+R5:
+
+!
+ipv6 unicast-routing
+!
+key chain KEY
+ key 1
+  key-string CISCO
+  accept-lifetime 16:49:00 february 21 2017 infinite 
+  send-lifetime 16:49:00 february 21 2017 infinite 
+!
+interface Lo0
+ ipv6 eigrp 100
+!
+interface Tunnel0
+ ipv6 eigrp 100
+ ipv6 authentication mode eigrp 100 md5
+ ipv6 authentication key-chain eigrp 100 KEY
+ no ipv6 split-horizon eigrp 100
+ no ipv6 next-hop-self eigrp 100
+!
+ipv6 router eigrp 100
+ eigrp router-id 150.1.5.5
+!
