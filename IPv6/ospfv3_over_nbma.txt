@@ -1,0 +1,40 @@
+R1:
+
+!
+interface tunnel0
+ ospfv3 1 area 0 ipv6
+!
+
+R2:
+
+!
+ipv6 unicast-routing
+!
+router ospfv3 1
+ address-family ipv6 unicast
+  router-id 150.1.2.2
+!
+interface Loopback0
+ ospfv3 1 area 0 ipv6
+!
+interface tunnel0
+ ospfv3 1 area 0 ipv6
+! 
+
+R5:
+
+!
+ipv6 unicast-routing
+!
+router ospfv3 1
+ address-family ipv6 unicast
+  router-id 150.1.5.5
+!
+interface Loopback0
+ ospfv3 1 area 0 ipv6
+!
+interface tunnel0
+ ospfv3 1 area 0 ipv6
+ ospfv3 network point-to-multipoint 
+ ospfv3 hello-interval 10
+! 

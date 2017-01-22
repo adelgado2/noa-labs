@@ -1,0 +1,61 @@
+R1:
+
+!
+ipv6 unicast-routing
+!
+router ospfv3 1
+ address-family ipv6 unicast
+  router-id 150.1.1.1
+!
+interface Loopback0
+ ospfv3 1 area 0 ipv6
+!
+interface GigabitEthernet0/1.146
+ ipv6 address fe80::1 link-local
+ ospfv3 1 area 0 ipv6
+ ospfv3 hello-interval 5
+ ospfv3 dead-interval 20
+ ospfv3 priority 255
+!
+ 
+
+R4:
+
+!
+ipv6 unicast-routing
+!
+router ospfv3 1
+ address-family ipv6 unicast
+  router-id 150.1.4.4
+!
+interface Loopback0
+ ospfv3 1 area 0 ipv6
+!
+interface GigabitEthernet0/1.146
+ ipv6 address fe80::4 link-local
+ ospfv3 1 area 0 ipv6
+ ospfv3 hello-interval 5
+ ospfv3 dead-interval 20
+ ospfv3 priority 0
+!
+
+R6:
+
+!
+ipv6 unicast-routing
+!
+router ospfv3 1
+ address-family ipv6 unicast
+  router-id 150.1.6.6
+!
+interface Loopback0
+ ospfv3 1 area 0 ipv6
+!
+interface GigabitEthernet0/1.146
+ ipv6 address fe80::6 link-local
+ ospfv3 1 area 0 ipv6
+ ospfv3 hello-interval 5
+ ospfv3 dead-interval 20
+ ospfv3 priority 0
+!
+
