@@ -1,0 +1,15 @@
+R5:
+
+!
+ipv6 router eigrp 100
+ redistribute ospf 1 metric 100000 1000 255 1 1500 include-connected
+ redistribute rip RIPNG metric 100000 1000 255 1 1500 include-connected
+!
+ipv6 router ospf 1
+ redistribute rip RIPNG include-connected
+ redistribute eigrp 100 include-connected 
+!
+ipv6 router rip RIPNG
+ redistribute eigrp 100 include-connected metric 8
+ redistribute ospf 1 include-connected metric 8
+!

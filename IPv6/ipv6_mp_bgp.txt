@@ -1,0 +1,32 @@
+R1:
+
+!
+interface Loopback1
+ ipv6 address 2003:1:0:1::1/64
+!
+interface Loopback2
+ ipv6 address 2003:1:0:11::11/61
+!
+
+!
+router bgp 100
+ no bgp default ipv4-unicast
+ bgp router-id 150.1.1.1
+ neighbor 2001:155:1:1234::5 remote-as 500
+ address-family ipv6
+  neighbor 2001:155:1:1234::5 activate
+  network 2003:1:0:1::/64
+  network 2003:1:0:10::/61
+  aggregate-address 2003:1::/59 summary-only
+!
+
+R5:
+
+!
+router bgp 500
+ no bgp default ipv4-unicast
+ bgp router-id 150.1.5.5
+ neighbor 2001:155:1:1234::1 remote-as 100
+ address-family ipv6
+  neighbor 2001:155:1:1234::1 activate
+!

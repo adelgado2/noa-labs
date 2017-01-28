@@ -1,0 +1,28 @@
+R3:
+
+!
+ipv6 access-list FILTER_IN
+ permit tcp 2001:155:1:37::/64 any range 20 21
+ permit tcp 2001:155:1:37::/64 any eq http
+ permit udp 2001:155:1:37::/64 any eq 53
+!
+
+!
+ipv6 access-list FILTER_OUT
+ permit udp any range 20 21 2001:155:1:37::/64 
+ permit tcp any eq http 2001:155:1:37::/64 
+ permit udp any eq 53 2001:155:1:37::/64
+ permit udp any any eq 521
+!
+
+!
+interface tunnel0
+ ipv6 traffic-filter FILTER_OUT out
+ ipv6 traffic-filter FILTER_IN in
+!
+
+R5:
+
+!
+ip http server
+!
