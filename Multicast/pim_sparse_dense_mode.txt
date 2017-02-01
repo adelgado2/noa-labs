@@ -1,0 +1,83 @@
+R6:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.146
+ ip pim sparse-dense-mode
+!
+ip access-list standard 10
+ permit 224.0.0.0 0.255.255.255
+!
+ip pim rp-address 150.1.5.5 10
+!
+
+R4:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.146
+ ip pim sparse-dense-mode
+!
+interface GigabitEthernet0/1.45
+ ip pim sparse-dense-mode
+!
+ip access-list standard 10
+ permit 224.0.0.0 0.255.255.255
+!
+ip pim rp-address 150.1.5.5 10
+!
+
+R5:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.58
+ ip pim sparse-dense-mode
+!
+interface GigabitEthernet0/1.45
+ ip pim sparse-dense-mode
+!
+ip access-list standard 10
+ permit 224.0.0.0 0.255.255.255
+!
+ip pim rp-address 150.1.5.5 10
+!
+
+R8:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.108
+ ip pim sparse-dense-mode
+!
+interface GigabitEthernet0/1.58
+ ip pim sparse-dense-mode
+!
+ip access-list standard 10
+ permit 224.0.0.0 0.255.255.255
+!
+ip pim rp-address 150.1.5.5 10
+!
+
+R10:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.108
+ ip pim sparse-dense-mode
+!
+interface GigabitEthernet0/1.10
+ ip pim sparse-dense-mode
+ ip igmp join-group 224.10.10.10
+ ip igmp join-group 239.0.0.1
+!
+ip access-list standard 10
+ permit 224.0.0.0 0.255.255.255
+!
+ip pim rp-address 150.1.5.5 10
+!

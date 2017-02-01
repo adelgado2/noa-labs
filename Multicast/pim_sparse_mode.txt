@@ -1,0 +1,70 @@
+R6:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.146
+ ip pim sparse-mode 
+!
+ip pim rp-address 150.1.5.5
+!
+
+R4:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.146
+ ip pim sparse-mode
+!
+interface GigabitEthernet0/1.45
+ ip pim sparse-mode 
+!
+ip pim rp-address 150.1.5.5
+!
+
+R5:
+
+!
+ip multicast-routing
+!
+interface Loopback0
+ ip pim sparse-mode
+!
+interface GigabitEthernet0/1.45
+ ip pim sparse-mode 
+!
+interface GigabitEthernet0/1.58
+ ip pim sparse-mode 
+!
+ip pim rp-address 150.1.5.5
+!
+
+R8:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.58
+ ip pim sparse-mode 
+!
+interface GigabitEthernet0/1.108
+ ip pim sparse-mode 
+!
+ip pim rp-address 150.1.5.5
+!
+
+R10:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.108
+ ip pim sparse-mode 
+!
+int GigabitEthernet0/1.10
+ ip pim sparse-mode
+ ip igmp join 224.10.10.10
+!
+ip pim rp-address 150.1.5.5
+!

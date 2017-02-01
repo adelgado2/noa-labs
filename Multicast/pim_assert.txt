@@ -1,0 +1,70 @@
+R1:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.146
+ ip pim dense-mode
+!
+interface Tunnel10
+ ip pim dense-mode
+!
+ip mroute 155.1.108.10 255.255.255.255 Tunnel10 
+!
+
+R6:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.146
+ ip pim dense-mode
+!
+interface Loopback0
+ ip igmp join-group 239.6.6.6
+!
+
+R4:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.146
+ ip pim dense-mode
+!
+interface GigabitEthernet0/1.45
+ ip pim dense-mode
+!
+
+R5:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.58
+ ip pim dense-mode
+!
+interface GigabitEthernet0/1.45
+ ip pim dense-mode
+!
+
+R8:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.58
+ ip pim dense-mode
+!
+interface GigabitEthernet0/1.108
+ ip pim dense-mode
+!
+
+R10:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.108
+ ip pim dense-mode
+!

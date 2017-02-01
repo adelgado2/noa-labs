@@ -1,0 +1,57 @@
+R6:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.146
+ ip pim dense-mode 
+!
+
+R4:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.146
+ ip pim dense-mode 
+!
+interface GigabitEthernet0/1.45
+ ip pim dense-mode 
+!
+
+R5:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.45
+ ip pim dense-mode 
+!
+interface GigabitEthernet0/1.58
+ ip pim dense-mode 
+!
+
+R8:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.58
+ ip pim dense-mode 
+!
+interface GigabitEthernet0/1.108
+ ip pim dense-mode 
+!
+
+R10:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.108
+ ip pim dense-mode 
+!
+int GigabitEthernet0/1.10
+ ip pim dense-mode
+ ip igmp join 224.10.10.10
+!
