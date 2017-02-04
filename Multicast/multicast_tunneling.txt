@@ -1,0 +1,68 @@
+R5:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.58
+ ip pim sparse-mode
+!
+ip pim rp-address 150.1.5.5 
+!
+interface Tunnel59
+ ip address 155.1.59.5 255.255.255.0
+ tunnel source 150.1.5.5
+ tunnel destination 150.1.9.9
+ ip pim sparse-mode
+!
+router ospf 1
+ passive-interface Tunnel59
+!
+
+R8:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.58
+ ip pim sparse-mode 
+!
+interface GigabitEthernet0/1.108
+ ip pim sparse-mode 
+!
+ip pim rp-address 150.1.5.5
+!
+
+R10:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.108
+ ip pim sparse-mode 
+!
+int GigabitEthernet0/1.10
+ ip pim sparse-mode
+!
+ip pim rp-address 150.1.5.5
+!
+
+R9:
+
+!
+ip multicast-routing
+!
+interface Tunnel59
+ ip address 155.1.59.9 255.255.255.0
+ tunnel source 150.1.9.9
+ tunnel destination 150.1.5.5
+ ip pim sparse-mode
+!
+interface GigabitEthernet0/1.9
+ ip pim sparse-mode 
+ ip igmp join-group 224.10.10.10
+!
+ip pim rp-address 150.1.5.5
+!
+router ospf 1
+ passive-interface Tunnel59
+!

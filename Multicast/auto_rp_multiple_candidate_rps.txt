@@ -1,0 +1,71 @@
+R8 224.0.0.0 - 231.255.255.255
+R10 232.0.0.0 - 239.255.255.255
+R5 Mapping Agent
+224.110.110.110 always dense-mode
+
+R5:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.58
+ ip pim sparse-dense-mode
+!
+interface Loopback0
+ ip pim sparse-dense-mode
+!
+interface GigabitEthernet0/1.45
+ ip pim sparse-dense-mode
+!
+ip pim send-rp-discovery loopback0 scope 31 
+!
+
+R8:
+
+!
+ip access-list standard 5
+ deny 224.110.110.110
+ permit 224.0.0.0 7.255.255.255
+ permit 224.0.0.0 15.255.255.255
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.58
+ ip pim sparse-dense-mode
+!
+interface GigabitEthernet0/1.108
+ ip pim sparse-dense-mode
+!
+interface Loopback0
+ ip pim sparse-dense-mode
+!
+ip pim send-rp-announce loopback0 scope 31 group-list 5 
+!
+
+R10:
+
+!
+ip access-list standard 5
+ deny 224.110.110.110
+ permit 232.0.0.0 7.255.255.255
+ permit 224.0.0.0 15.255.255.255
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.108
+ ip pim sparse-dense-mode
+!
+interface Loopback 0
+ ip pim sparse-dense-mode
+!
+ip pim send-rp-announce loopback0 scope 31 group-list 5 
+!
+
+R4:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.45
+ ip pim sparse-dense-mode
+!

@@ -1,0 +1,86 @@
+R6:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.146
+ ip pim sparse-mode 
+!
+ip pim rp-address 150.1.5.5
+!
+
+R4:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.146
+ ip pim sparse-mode
+ ip pim dr-priority 100
+!
+interface GigabitEthernet0/1.45
+ ip pim sparse-mode 
+!
+ip pim rp-address 150.1.5.5
+!
+
+R5:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.58
+ ip pim sparse-mode
+!
+interface GigabitEthernet0/1.45
+ ip pim sparse-mode
+!
+ip pim rp-address 150.1.5.5
+ip pim accept-register list 100
+!
+ip access-list extended 100
+ permit ip host 155.1.146.6 224.0.0.0 15.255.255.255
+ deny ip 155.1.146.0 0.0.0.255 any
+ permit ip any any
+!
+
+R8:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.58
+ ip pim sparse-mode 
+!
+interface GigabitEthernet0/1.108
+ ip pim sparse-mode 
+!
+ip pim rp-address 150.1.5.5
+!
+
+R10:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.108
+ ip pim sparse-mode 
+!
+int GigabitEthernet0/1.10
+ ip pim sparse-mode
+ ip igmp join 224.10.10.10
+!
+ip pim rp-address 150.1.5.5
+!
+
+R7:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.146
+ encapsulation dot1q 146
+ ip pim sparse-mode 
+!
+ip pim rp-address 150.1.5.5
+!

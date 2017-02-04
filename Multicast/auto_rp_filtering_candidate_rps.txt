@@ -1,0 +1,75 @@
+
+224.110.110.110 always dense-mode
+
+R5:
+
+!
+ip access-list standard FROM_R10
+ permit 150.1.10.10
+!
+ip access-list standard GROUPS
+ deny 224.110.110.110
+ permit any
+! 
+ip multicast-routing
+!
+interface GigabitEthernet0/1.58
+ ip pim sparse-dense-mode
+!
+interface Loopback0
+ ip pim sparse-dense-mode
+!
+interface GigabitEthernet0/1.45
+ ip pim sparse-dense-mode
+!
+ip pim send-rp-discovery loopback0 scope 31 
+ip pim rp-announce-filter rp-list FROM_R10 group-list GROUPS 
+!
+
+R8:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.58
+ ip pim sparse-dense-mode
+!
+interface GigabitEthernet0/1.108
+ ip pim sparse-dense-mode
+!
+interface Loopback0
+ ip pim sparse-dense-mode
+!
+ip access-list standard 8
+ deny 224.110.110.110
+ permit 224.0.0.0 7.255.255.255
+!
+ip pim send-rp-announce loopback0 scope 31 group-list 8
+!
+
+R10:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.108
+ ip pim sparse-dense-mode
+!
+interface Loopback 0
+ ip pim sparse-dense-mode
+!
+ip access-list standard 10
+ deny 224.110.110.110
+ permit 224.0.0.0 7.255.255.255
+!
+ip pim send-rp-announce loopback0 scope 31 group-list 10
+!
+
+R4:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.45
+ ip pim sparse-dense-mode
+!

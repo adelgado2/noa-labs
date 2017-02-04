@@ -1,0 +1,54 @@
+R5:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.58
+ ip pim sparse-mode
+!
+ip access-list standard 10
+ permit 224.10.10.10
+ permit 224.110.110.110
+!
+ip pim rp-address 150.1.5.5 10
+ip pim accept-rp 150.1.5.5
+!
+
+R8:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.58
+ ip pim sparse-mode
+!
+interface GigabitEthernet0/1.108
+ ip pim sparse-mode
+!
+ip access-list standard 10
+ permit 224.10.10.10
+ permit 224.110.110.110
+!
+ip pim rp-address 150.1.5.5 10
+ip pim accept-rp 150.1.5.5
+!
+
+R10:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.108
+ ip pim sparse-mode
+!
+ip access-list standard 10
+ permit 224.10.10.10
+ permit 224.110.110.110
+!
+ip pim rp-address 150.1.5.5 10
+ip pim accept-rp 150.1.5.5
+!
+interface Gi0/1.10
+ ip pim sparse-mode
+ ip igmp join-group
+!

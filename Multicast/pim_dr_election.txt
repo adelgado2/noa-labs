@@ -1,0 +1,47 @@
+R4:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.146
+ ip pim sparse-mode
+ ip pim dr-priority 255
+!
+interface GigabitEthernet0/1.45
+ ip pim sparse-mode 
+!
+ip pim rp-address 150.1.5.5
+!
+
+R6:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.146
+ ip pim sparse-mode 
+!
+ip pim rp-address 150.1.5.5
+!
+
+R1:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.146
+ ip pim sparse-mode 
+!
+ip pim rp-address 150.1.5.5
+!
+
+R5:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.45
+ ip pim sparse-mode 
+!
+ip pim rp-address 150.1.5.5
+!

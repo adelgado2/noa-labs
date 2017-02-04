@@ -1,0 +1,92 @@
+R5:
+
+!
+ip access-list standard 10
+ deny 232.0.0.0 7.255.255.255
+ permit any
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.58
+ ip pim sparse-mode
+ ip multicast boundary 10 filter-autorp
+!
+interface Loopback0
+ ip pim sparse-mode
+!
+interface GigabitEthernet0/1.45
+ ip pim sparse-mode
+!
+ip pim autorp listener
+!
+
+R8:
+
+!
+ip access-list standard 5
+ deny 224.110.110.110
+ permit 224.0.0.0 7.255.255.255
+ permit 224.0.0.0 15.255.255.255
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.58
+ ip pim sparse-mode
+!
+interface GigabitEthernet0/1.108
+ ip pim sparse-mode
+!
+interface Loopback0
+ ip pim sparse-mode
+!
+ip pim send-rp-announce loopback0 scope 31 group-list 5 
+ip pim autorp listener
+!
+
+R10:
+
+!
+ip access-list standard 5
+ deny 224.110.110.110
+ permit 232.0.0.0 7.255.255.255
+ permit 224.0.0.0 15.255.255.255
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.108
+ ip pim sparse-mode
+!
+interface Loopback 0
+ ip pim sparse-mode
+!
+ip pim send-rp-announce loopback0 scope 31 group-list 5 
+ip pim autorp listener
+!
+
+R4:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.45
+ ip pim sparse-mode
+interface GigabitEthernet0/1.146
+ ip pim sparse-mode 
+!
+ip pim autorp listener
+!
+
+R6:
+
+!
+ip multicast-routing
+!
+interface Loopback0
+ ip pim sparse-mode
+!
+interface GigabitEthernet0/1.146
+ ip pim sparse-mode 
+!
+ip pim autorp listener
+ip pim send-rp-discovery loopback0 scope 31
+!

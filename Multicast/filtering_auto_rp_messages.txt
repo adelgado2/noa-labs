@@ -1,0 +1,94 @@
+R6:
+
+!
+ip multicast-routing
+!
+interface Loopback0
+ ip pim sparse-mode
+!
+interface GigabitEthernet0/1.146
+ ip pim sparse-mode 
+!
+ip pim send-rp-discovery loopback0 scope 3
+ip pim autorp listener
+!
+
+R4:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.146
+ ip pim sparse-mode
+!
+interface GigabitEthernet0/1.45
+ ip pim sparse-mode 
+!
+ip pim autorp listener
+!
+
+R5:
+
+!
+ip multicast-routing
+!
+interface Loopback0
+ ip pim sparse-mode
+!
+interface GigabitEthernet0/1.45
+ ip pim sparse-mode 
+!
+interface GigabitEthernet0/1.58
+ ip pim sparse-mode 
+!
+ip pim autorp listener
+ip pim send-rp-announce loopback0 scope 31
+!
+
+R8:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.58
+ ip pim sparse-mode 
+!
+interface GigabitEthernet0/1.108
+ ip pim sparse-mode 
+!
+ip pim autorp listener
+!
+
+!Para chequear TTL:
+
+!
+flow record MAPPING_AGENT
+ match ipv4 protocol
+ match ipv4 source address
+ match ipv4 destination address
+ collect ipv4 ttl
+ collect interface input
+!
+flow monitor MAPPING_AGENT
+ record MAPPING_AGENT
+!
+interface GigabitEthernet0/1.58
+ ip flow monitor MAPPING_AGENT input
+!
+!
+
+show flow monitor MAPPING_AGENT cache format table
+
+R10:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.108
+ ip pim sparse-mode 
+!
+int GigabitEthernet0/1.10
+ ip pim sparse-mode
+!
+ip pim autorp listener
+!

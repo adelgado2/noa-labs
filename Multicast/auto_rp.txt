@@ -1,0 +1,35 @@
+R5:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.58
+ ip pim sparse-dense-mode
+!
+interface Loopback0
+ ip pim sparse-dense-mode
+!
+ip pim send-rp-announce loopback0 scope 31 
+ip pim send-rp-discovery loopback0 scope 31 
+!
+
+R8:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.58
+ ip pim sparse-dense-mode
+!
+interface GigabitEthernet0/1.108
+ ip pim sparse-dense-mode
+!
+
+R10:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.108
+ ip pim sparse-dense-mode
+!

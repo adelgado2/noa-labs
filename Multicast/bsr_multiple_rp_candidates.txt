@@ -1,0 +1,56 @@
+R4:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.45
+ ip pim sparse-mode
+!
+
+R5:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.45
+ ip pim sparse-mode
+!
+interface GigabitEthernet0/1.58
+ ip pim sparse-mode  
+!
+interface Loopback0
+ ip pim sparse-mode
+! 
+ip pim bsr-candidate Loopback0 31
+!
+
+R8:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.108
+ ip pim sparse-mode
+!
+interface GigabitEthernet0/1.58
+ ip pim sparse-mode  
+!
+interface loopback0
+ ip pim sparse-mode
+! 
+ip pim rp-candidate Loopback 0
+!
+
+R10:
+
+!
+ip multicast-routing
+!
+interface loopback0
+ ip pim sparse-mode
+! 
+interface GigabitEthernet0/1.108
+ ip pim sparse-mode  
+!
+ip pim rp-candidate Loopback 0
+!
