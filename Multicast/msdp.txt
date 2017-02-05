@@ -1,0 +1,54 @@
+R5:
+
+!
+ip multicast-routing
+!
+interface tunnel35
+ ip pim bsr-border
+!
+ip pim rp-candidate loopback0
+!
+ip msdp peer 150.1.7.7 connect-source loopback0 remote-as 100
+!
+
+R8:
+
+!
+ip multicast-routing
+!
+ip pim rp-candidate loopback0
+!
+ip msdp peer 150.1.7.7 connect-source loopback0 remote-as 100
+!
+
+R10:
+
+!
+ip multicast-routing
+!
+ip pim bsr-candidate loopback0 31
+!
+
+R4:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.146
+ ip pim bsr-border
+!
+
+R7:
+
+!
+ip multicast-routing
+!
+ip msdp peer 150.1.8.8 connect-source loopback0 remote-as 200
+ip msdp peer 150.1.5.5 connect-source loopback0 remote-as 200
+!
+
+R3, R4, R9, R6: 
+
+!
+ip multicast-routing
+!

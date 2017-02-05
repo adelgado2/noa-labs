@@ -1,0 +1,97 @@
+R3:
+
+!
+router bgp 100
+ address-family ipv4 multicast
+  redistribute ospf 1
+  neighbor 150.1.7.7 activate
+  neighbor 150.1.7.7 next-hop-self
+  neighbor 155.1.0.5 activate
+!
+interface Tunnel35
+ ip pim sparse-mode
+!
+
+R4:
+
+!
+route-map PREPEND
+ set as-path prepend 200 200 200
+!
+router bgp 200
+ address-family ipv4 multicast
+  redistribute ospf 1
+  neighbor 155.1.146.6 activate
+  neighbor 155.1.146.6 route-map PREPEND out
+  neighbor 150.1.5.5 activate
+  neighbor 150.1.5.5 next-hop-self
+!
+interface GigabitEthernet0/1.146
+ ip pim sparse-mode
+ ip pim bsr-border
+!
+
+R5:
+
+!
+router bgp 200
+ address-family ipv4 multicast
+  redistribute ospf 1
+  neighbor IBGP route-reflector-client
+  neighbor IBGP next-hop-self
+  neighbor 150.1.4.4 peer-group IBGP
+  neighbor 150.1.8.8 peer-group IBGP
+  neighbor 150.1.10.10 peer-group IBGP
+  neighbor 155.1.0.3 activate
+!
+interface Tunnel35
+ ip pim sparse-mode
+ ip pim bsr-border
+!
+
+R6:
+
+!
+route-map PREPEND
+ set as-path prepend 100 100 100
+!
+router bgp 100
+ address-family ipv4 multicast
+  redistribute ospf 1
+  neighbor 150.1.7.7 activate
+  neighbor 150.1.7.7 next-hop-self
+  neighbor 155.1.146.4 activate
+  neighbor 155.1.146.4 route-map PREPEND out
+ !
+interface GigabitEthernet0/1.146
+ ip pim sparse-mode
+!
+
+R7:
+
+!
+router bgp 100
+ address-family ipv4 multicast
+  neighbor IBGP route-reflector-client
+  neighbor 150.1.3.3 peer-group IBGP
+  neighbor 150.1.6.6 peer-group IBGP
+  neighbor 150.1.9.9 peer-group IBGP
+!
+
+R8:
+
+router bgp 200
+ address-family ipv4 multicast
+  neighbor 150.1.5.5 activate 
+
+R9:
+
+router bgp 100
+ address-family ipv4 multicast
+  neighbor 150.1.7.7 activate
+
+R10:
+
+router bgp 200
+ address-family ipv4 multicast
+  neighbor 150.1.5.5 activate

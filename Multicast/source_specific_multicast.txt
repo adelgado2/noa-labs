@@ -1,0 +1,74 @@
+R6:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.146
+ ip pim sparse-mode 
+!
+ip pim ssm default
+!
+
+R4:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.146
+ ip pim sparse-mode
+!
+interface GigabitEthernet0/1.45
+ ip pim sparse-mode 
+!
+ip pim ssm default
+!
+
+R5:
+
+!
+ip multicast-routing
+!
+ip access-list standard 1
+ permit 238.0.0.0 0.255.255.255
+!
+interface Loopback0
+ ip pim sparse-mode
+!
+interface GigabitEthernet0/1.45
+ ip pim sparse-mode 
+!
+interface GigabitEthernet0/1.58
+ ip pim sparse-mode 
+!
+ip pim ssm default
+!
+
+R8:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.58
+ ip pim sparse-mode 
+!
+interface GigabitEthernet0/1.108
+ ip pim sparse-mode 
+!
+ip pim ssm default
+!
+
+R10:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.108
+ ip pim sparse-mode 
+ ip igmp version 3
+ ip igmp join-group 232.10.10.10 source 150.1.6.6
+!
+int GigabitEthernet0/1.10
+ ip pim sparse-mode
+!
+ip pim ssm default
+!

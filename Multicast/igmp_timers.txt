@@ -1,0 +1,69 @@
+R1:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.146
+ ip pim sparse-mode
+ ip igmp querier-timeout 60
+ ip igmp query-interval 20
+ ip igmp query-max-response-time 4
+!
+
+R4:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.146
+ ip pim sparse-mode
+ ip igmp querier-timeout 60
+!
+
+R6:
+
+!
+ip multicast-routing
+!
+interface Loopback0
+ ip pim sparse-mode
+!
+interface GigabitEthernet0/1.146
+ ip pim sparse-mode
+ ip igmp querier-timeout 60
+!
+ip pim bsr-candidate Loopback0
+ip pim rp-candidate Loopback0
+!
+
+R8:
+
+!
+ip multicast-routing
+!
+ip access-list standard 1
+ permit 239.1.1.0 0.0.0.255
+! 
+interface Loopback0
+ ip pim sparse-mode
+!
+interface GigabitEthernet0/1.108
+ ip pim sparse-mode
+ ip igmp immediate-leave group-list 1
+!
+ip pim bsr-candidate Loopback0
+ip pim rp-candidate Loopback0
+!
+
+R10:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.108
+ ip pim sparse-mode
+ ip igmp join-group 239.1.1.10
+!
+interface GigabitEthernet0/1.10
+ ip pim sparse-mode
+!
