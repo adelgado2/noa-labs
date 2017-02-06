@@ -1,0 +1,43 @@
+SW1:
+
+!
+ip igmp snooping vlan 146 immediate-leave
+!
+interface GigabitEthernet0/1
+ switchport mode access
+ switchport access vlan 146
+!
+
+SW3:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1
+ no switchport
+ ip address 155.1.146.20 255.255.255.0
+ ip pim dense-mode
+ ip igmp join-group 239.1.1.100
+!
+
+SW2:
+
+!
+ip igmp snooping vlan 146 immediate-leave
+!
+interface GigabitEthernet0/1
+ switchport mode access
+ switchport access vlan 146
+!
+
+SW4:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1
+ no switchport
+ ip address 155.1.146.40 255.255.255.0
+ ip pim dense-mode
+ ip igmp join-group 239.1.1.100
+!

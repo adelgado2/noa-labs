@@ -1,0 +1,72 @@
+R6:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.146
+ ip pim sparse-mode 
+!
+
+R4:
+
+!
+ip multicast-routing
+!
+interface Loopback1
+ ip address 150.1.100.100 255.255.255.255
+ ip pim sparse-mode
+!
+interface GigabitEthernet0/1.146
+ ip pim sparse-mode
+!
+interface GigabitEthernet0/1.45
+ ip pim sparse-mode 
+!
+ip pim rp-candidate Loopback1
+ip msdp peer 150.1.8.8 connect-source Loopback0 
+!
+
+R5:
+
+!
+ip multicast-routing
+!
+interface Loopback0
+ ip pim sparse-mode
+!
+interface GigabitEthernet0/1.45
+ ip pim sparse-mode 
+!
+interface GigabitEthernet0/1.58
+ ip pim sparse-mode 
+!
+ip pim bsr-candidate Loopback0
+!
+
+R8:
+
+!
+ip multicast-routing
+!
+interface Loopback1
+ ip address 150.1.100.100 255.255.255.255
+ ip pim sparse-mode
+!
+interface GigabitEthernet0/1.58
+ ip pim sparse-mode 
+!
+interface GigabitEthernet0/1.108
+ ip pim sparse-mode 
+!
+ip pim rp-candidate Loopback1
+ip msdp peer 150.1.4.4 connect-source Loopback0 
+!
+
+R10:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.108
+ ip pim sparse-mode 
+!
