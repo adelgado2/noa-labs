@@ -1,0 +1,94 @@
+R7:
+
+!
+router ospf 100
+ network 155.1.79.7 0.0.0.0 area 0
+!
+interface tunnel78
+ ip address 169.254.78.7 255.255.255.0
+ tunnel source Loopback0
+ tunnel destination 150.1.8.8
+ ip ospf 100 area 0
+ ip mtu 1400
+ ip tcp adjust-mss 1360
+!
+ip access-list ext VPN-TUNNEL
+ permit gre host 150.1.7.7 host 150.1.8.8
+!
+crypto isakmp policy 10
+ encryption 3des
+ hash md5
+ authentication pre-share
+ group 5
+!
+crypto isakmp key CISCO address 150.1.8.8
+!
+crypto ipsec transform-set ESP_AES_128_SHA1 esp-aes 128 esp-sha-hmac
+ mode transport
+!
+crypto map GRE_OVER_IPSEC 10 ipsec-isakmp
+ set peer 150.1.8.8
+ set transform-set ESP_AES_128_SHA1
+ match address VPN-TUNNEL
+!
+crypto map GRE_OVER_IPSEC local-address Loopback0
+!
+interface GigabitEthernet0/1.37
+ crypto map GRE_OVER_IPSEC
+!
+interface GigabitEthernet0/1.67
+ crypto map GRE_OVER_IPSEC
+!
+
+R9:
+
+!
+router ospf 100
+ network 0.0.0.0 0.0.0.0 area 0
+!
+
+R8:
+
+!
+router ospf 100
+ network 155.1.108.8 0.0.0.0 area 0
+!
+interface tunnel78
+ ip address 169.254.78.8 255.255.255.0
+ tunnel source Loopback0
+ tunnel destination 150.1.7.7
+ ip ospf 100 area 0
+ ip mtu 1400
+ ip tcp adjust-mss 1360
+!
+ip access-list ext VPN-TUNNEL
+ permit gre host 150.1.8.8 host 150.1.7.7
+!
+crypto isakmp policy 10
+ encryption 3des
+ hash md5
+ authentication pre-share
+ group 5
+!
+crypto isakmp key CISCO address 150.1.7.7
+!
+crypto ipsec transform-set ESP_AES_128_SHA1 esp-aes 128 esp-sha-hmac
+ mode transport
+!
+crypto map GRE_OVER_IPSEC 10 ipsec-isakmp
+ set peer 150.1.7.7
+ set transform-set ESP_AES_128_SHA1
+ match address VPN-TUNNEL
+!
+crypto map GRE_OVER_IPSEC local-address Loopback0
+!
+interface GigabitEthernet0/1.58
+ crypto map GRE_OVER_IPSEC
+!
+
+R10:
+
+!
+router ospf 100
+ network 0.0.0.0 0.0.0.0 area 0
+!

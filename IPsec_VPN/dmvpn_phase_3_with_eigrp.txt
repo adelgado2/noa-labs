@@ -1,0 +1,212 @@
+R1:
+
+!
+crypto isakmp policy 10
+ encryption aes 128
+ hash sha256
+ authentication pre-share
+ group 16
+!
+crypto isakmp key DMVPN_PSK address 0.0.0.0
+!
+crypto ipsec transform-set ESP_AES_256_SHA_512 esp-aes 256 esp-sha512-hmac
+ mode transport
+!
+crypto ipsec profile DMVPN_PROFILE
+ set transform-set ESP_AES_256_SHA_512
+!
+interface tunnel0
+ ip address 155.1.0.1 255.255.255.0
+ ip mtu 1400
+ ip nhrp authentication NHRPAUTH
+ ip nhrp map 155.1.0.5 169.254.100.5
+ ip nhrp map multicast 169.254.100.5
+ ip nhrp nhs 155.1.0.5
+ ip nhrp network-id 1
+ ip nhrp shortcut
+ tunnel source GigabitEthernet0/1.100
+ tunnel protection ipsec profile DMVPN_PROFILE
+ tunnel key 2
+ tunnel mode gre multipoint
+ ip tcp adjust-mss 1360
+!
+router eigrp A
+ address-family ipv4 autonomous-system 100
+  network 155.1.0.0 0.0.255.255
+  network 150.1.0.0 0.0.255.255
+  af-interface default
+   passive-interface
+  af-interface tunnel0
+   no passive-interface
+!
+
+R2:
+
+!
+crypto isakmp policy 10
+ encryption aes 128
+ hash sha256
+ authentication pre-share
+ group 16
+!
+crypto isakmp key DMVPN_PSK address 0.0.0.0
+!
+crypto ipsec transform-set ESP_AES_256_SHA_512 esp-aes 256 esp-sha512-hmac
+ mode transport
+!
+crypto ipsec profile DMVPN_PROFILE
+ set transform-set ESP_AES_256_SHA_512
+!
+interface tunnel0
+ ip address 155.1.0.2 255.255.255.0
+ ip mtu 1400
+ ip nhrp authentication NHRPAUTH
+ ip nhrp map 155.1.0.5 169.254.100.5
+ ip nhrp map multicast 169.254.100.5
+ ip nhrp nhs 155.1.0.5
+ ip nhrp network-id 1
+ ip nhrp shortcut
+ tunnel source GigabitEthernet0/1.100
+ tunnel key 2
+ tunnel mode gre multipoint
+ tunnel protection ipsec profile DMVPN_PROFILE
+ ip tcp adjust-mss 1360
+ !
+router eigrp A
+ address-family ipv4 autonomous-system 100
+  network 155.1.0.0 0.0.255.255
+  network 150.1.0.0 0.0.255.255
+  af-interface default
+   passive-interface
+  af-interface tunnel0
+   no passive-interface
+! 
+
+R3:
+
+!
+crypto isakmp policy 10
+ encryption aes 128
+ hash sha256
+ authentication pre-share
+ group 16
+!
+crypto isakmp key DMVPN_PSK address 0.0.0.0
+!
+crypto ipsec transform-set ESP_AES_256_SHA_512 esp-aes 256 esp-sha512-hmac
+ mode transport
+!
+crypto ipsec profile DMVPN_PROFILE
+ set transform-set ESP_AES_256_SHA_512
+!
+interface tunnel0
+ ip address 155.1.0.3 255.255.255.0
+ ip mtu 1400
+ ip nhrp authentication NHRPAUTH
+ ip nhrp map 155.1.0.5 169.254.100.5
+ ip nhrp map multicast 169.254.100.5
+ ip nhrp nhs 155.1.0.5
+ ip nhrp network-id 1
+ ip nhrp shortcut
+ tunnel source GigabitEthernet0/1.100
+ tunnel key 2
+ tunnel mode gre multipoint
+ tunnel protection ipsec profile DMVPN_PROFILE
+ ip tcp adjust-mss 1360
+! 
+router eigrp A
+ address-family ipv4 autonomous-system 100
+  network 155.1.0.0 0.0.255.255
+  network 150.1.0.0 0.0.255.255
+  af-interface default
+   passive-interface
+  af-interface tunnel0
+   no passive-interface
+!
+
+
+R4:
+
+!
+crypto isakmp policy 10
+ encryption aes 128
+ hash sha256
+ authentication pre-share
+ group 16
+!
+crypto isakmp key DMVPN_PSK address 0.0.0.0
+!
+crypto ipsec transform-set ESP_AES_256_SHA_512 esp-aes 256 esp-sha512-hmac
+ mode transport
+!
+crypto ipsec profile DMVPN_PROFILE
+ set transform-set ESP_AES_256_SHA_512
+!
+interface tunnel0
+ bandwidth 2048
+ ip address 155.1.0.4 255.255.255.0
+ ip mtu 1400
+ ip nhrp authentication NHRPAUTH
+ ip nhrp map 155.1.0.5 169.254.100.5
+ ip nhrp map multicast 169.254.100.5
+ ip nhrp nhs 155.1.0.5
+ ip nhrp network-id 1
+ ip nhrp shortcut
+ tunnel source GigabitEthernet0/1.100
+ tunnel key 2
+ tunnel mode gre multipoint
+ tunnel protection ipsec profile DMVPN_PROFILE
+ ip tcp adjust-mss 1360
+! 
+router eigrp A
+ address-family ipv4 autonomous-system 100
+  network 155.1.0.0 0.0.255.255
+  network 150.1.0.0 0.0.255.255
+  af-interface default
+   passive-interface
+  af-interface tunnel0
+   no passive-interface
+!
+
+R5:
+
+!
+crypto isakmp policy 10
+ encryption aes 128
+ hash sha256
+ authentication pre-share
+ group 16
+!
+crypto isakmp key DMVPN_PSK address 0.0.0.0
+!
+crypto ipsec transform-set ESP_AES_256_SHA_512 esp-aes 256 esp-sha512-hmac
+ mode transport
+!
+crypto ipsec profile DMVPN_PROFILE
+ set transform-set ESP_AES_256_SHA_512
+!
+interface tunnel0
+ bandwidth 2048
+ ip address 155.1.0.5 255.255.255.0
+ ip mtu 1400
+ ip nhrp authentication NHRPAUTH
+ ip nhrp map multicast dynamic
+ ip nhrp network-id 1
+ ip nhrp redirect
+ tunnel source GigabitEthernet0/1.100
+ tunnel key 2
+ tunnel mode gre multipoint
+ tunnel protection ipsec profile DMVPN_PROFILE
+ ip tcp adjust-mss 1360
+! 
+router eigrp A
+ address-family ipv4 autonomous-system 100
+  network 155.1.0.0 0.0.255.255
+  network 150.1.0.0 0.0.255.255
+  af-interface default
+   passive-interface
+  af-interface tunnel0
+   no passive-interface
+   no split-horizon 
+   summary-address 0.0.0.0 0.0.0.0
+!

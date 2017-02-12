@@ -1,0 +1,267 @@
+VRFs:
+
+R5:
+
+!
+vrf definition UNDERLAY_TRANSPORT
+ address-family ipv4 unicast 
+  rd 1:1
+!
+interface GigabitEthernet0/1.45
+ vrf forwarding UNDERLAY_TRANSPORT
+ encapsulation dot1Q 45
+ ip address 155.1.45.5 255.255.255.0
+! 
+ip route vrf UNDERLAY_TRANSPORT 0.0.0.0 0.0.0.0 155.1.45.4
+!
+ 
+R6:
+
+!
+vrf definition UNDERLAY_TRANSPORT
+ address-family ipv4 unicast 
+  rd 1:1
+!
+interface GigabitEthernet0/1.146
+ vrf forwarding UNDERLAY_TRANSPORT
+ encapsulation dot1Q 146
+ ip address 155.1.146.6 255.255.255.0
+!
+interface GigabitEthernet0/1.67
+ vrf forwarding UNDERLAY_TRANSPORT
+ ip address 155.1.67.6 255.255.255.0
+!
+interface Loopback0
+ vrf forwarding UNDERLAY_TRANSPORT
+ ip address 6.6.6.6 255.255.255.255 
+!
+
+R9:
+
+!
+vrf definition UNDERLAY_TRANSPORT
+ address-family ipv4 unicast 
+  rd 1:1
+!
+interface GigabitEthernet0/1.79
+ vrf forwarding UNDERLAY_TRANSPORT
+ encapsulation dot1Q 79
+ ip address 155.1.79.9 255.255.255.0
+!
+ip route vrf UNDERLAY_TRANSPORT 0.0.0.0 0.0.0.0 155.1.79.7
+!
+
+BGP:
+
+R1:
+
+!
+interface GigabitEthernet0/1.146
+ bfd interval 250 min_rx 250 multiplier 4
+!
+router bgp 100
+ bgp router-id 150.1.1.1
+ neighbor 155.1.146.4 remote-as 100
+ neighbor 155.1.146.4 next-hop-self
+ neighbor 155.1.13.3 remote-as 200
+ neighbor 155.1.146.6 remote-as 6
+ neighbor 155.1.146.6 fall-over bfd
+!
+
+R4:
+
+!
+router bgp 100
+ bgp router-id 150.1.4.4
+ network 155.1.45.0 mask 255.255.255.0
+ neighbor 155.1.146.1 remote-as 100
+ neighbor 155.1.146.1 next-hop-self
+!
+
+R3:
+
+!
+router bgp 200
+ bgp router-id 150.1.3.3
+ neighbor 155.1.37.7 remote-as 200
+ neighbor 155.1.37.7 next-hop-self
+ neighbor 155.1.13.1 remote-as 100
+!
+
+R7:
+
+!
+interface GigabitEthernet0/1.67
+ bfd interval 250 min_rx 250 multiplier 4
+!
+router bgp 200
+ bgp router-id 150.1.7.7
+ network 155.1.79.0 mask 255.255.255.0
+ neighbor 155.1.37.3 remote-as 200
+ neighbor 155.1.67.6 remote-as 6
+ neighbor 155.1.67.6 fall-over bfd
+!
+ 
+R6:
+
+!
+interface GigabitEthernet0/1.146
+ bfd interval 250 min_rx 250 multiplier 4
+!
+interface GigabitEthernet0/1.67
+ bfd interval 250 min_rx 250 multiplier 4
+!
+router bgp 6
+ address-family ipv4 vrf UNDERLAY_TRANSPORT
+ bgp router-id 150.1.6.6 
+ network 6.6.6.6 mask 255.255.255.255
+ neighbor 155.1.146.1 remote-as 100
+ neighbor 155.1.146.1 fall-over bfd
+ neighbor 155.1.67.7 remote-as 200
+ neighbor 155.1.67.7 fall-over bfd
+!
+
+DMVPN Phase 3, IGP, IPsec
+
+R5:
+
+!
+crypto isakmp policy 10
+ encryption aes 128
+ hash sha256
+ authentication pre-share
+ group 16
+!
+crypto keyring VRF_AWARE_PSK vrf UNDERLAY_TRANSPORT 
+  pre-shared-key address 0.0.0.0 0.0.0.0 key DMVPN_PSK
+!
+crypto ipsec transform-set ESP_AES_256_SHA_512 esp-aes 256 esp-sha512-hmac
+ mode transport
+!
+crypto ipsec profile DMVPN_PROFILE
+ set transform-set ESP_AES_256_SHA_512
+!
+interface tunnel0
+ ip address 155.1.0.5 255.255.255.0
+ ip mtu 1400
+ ip nhrp authentication NHRPAUTH
+ ip nhrp map 155.1.0.6 6.6.6.6
+ ip nhrp map multicast 6.6.6.6
+ ip nhrp nhs 155.1.0.6
+ ip nhrp network-id 1
+ ip nhrp shortcut
+ tunnel source GigabitEthernet0/1.45
+ tunnel protection ipsec profile DMVPN_PROFILE
+ tunnel vrf UNDERLAY_TRANSPORT
+ tunnel key 2
+ tunnel mode gre multipoint
+ ip tcp adjust-mss 1360
+!
+router eigrp A
+ address-family ipv4 autonomous-system 100
+  network 155.1.0.0 0.0.255.255
+  network 150.1.0.0 0.0.255.255
+  af-interface default
+   passive-interface
+  af-interface tunnel0
+   no passive-interface
+!
+
+R9:
+
+
+!
+crypto isakmp policy 10
+ encryption aes 128
+ hash sha256
+ authentication pre-share
+ group 16
+!
+crypto keyring VRF_AWARE_PSK vrf UNDERLAY_TRANSPORT 
+  pre-shared-key address 0.0.0.0 0.0.0.0 key DMVPN_PSK
+!
+crypto ipsec transform-set ESP_AES_256_SHA_512 esp-aes 256 esp-sha512-hmac
+ mode transport
+!
+crypto ipsec profile DMVPN_PROFILE
+ set transform-set ESP_AES_256_SHA_512
+!
+interface tunnel0
+ ip address 155.1.0.9 255.255.255.0
+ ip mtu 1400
+ ip nhrp authentication NHRPAUTH
+ ip nhrp map 155.1.0.6 6.6.6.6
+ ip nhrp map multicast 6.6.6.6
+ ip nhrp nhs 155.1.0.6
+ ip nhrp network-id 1
+ ip nhrp shortcut
+ tunnel source GigabitEthernet0/1.79
+ tunnel protection ipsec profile DMVPN_PROFILE
+ tunnel vrf UNDERLAY_TRANSPORT
+ tunnel key 2
+ tunnel mode gre multipoint
+ ip tcp adjust-mss 1360
+!
+router eigrp A
+ address-family ipv4 autonomous-system 100
+  network 155.1.0.0 0.0.255.255
+  network 150.1.0.0 0.0.255.255
+  af-interface default
+   passive-interface
+  af-interface tunnel0
+   no passive-interface
+!
+
+R6:
+
+!
+crypto isakmp policy 10
+ encryption aes 128
+ hash sha256
+ authentication pre-share
+ group 16
+!
+crypto keyring VRF_AWARE_PSK vrf UNDERLAY_TRANSPORT 
+  pre-shared-key address 0.0.0.0 0.0.0.0 key DMVPN_PSK
+!
+crypto ipsec transform-set ESP_AES_256_SHA_512 esp-aes 256 esp-sha512-hmac
+ mode transport
+!
+crypto ipsec profile DMVPN_PROFILE
+ set transform-set ESP_AES_256_SHA_512
+!
+interface tunnel0
+ bandwidth 2048
+ ip address 155.1.0.6 255.255.255.0
+ ip mtu 1400
+ ip nhrp authentication NHRPAUTH
+ ip nhrp map multicast dynamic
+ ip nhrp network-id 1
+ ip nhrp redirect
+ tunnel source 6.6.6.6
+ tunnel key 2
+ tunnel mode gre multipoint
+ tunnel protection ipsec profile DMVPN_PROFILE
+ tunnel vrf UNDERLAY_TRANSPORT
+ ip tcp adjust-mss 1360
+! 
+router eigrp A
+ address-family ipv4 autonomous-system 100
+  network 155.1.0.0 0.0.255.255
+  network 150.1.0.0 0.0.255.255
+  af-interface default
+   passive-interface
+  af-interface tunnel0
+   no passive-interface
+!
+router eigrp A
+ address-family ipv4 autonomous-system 100
+  network 155.1.0.0 0.0.255.255
+  network 150.1.0.0 0.0.255.255
+  af-interface default
+   passive-interface
+  af-interface tunnel0
+   no passive-interface
+   no split-horizon 
+   summary-address 0.0.0.0 0.0.0.0
+!

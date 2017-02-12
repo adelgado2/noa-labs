@@ -1,0 +1,73 @@
+R7:
+
+!
+router ospf 100
+ network 155.1.79.7 0.0.0.0 area 0
+!
+crypto isakmp policy 10
+ encryption aes 192
+ hash sha384 
+ authentication pre-share
+ group 15
+!
+crypto isakmp key CISCO address 150.1.8.8
+!
+crypto ipsec transform-set ESP_3DES_MD5 esp-3des esp-md5-hmac
+ mode tunnel
+!
+crypto ipsec profile VTI_PROFILE
+ set transform-set ESP_3DES_MD5
+!
+interface tunnel78
+ ip address 169.254.78.7 255.255.255.0
+ tunnel mode ipsec ipv4
+ tunnel source Loopback0
+ tunnel destination 150.1.8.8
+ tunnel protection ipsec profile VTI_PROFILE
+ ip tcp adjust-mss 1406
+!
+
+R9:
+
+!
+router ospf 100
+ network 0.0.0.0 0.0.0.0 area 0
+!
+
+R8:
+
+!
+router ospf 100
+ network 155.1.108.8 0.0.0.0 area 0
+!
+crypto isakmp policy 10
+ encryption aes 192
+ hash sha384 
+ authentication pre-share
+ group 15
+!
+crypto isakmp key CISCO address 150.1.7.7
+!
+crypto ipsec transform-set ESP_3DES_MD5 esp-3des esp-md5-hmac
+ mode tunnel
+!
+crypto ipsec profile VTI_PROFILE
+ set transform-set ESP_3DES_MD5
+!
+interface tunnel78
+ ip address 169.254.78.8 255.255.255.0
+ tunnel mode ipsec ipv4
+ tunnel source Loopback0
+ tunnel destination 150.1.7.7
+ tunnel protection ipsec profile VTI_PROFILE
+ ip ospf 100 area 0
+ ip tcp adjust-mss 1406
+!
+
+
+R10:
+
+!
+router ospf 100
+ network 0.0.0.0 0.0.0.0 area 0
+!

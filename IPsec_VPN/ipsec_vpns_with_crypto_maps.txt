@@ -1,0 +1,92 @@
+R7:
+
+!
+ip route 0.0.0.0 0.0.0.0 155.1.37.3
+ip route 0.0.0.0 0.0.0.0 155.1.67.6
+!
+router ospf 100
+ network 155.1.79.7 0.0.0.0 area 0
+ default-information originate
+!
+ 
+R8:
+
+!
+ip route 0.0.0.0 0.0.0.0 155.1.58.5
+!
+router ospf 100
+ network 155.1.108.8 0.0.0.0 area 0
+ default-information originate
+!
+
+R9:
+
+!
+router ospf 100
+ network 0.0.0.0 0.0.0.0 area 0
+!
+
+R10:
+
+!
+router ospf 100
+ network 0.0.0.0 0.0.0.0 area 0
+!
+
+R7:
+
+!
+ip access-list extended VPN-TUNNEL
+ permit ip 150.1.9.0 0.0.0.255 150.1.10.0 0.0.0.255
+!
+crypto isakmp policy 10
+ encryption aes 256
+ authentication pre-share
+ group 24
+ hash sha512
+!
+crypto isakmp key CISCO address 150.1.8.8
+!
+crypto ipsec transform-set ESP_AES_192_SHA1 esp-aes 192 esp-sha384-hmac
+ mode tunnel
+!
+crypto map R7_TO_R8 10 ipsec-isakmp
+ set peer 150.1.8.8
+ set transform-set ESP_AES_192_SHA1
+ match address VPN-TUNNEL
+!
+crypto map R7_TO_R8 local-address Loopback0
+!
+interface GigabitEthernet0/1.37
+ crypto map R7_TO_R8
+interface GigabitEthernet0/1.67
+ crypto map R7_TO_R8
+!
+
+R8:
+
+!
+ip access-list extended VPN-TUNNEL
+ permit ip 150.1.10.0 0.0.0.255 150.1.9.0 0.0.0.255
+!
+crypto isakmp policy 10
+ encryption aes 256
+ authentication pre-share
+ group 24
+ hash sha512
+!
+crypto isakmp key CISCO address 150.1.7.7
+!
+crypto ipsec transform-set ESP_AES_192_SHA1 esp-aes 192 esp-sha384-hmac
+ mode tunnel
+!
+crypto map R7_TO_R8 10 ipsec-isakmp
+ set peer 150.1.7.7
+ set transform-set ESP_AES_192_SHA1
+ match address VPN-TUNNEL
+!
+crypto map R7_TO_R8 local-address Loopback0
+!
+interface GigabitEthernet0/1.58
+ crypto map R7_TO_R8
+!
