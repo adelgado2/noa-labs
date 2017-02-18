@@ -1,0 +1,17 @@
+R6:
+
+!
+policy-map SHAPING-146
+ class class-default
+  shape average 384000 7680
+!
+policy-map SHAPING-67
+ class class-default
+  shape average 512000 10240
+!
+interface GigabitEthernet0/1.146
+ service-policy output SHAPING-146
+!
+interface GigabitEthernet0/1.67
+ service-policy output SHAPING-67
+! 

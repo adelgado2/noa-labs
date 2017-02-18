@@ -1,0 +1,56 @@
+R1:
+
+!
+interface Tunnel16
+ ip address 172.1.16.1 255.255.255.0
+ tunnel source GigabitEthernet0/1.146
+ tunnel destination 155.1.146.6 
+!
+router eigrp INE_RSv5
+ !
+ address-family ipv4 unicast autonomous-system 123
+  !
+  af-interface Tunnel16
+   passive-interface
+!
+ip route 150.1.6.6 255.255.255.255 Tunnel16
+!
+
+R6:
+
+!
+ip access-list extended R1_R6
+ 10 permit ip host 150.1.6.6 host 150.1.1.1 
+ 20 permit ip host 150.1.1.1 host 150.1.6.6
+!
+class-map match-all VOICE
+ match ip dscp ef
+ match access-group name R1_R6
+!
+interface Tunnel16
+ ip address 172.1.16.6 255.255.255.0
+ tunnel source GigabitEthernet0/1.146
+ tunnel destination 155.1.146.1
+ qos pre-classify
+!
+router eigrp INE_RSv5
+ !
+ address-family ipv4 unicast autonomous-system 123
+  !
+  af-interface Tunnel16
+   passive-interface
+!
+ip route 150.1.1.1 255.255.255.255 Tunnel16
+!
+policy-map POLICE_2
+ class VOICE
+  priority 3000
+!
+policy-map SHAPE_1 
+ class class-default
+  shape average 10000000
+   service-policy POLICE_2
+!
+interface GigabitEthernet0/1.146
+ service-policy output SHAPE_1
+! 

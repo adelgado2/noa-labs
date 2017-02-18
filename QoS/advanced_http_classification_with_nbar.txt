@@ -1,0 +1,16 @@
+
+R6:
+
+!
+class-map match-any CUSTOM
+ match protocol http url "*.bin|*.t[ea]xt"
+!
+policy-map SHAPE
+ class CUSTOM
+  shape average 256000
+!
+interface GigabitEthernet0/1.146
+ service-policy output SHAPE
+!
+
+Use the method most friendly for TCP connections: SHAPE

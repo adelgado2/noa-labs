@@ -1,0 +1,30 @@
+R4:
+
+!
+ip access-list extended WWW
+ permit tcp 155.1.146.0 0.0.0.255 eq www any
+!
+class-map match-all WWW
+ match access-group name WWW
+!
+policy-map CHILD
+ class WWW
+  bandwidth remaining percent 33 
+  random-detect 
+  random-detect precedence 2 4 16 4
+!
+policy-map PARENT
+ class class-default
+  shape average 768000
+   service-policy CHILD
+!
+interface GigabitEthernet0/1.45
+ service-policy output PARENT
+!
+policy-map MARKING
+ class WWW
+  set ip precedence 2
+!
+interface GigabitEthernet0/1.146
+ service-policy input MARKING
+!

@@ -1,0 +1,13 @@
+R4:
+
+!
+class-map match-all HTTP
+ match protocol http
+!
+policy-map POLICING
+ class HTTP 
+   police 128000 3200 4800 conform-action set-prec-transmit 1 exceed-action set-prec-transmit 0 violate-action drop
+!
+interface GigabitEthernet0/1.146
+ service-policy input POLICING
+!

@@ -1,0 +1,17 @@
+R4:
+
+!
+policy-map CHILD
+ class class-default
+  fair-queue
+  random-detect
+  random-detect precedence 1 1 40 4
+!
+policy-map PARENT
+ class class-default
+  shape average 768000
+  service-policy CHILD
+!
+interface GigabitEthernet0/1.45
+ service-policy output PARENT
+!

@@ -1,0 +1,18 @@
+R1:
+
+!
+policy-map POLICING
+ class class-default
+  police cir percent 1 125 ms
+!
+interface GigabitEthernet0/1.146
+ service-policy input POLICING
+!
+
+La otra forma (que es más para el control-plane) es:
+
+!
+policy-map POLICING
+ class class-default
+  police rate percent 1 burst 125 ms
+!

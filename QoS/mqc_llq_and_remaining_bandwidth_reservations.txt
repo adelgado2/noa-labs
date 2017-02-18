@@ -1,0 +1,35 @@
+R4:
+
+!
+ip access-list extended WWW
+ permit tcp 155.1.146.0 0.0.0.255 eq www any
+!
+ip access-list extended VOICE
+ permit udp any any range 16384 32767 
+!
+class-map match-all WWW
+ match access-group name WWW
+!
+class-map match-all SCAVENGER
+ match ip precedence 0
+!
+class-map match-all VOICE
+ match access-group name VOICE
+ match packet length min 60 max 60
+!
+policy-map CHILD
+ class VOICE
+  priority 24
+ class WWW
+  bandwidth remaining percent 33 
+ class SCAVENGER 
+  bandwidth remaining percent 33
+!
+policy-map PARENT
+ class class-default
+  shape average 1500000
+   service-policy CHILD
+!
+interface GigabitEthernet0/1.45
+ service-policy output PARENT
+!

@@ -1,0 +1,37 @@
+R4:
+
+!
+ip access-list extended HTTP
+ permit tcp 155.1.146.0 0.0.0.255 eq www any
+!
+ip access-list extended VOIP
+ permit udp any any range 16384 32767
+!
+class-map match-all HTTP
+ match access-group name HTTP
+!
+class-map match-all VOIP
+ match access-group name VOIP
+ match packet length min 60 max 60
+!
+class-map match-all ICMP
+ match protocol icmp
+ match packet length min 1001
+!
+class-map match-all REMARK
+ match ip precedence 0
+!
+policy-map TO-R5 
+ class VOIP 
+  set ip dscp ef
+ class HTTP
+  set ip precedence 2
+ class ICMP 
+  set ip precedence 0
+ class REMARK
+  set ip precedence 1 
+!
+interface GigabitEthernet0/1.45
+ service-policy output TO-R5 
+!
+

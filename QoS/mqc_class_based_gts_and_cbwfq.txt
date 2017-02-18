@@ -1,0 +1,25 @@
+R6:
+
+!
+class-map VOICE
+ match packet lenght min 60 max 60
+!
+class-map HTTP
+ match protocol HTTP
+!
+policy-map CHILD-SHAPING
+ class VOICE
+  priority 32 4000 
+ class HTTP 
+  bandwidth 256
+ class class-default
+  fair-queue
+!
+policy-map SHAPING-146
+ class class-default
+  shape average 384000 7680
+   service-policy CHILD-SHAPING  
+!
+interface GigabitEthernet0/1.146
+ service-policy output SHAPING-146
+!

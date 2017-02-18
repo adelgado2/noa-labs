@@ -1,0 +1,32 @@
+R4:
+
+!
+ip access-list extended FROM_R1
+ 10 permit ip host 155.1.146.1 any
+!
+ip access-list extended FROM_R6
+ 10 permit ip host 155.1.146.6 any 
+!
+class-map HTTP
+ match protocol HTTP
+!
+class-map FROM_R1
+ match access-group name FROM_R1
+!
+class-map FROM_R6
+ match access-group name FROM_R6 
+!
+policy-map POLICING_2
+ class FROM_R1
+  police 64000 conform-action set-prec-transmit 1 exceed-action set-prec-transmit 0 violate-action drop
+ class FROM_R6
+  police 64000 conform-action set-prec-transmit 1 exceed-action set-prec-transmit 0 violate-action drop 
+!
+policy-map POLICING
+ class HTTP
+  police 128000 conform-action transmit exceed-action set-prec-transmit 0 violate-action drop
+   service-policy POLICING_2
+!
+interface GigabitEthernet0/1.146
+ service-policy input POLICING
+!
