@@ -1,0 +1,20 @@
+R8:
+
+!
+time-range WEEKEND
+ periodic weekend 00:00 to 23:59
+!
+time-range FROM-18-TO-9
+ periodic daily 18:00 to 23:59
+ periodic daily 00:00 to 8:59 
+!
+ip access-list extended NOT-PASS
+ deny ip any host 150.1.10.10 time-range WEEKEND
+ deny ip any 155.1.10.1 0.0.0.255 time-range WEEKEND
+ deny ip any host 150.1.10.10 time-range FROM-18-TO-9
+ deny ip any 155.1.10.1 0.0.0.255 time-range FROM-18-TO-9
+ permit ip any any
+!
+interface GigabitEthernet0/1.108
+ ip access-group NOT-PASS out
+!

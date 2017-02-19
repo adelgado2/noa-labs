@@ -1,0 +1,8 @@
+R4:
+
+!
+access-list 100 deny ip any any log
+!
+interface GigabitEthernet0/1.146
+ ip verify unicast 
+!

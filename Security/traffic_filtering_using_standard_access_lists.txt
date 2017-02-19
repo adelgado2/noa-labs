@@ -1,0 +1,19 @@
+R1:
+
+!
+ip access-list standard 10
+ permit 150.1.0.0 0.0.6.255
+ permit 155.1.0.0 0.0.255.255
+!
+interface GigabitEthernet0/1.146
+ ip access-group 10 in
+!
+interface GigabitEthernet0/1.13
+ ip access-group 10 in
+!
+interface Tunnel0
+ ip access-group 10 in
+!
+interface GigabitEthernet0/1.100
+ ip access-group 10 in
+!

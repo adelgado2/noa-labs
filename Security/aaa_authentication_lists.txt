@@ -1,0 +1,30 @@
+R1:
+
+!
+username ADMIN privilege 15 secret 0 CISCO
+enable secret 0 cisco
+!
+aaa new-model
+!
+aaa authentication banner *Unauthorized Access Prohibited*
+aaa authentication fail-message *Failed login. Try again.*
+!
+aaa authentication password-prompt "Please Enter Your Password:"
+aaa authentication username-prompt "Please Enter Your ID:"
+!
+aaa authentication login VTY group tacacs+ line
+aaa authentication login CON local
+aaa authentication enable default group tacacs+ enable
+!
+tacacs-server host 155.1.146.100 
+tacacs-server key CISCO
+ip tacacs source-interface Loopback0
+!
+line con 0
+ login authentication CON
+!
+line vty 0 5
+ login authentication VTY
+ password 0 cisco
+ transport input telnet
+!

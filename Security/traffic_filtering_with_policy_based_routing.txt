@@ -1,0 +1,17 @@
+R6:
+
+!
+ip access-list extended ICMP
+ permit icmp any any
+!
+route-map DENY 
+ match ip address ICMP
+ match length 100 100
+ set interface Null0
+!
+interface GigabitEthernet0/1.146
+ ip policy route-map DENY 
+!
+interface Null0
+ no ip unreachables
+!

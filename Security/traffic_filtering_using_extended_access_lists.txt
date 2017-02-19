@@ -1,0 +1,40 @@
+R4:
+
+!
+ip access-list extended ACL-IN
+ permit eigrp any any
+ permit icmp any any echo
+ permit icmp any any echo-reply
+ permit icmp any any port-unreachable
+ permit icmp any any time-exceeded
+ permit icmp any any packet-too-big
+ permit tcp any 155.1.146.0 0.0.0.255 range 20 21
+ permit tcp any 155.1.146.0 0.0.0.255 eq www
+ permit tcp any 155.1.146.0 0.0.0.255 eq smtp
+ permit tcp any 150.1.0.0 0.0.255.255 established
+ permit udp any any range 33434 33474
+ deny ip any any log
+!
+ip access-list extended ACL-OUT
+ permit icmp any any echo
+ permit icmp any any echo-reply
+ permit icmp any any port-unreachable
+ permit icmp any any time-exceeded
+ permit icmp any any packet-too-big
+ permit tcp 155.1.146.0 0.0.0.255 range 20 21 any
+ permit tcp 155.1.146.0 0.0.0.255 eq www any
+ permit tcp 155.1.146.0 0.0.0.255 eq smtp any
+ permit tcp 150.1.0.0 0.0.255.255 any
+ permit udp any any range 33434 33474 
+ deny ip any any log
+!
+interface GigabitEthernet0/1.45
+ ip access-group ACL-IN in
+ ip access-group ACL-OUT out
+!
+interface Tunnel0
+ ip access-group ACL-IN in
+ ip access-group ACL-OUT out
+!
+
+!! No se pone EIGRP en Outbound ACL porque traffic generated locally by the router is not subject to match against the !! outbound access-list.

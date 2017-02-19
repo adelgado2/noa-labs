@@ -1,0 +1,25 @@
+R1:
+
+!
+username ADMIN privilege 7 password 0 CISCO
+!
+aaa new-model
+aaa authentication login VTY local
+aaa authorization exec VTY local
+!
+privilege exec level 7 configure terminal
+privilege exec level 7 undebug all
+privilege exec level 7 show running-config
+privilege exec level 7 debug ip rip
+!
+privilege configure level 7 interface 
+!
+privilege interface level 7 shutdown
+privilege interface level 7 no shutdown
+privilege interface all level 7 ip
+!
+line vty 0 5
+ login authentication VTY
+ authorization exec VTY
+ transport input telnet
+!

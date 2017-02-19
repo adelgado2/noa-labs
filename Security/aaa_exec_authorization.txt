@@ -1,0 +1,20 @@
+R1:
+
+!
+username ADMIN privilege 7 secret 0 CISCO
+!
+aaa new-model
+!
+aaa authentication login VTY local 
+aaa authorization exec VTY group tacacs+ if-authenticated
+!
+tacacs-server host 155.1.146.100 
+tacacs-server key CISCO
+ip tacacs source-interface Loopback0
+!
+line vty 0 5
+ login authentication VTY
+ privilege level 15
+ authorization exec VTY
+ transport input telnet
+!

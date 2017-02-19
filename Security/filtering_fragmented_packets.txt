@@ -1,0 +1,17 @@
+R3:
+
+! 
+ip access-list extended NON-FRAGMENTS
+ permit eigrp any any
+ deny ip any any fragments log
+ permit tcp any any eq 80
+!
+username admin privilege 15 password cisco
+ip http authentication local
+ip http server
+ip http path flash0:/
+!
+interface Tunnel0
+ ip access-group NON-FRAGMENTS in
+!
+ 
