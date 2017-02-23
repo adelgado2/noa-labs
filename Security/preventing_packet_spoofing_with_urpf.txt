@@ -4,5 +4,14 @@ R4:
 access-list 100 deny ip any any log
 !
 interface GigabitEthernet0/1.146
- ip verify unicast 
+ ip verify unicast source reachable-via any 100
+!
+interface GigabitEthernet0/1.45 
+ ip verify unicast source reachable-via rx 100
+!
+interface GigabitEthernet0/1.100
+ ip verify unicast source reachable-via rx 100
+!
+interface Tunnel0
+ ip verify unicast source reachable-via rx 100
 !

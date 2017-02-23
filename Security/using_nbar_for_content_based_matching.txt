@@ -1,0 +1,12 @@
+R6:
+
+!
+class-map HTTP
+ match protocol http url “*.bin|*.exe|*.com”
+!
+policy-map HTTP
+ class EXTENSION
+!
+interface GigabitEthernet0/1.146
+  service-policy output HTTP
+!

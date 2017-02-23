@@ -1,0 +1,26 @@
+SW2:
+
+!
+interface Vlan10
+ ip address 160.1.10.2 255.255.255.0
+!
+
+SW3:
+
+!
+interface Vlan10
+ ip address 160.1.10.3 255.255.255.0
+!
+
+SW1:
+
+!
+ip access-list extended ip1
+ permit tcp any any
+!
+vlan access-map map_1 10
+ match ip address ip1
+ action forward
+!
+vlan filter map_1 vlan-list 10
+!

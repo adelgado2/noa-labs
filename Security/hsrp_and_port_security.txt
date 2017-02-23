@@ -1,0 +1,43 @@
+SW1:
+
+!
+vlan 10
+ name LAB
+!
+interface GigabitEthernet0/2
+ switchport mode access
+ switchport access vlan 10
+ switchport port-security
+ switchport port-security maximum 2
+ spanning-tree link-type point-to-point
+!
+
+!
+interface GigabitEthernet1/1
+ switchport mode access
+ switchport access vlan 10
+ switchport port-security
+ switchport port-security maximum 2
+ spanning-tree link-type point-to-point
+!
+
+SW2:
+
+!
+interface GigabitEthernet1/1
+ no switchport
+ ip address 160.1.10.2 255.255.255.0
+ standby version 2
+ standby 10 ip 160.1.10.254
+ standby 10 priority 110
+!
+
+SW3:
+
+!
+interface GigabitEthernet0/2
+ no switchport
+ ip address 160.1.10.3 255.255.255.0
+ standby version 2
+ standby 10 ip 160.1.10.254
+!

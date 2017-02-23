@@ -1,0 +1,167 @@
+
+SW1:
+
+!
+vlan 20
+!
+interface Vlan20
+ ip address 160.1.20.1 255.255.255.0
+ no shut
+!
+ip dhcp snooping
+ip dhcp snooping vlan 20
+!
+ip arp inspection vlan 20
+ip arp inspection vlan 20 logging acl-match matchlog 
+ip arp inspection vlan 20 logging dhcp-bindings all
+ip arp inspection log-buffer entries 16
+ip arp inspection log-buffer logs 4 interval 10
+ip arp inspection validate src-mac dst-mac ip
+! 
+arp access-list ARP_VLAN20
+ permit ip host 160.1.20.2 mac host fa16.3e22.8014 log
+ permit ip host 160.1.20.3 mac host fa16.3ee1.8014 log
+!
+ip arp inspection filter ARP_VLAN20 vlan 20
+!
+
+SW2:
+
+!
+vtp mode server
+!
+vlan 20
+!
+vtp mode client
+!
+interface Vlan20
+ ip address 160.1.20.2 255.255.255.0
+ no shut
+!
+
+SW3:
+
+!
+vlan 20
+!
+vtp mode client
+!
+interface Vlan20
+ ip address 160.1.20.3 255.255.255.0
+ no shut
+!
+
+***************************************
+Initial for VIRL:
+
+SW1:
+
+!
+vlan 10
+!
+interface gi0/2
+ shut
+!
+interface Gi0/1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ spanning-tree link-type point-to-point
+!
+interface Gi1/0
+ shut
+!
+interface Gi0/3
+ shut
+!
+interface Gi1/1
+ shut
+!
+interface Gi1/2 
+ switchport trunk encapsulation dot1q 
+ switchport mode trunk
+ spanning-tree link-type point-to-point
+!
+
+SW2:
+
+!
+vtp mode server
+vlan 10
+vtp mode client
+!
+int range Gi0/1 - 2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ spanning-tree link-type point-to-point
+!
+int Gi0/3
+ shut
+!
+int Gi1/0
+ shut
+!
+int Gi1/1
+ shut
+!
+interface Gi1/2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ spanning-tree link-type point-to-point
+! 
+
+SW3:
+
+!
+vtp mode server
+vlan 10
+vtp mode client
+!
+interface Gi0/2
+ shut
+!
+interface Gi0/1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ spanning-tree link-type point-to-point
+!
+interface Gi1/0
+ shut
+!
+int Gi0/3
+ shut
+!
+int Gi1/1
+ shut
+!
+int range Gi1/1 - 2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ spanning-tree link-type point-to-point
+!
+
+SW4:
+
+!
+vtp mode server
+vlan 10
+vtp mode client
+!
+int range Gi0/1 - 2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ spanning-tree link-type point-to-point
+!
+int Gi0/3
+ shut
+!
+int Gi1/0
+ shut
+!
+int Gi1/1
+ shut
+!
+int range Gi1/1 - 2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ spanning-tree link-type point-to-point
+!

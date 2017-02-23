@@ -1,0 +1,13 @@
+R6:
+
+!
+ip access-list extended ICMP
+ permit icmp any any log
+ permit ip any any
+!
+ip access-list log-update threshold 5
+ip access-list logging interval 1000
+!
+interface GigabitEthernet0/1.146
+ ip access-group ICMP in
+!

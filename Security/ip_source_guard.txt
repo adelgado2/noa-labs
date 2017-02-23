@@ -1,0 +1,43 @@
+SW2:
+
+!
+interface Gi1/1
+ no switchport
+ ip address 160.1.30.2 255.255.255.0
+ no shut
+!
+
+SW3:
+
+!
+interface Gi0/2
+ no switchport
+ ip address 160.1.30.3 255.255.255.0
+ no shut
+!
+
+SW1:
+
+!
+vlan 30
+!
+interface GigabitEthernet1/1
+ switchport mode access
+ switchport access vlan 30
+ spanning-tree link-type point-to-point
+ ip verify source port-security
+ switchport port-security
+!
+interface GigabitEthernet0/2
+ switchport mode access
+ switchport access vlan 30
+ spanning-tree link-type point-to-point
+ ip verify source port-security
+ switchport port-security 
+!
+ip dhcp snooping
+ip dhcp snooping vlan 30
+!
+ip source binding fa16.3ec5.c7fb vlan 30 160.1.30.2 interface GigabitEthernet1/1
+ip source binding fa16.3e4d.8502 vlan 30 160.1.30.3 interface GigabitEthernet0/2
+!

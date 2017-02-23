@@ -1,0 +1,35 @@
+SW1:
+
+!
+errdisable recovery cause psecure-violation
+errdisable recovery interval 180
+!
+interface FastEthernet0/5
+ switchport mode access
+ switchport access vlan 10
+ switchport port-security
+ switchport port-security maximum 1
+ switchport port-security aging time 10 
+ switchport port-security aging type inactivity
+!
+interface FasEthernet0/6
+ switchport mode access
+ switchport access vlan 20
+ switchport port-security
+ switchport port-security violation restrict
+ switchport port-security mac-address sticky
+ switchport port-security aging time 10 
+ switchport port-security aging type inactivity
+!
+interface FastEthernet0/7
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport trunk allowed vlan add all
+ switchport port-security
+ switchport port-security violation protect
+ switchport port-security maximum 2
+ switchport port-security maximum 1 vlan 10
+ switchport port-security maximum 1 vlan 20
+ switchport port-security aging time 10 
+ switchport port-security aging type inactivity
+!
