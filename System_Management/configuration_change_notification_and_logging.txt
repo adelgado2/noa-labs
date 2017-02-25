@@ -1,0 +1,10 @@
+R7:
+
+!
+archive
+ log config
+  logging enable
+  logging size 1000
+  notify syslog
+  hidekeys
+!

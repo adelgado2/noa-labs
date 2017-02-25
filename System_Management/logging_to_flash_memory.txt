@@ -1,0 +1,9 @@
+R7:
+
+! mkdir syslog
+
+!
+logging on
+logging persistent filesize 32768
+logging persistent url flash:syslog/
+!

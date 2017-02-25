@@ -1,0 +1,19 @@
+
+R4:
+
+!
+logging on
+logging count 
+service timestamps log uptime 
+service sequence-numbers
+!
+
+R6:
+
+!
+logging on
+logging count 
+service timestamps log datetime year 
+service timestamps debug datetime msec
+service sequence-numbers
+!

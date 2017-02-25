@@ -1,0 +1,23 @@
+R4:
+
+!
+logging on
+logging host 155.1.146.100 transport tcp port 5000
+logging trap notifications
+logging facility local1
+logging source-interface Loopback0
+logging origin-id string ROUTER4
+logging queue-limit 256
+!
+
+R6:
+
+!
+logging on
+logging host 155.1.146.100 
+logging trap notifications
+logging facility local1
+logging source-interface Loopback0
+logging origin-id ROUTER6
+logging queue-limit 256
+!

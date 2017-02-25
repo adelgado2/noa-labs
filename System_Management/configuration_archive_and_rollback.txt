@@ -1,0 +1,8 @@
+R7:
+
+!
+archive
+ path tftp://155.1.58.100:R7-config
+ time-period 1440
+ write-memory
+!
