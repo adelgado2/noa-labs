@@ -1,0 +1,13 @@
+
+R4, R6:
+
+!
+logging on
+logging buffered 8192 debugging
+logging console 7
+logging rate-limit console all 1
+logging monitor 6
+!
+line console 0
+ logging synchronous 
+!

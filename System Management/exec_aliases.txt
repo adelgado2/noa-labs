@@ -1,0 +1,11 @@
+R1:
+
+!
+alias exec ri show ip route  
+alias exec rb show ip bgp 
+!
+alias configure iae ip access-list extended ACL
+!
+alias interface so service-policy output 
+alias interface si service-policy input 
+!
