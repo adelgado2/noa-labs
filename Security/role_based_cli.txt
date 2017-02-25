@@ -1,0 +1,38 @@
+R4:
+
+!
+aaa new-model
+enable password CISCO
+!
+exit
+!
+enable view !En modo fuera de conf t, meter contraseña
+!
+conf t
+!
+parser view INTERFACE1 
+ secret 0 CISCO
+ commands interface include all ip
+ commands configure include interface
+ commands exec include configure terminal
+ commands configure include interface GigabitEthernet0/1.146
+!
+parser view INTERFACE2
+ secret 0 CISCO
+ commands interface include all ip
+ commands configure include interface
+ commands exec include configure terminal
+ commands configure include interface GigabitEthernet0/1.45
+!
+parser view DEBUG 
+ secret 0 CISCO
+ commands exec include all debug
+ commands exec include all undebug
+ commands exec include show running-config
+!
+parser view SUPER superview
+ secret 0 CISCO
+ view INTERFACE1
+ view INTERFACE2
+ view DEBUG
+!

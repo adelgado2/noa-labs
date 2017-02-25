@@ -1,0 +1,158 @@
+SW2:
+
+!
+interface GigabitEthernet1/1
+ no switchport
+ ip address 160.1.30.2 255.255.255.0
+ no shutdown
+!
+
+SW3:
+
+!
+interface GigabitEthernet0/2
+ no switchport 
+ ip address 160.1.30.3 255.255.255.0
+ no shutdown
+!
+
+SW1:
+
+!
+vlan 30
+!
+interface GigabitEthernet1/1
+ switchport mode access
+ switchport access vlan 30
+ spanning-tree link-type point-to-point
+ no shut
+!
+interface GigabitEthernet0/2
+ switchport mode access
+ switchport access vlan 30
+ spanning-tree link-type point-to-point
+ no shut
+ ip access-group ACL-ICMP in
+ mac access-group ACL-ARP in
+!
+ip access-list extended ACL-ICMP
+ permit icmp any any
+!
+mac access-list extended ACL-ARP
+ permit any any 0x806 0x0
+!
+
+***************************************
+Initial for VIRL:
+
+SW1:
+
+!
+vlan 10
+!
+interface gi0/2
+ shut
+!
+interface Gi0/1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ spanning-tree link-type point-to-point
+!
+interface Gi1/0
+ shut
+!
+interface Gi0/3
+ shut
+!
+interface Gi1/1
+ shut
+!
+interface Gi1/2 
+ switchport trunk encapsulation dot1q 
+ switchport mode trunk
+ spanning-tree link-type point-to-point
+!
+
+SW2:
+
+!
+vtp mode server
+vlan 10
+vtp mode client
+!
+int range Gi0/1 - 2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ spanning-tree link-type point-to-point
+!
+int Gi0/3
+ shut
+!
+int Gi1/0
+ shut
+!
+int Gi1/1
+ shut
+!
+interface Gi1/2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ spanning-tree link-type point-to-point
+! 
+
+SW3:
+
+!
+vtp mode server
+vlan 10
+vtp mode client
+!
+interface Gi0/2
+ shut
+!
+interface Gi0/1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ spanning-tree link-type point-to-point
+!
+interface Gi1/0
+ shut
+!
+int Gi0/3
+ shut
+!
+int Gi1/1
+ shut
+!
+int range Gi1/1 - 2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ spanning-tree link-type point-to-point
+!
+
+SW4:
+
+!
+vtp mode server
+vlan 10
+vtp mode client
+!
+int range Gi0/1 - 2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ spanning-tree link-type point-to-point
+!
+int Gi0/3
+ shut
+!
+int Gi1/0
+ shut
+!
+int Gi1/1
+ shut
+!
+int range Gi1/1 - 2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ spanning-tree link-type point-to-point
+!

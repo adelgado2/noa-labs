@@ -1,0 +1,31 @@
+R2:
+
+!
+username TELNET password CISCO
+username TELNET access-class TO-OUTSIDE
+!
+ip access-list extended FROM-LO
+ permit ip 150.1.0.0 0.0.255.255 any
+!
+access-list 100 permit ip any host 150.1.1.1
+access-list 100 permit ip any host 155.1.146.1
+access-list 100 permit ip any host 155.1.0.1
+access-list 100 permit ip any host 155.1.13.1
+access-list 100 permit ip any host 155.1.146.1
+access-list 100 deny tcp any any eq 80 log
+! 
+line vty 0 4
+ access-class FROM-LO in
+ login local
+ transport input telnet
+!
+
+R1:
+
+!
+username TELNET password CISCO
+!
+line vty 0 4 
+ login local
+ transport input telnet 
+!

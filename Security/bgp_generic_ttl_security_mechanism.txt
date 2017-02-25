@@ -1,0 +1,19 @@
+
+R5:
+
+!
+router bgp 100
+ neighbor 150.1.6.6 remote-as 200
+ neighbor 150.1.6.6 update-source Loopback0
+ neighbor 150.1.6.6 ttl-security hops 2
+!
+ 
+ 
+R6:
+
+!
+router bgp 200
+ neighbor 150.1.5.5 remote-as 100
+ neighbor 150.1.5.5 update-source Loopback0
+ neighbor 150.1.5.5 ttl-security hops 2
+!

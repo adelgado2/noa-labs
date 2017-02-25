@@ -1,0 +1,18 @@
+R3:
+
+! Una de las formas de hacerlo, en INE otra más selectiva (ACL en interfaz)
+
+!
+no ip options
+!
+
+! La otra forma:
+
+ip access-list extended DROP_IP_SOURCE_ROUTE
+ deny ip any any option lsr
+ deny ip any any option ssr
+ permit ip any any
+!
+interface GigabitEthernet0/1.37
+ ip access-group DROP_IP_SOURCE_ROUTE in
+!

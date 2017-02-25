@@ -1,0 +1,9 @@
+R4:
+
+!
+interface GigabitEthernet0/1.146
+ no ip unreachables
+!
+ip icmp rate-limit unreachable 10
+ip icmp rate-limit unreachable DF 1
+!

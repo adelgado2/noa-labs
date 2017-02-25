@@ -1,0 +1,18 @@
+R3:
+
+!
+username TEST password TEST
+!
+ip access-list extended myacl
+ 10 permit ip host 150.1.5.5 any
+!
+login block-for 40 attempts 3 within 30  
+login quiet-mode access-class myacl
+login delay 2
+login on-failure log every 3
+login on-success log
+!
+line vty 0 4 
+ login local
+ transport input telnet
+!

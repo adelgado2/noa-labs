@@ -1,0 +1,34 @@
+R1:
+
+!
+access-list 100 permit icmp any any 
+!
+class-map ICMP
+ match access-group 100
+!
+class-map ROUTING
+ match ip precedence 6
+!
+class-map ARP
+ match protocol arp
+!
+policy-map cp-in
+ class ARP
+  police rate 100 pps
+   conform-action transmit
+   exceed-action drop
+ class ROUTING
+  police rate 50 pps
+   conform-action transmit
+   exceed-action drop
+!
+policy-map cp-out
+ class ICMP
+  police rate 10 pps
+   conform-action transmit
+   exceed-action drop
+!
+control-plane
+ service-policy output cp-out
+ service-policy input cp-in
+!
