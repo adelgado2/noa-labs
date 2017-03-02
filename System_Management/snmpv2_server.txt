@@ -1,0 +1,13 @@
+
+R4:
+
+!
+access-list 98 permit host 155.1.146.100
+!
+snmp-server community CISCO rw
+snmp-server ifindex persist
+snmp-server system-shutdown
+snmp-server file-transfer access-group 98 protocol tftp
+snmp-server location '{ Default Location }'
+snmp-server contact '{ Default Contact }'
+!

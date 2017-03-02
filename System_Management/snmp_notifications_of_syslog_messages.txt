@@ -1,0 +1,9 @@
+
+R1:
+
+!
+snmp-server enable traps syslog
+logging history 7
+logging history size 100
+snmp-server host 155.1.146.100 CISCO
+!

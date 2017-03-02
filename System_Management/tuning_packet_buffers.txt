@@ -1,0 +1,19 @@
+
+R3:
+
+!
+buffers tune automatic
+!
+
+R4:
+
+!
+buffers small permanent 1024
+buffers middle permanent 1024
+buffers big permanent 22
+buffers verybig permanent 20
+buffers large permanent 10
+buffers huge permanent 10
+!
+
+! He sacado antes 'show buffers' y de lo que me ha sacado el VIRL he puesto el doble.

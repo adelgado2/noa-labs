@@ -1,0 +1,17 @@
+
+R1:
+
+!
+ip rcmd remote-username RCP
+ip rcmd source-interface Loopback0
+!
+
+R6:
+
+!
+ip rcmd rcp-enable
+ip rcmd rsh-enable
+!
+ip rcmd remote-host R6 150.1.1.1 R1 enable
+ip rcmd remote-host RCP 150.1.1.1 R1 enable
+!

@@ -1,0 +1,10 @@
+R4:
+
+!
+access-list 99 permit 155.1.146.0 0.0.0.255
+access-list 99 deny any log
+!
+snmp-server community CISCO rw 99
+snmp-server view root_view cisco included
+snmp-server community PUBLIC view root_view ro
+!

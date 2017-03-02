@@ -1,0 +1,22 @@
+
+R3:
+
+!
+line vty 0 4
+ transport input telnet
+ transport preferred none
+ refuse-message % Sorry, the line is already in use %
+ lockable
+ exec-timeout 2
+ session-timeout 1 
+ absolute-timeout 5  
+ ip netmask-format hexadecimal 
+ length 20
+!
+line vty 0
+ rotary 1
+! 
+line con 0
+ vacant-message % Welcome to IOS %
+ session-limit 1
+!

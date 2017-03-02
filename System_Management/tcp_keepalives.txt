@@ -1,0 +1,7 @@
+R1:
+
+!
+ip tcp keepalive retries 4
+service tcp-keepalives-in
+service tcp-keepalives-out
+!

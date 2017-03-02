@@ -1,0 +1,13 @@
+
+SW1:
+
+interface GigabitEthernet1/3
+ snmp trap mac-notification change added
+ snmp trap mac-notification change removed
+!
+snmp-server enable traps mac-notification change
+snmp-server host 155.1.146.100 traps CISCO 
+!
+mac address-table notification interval 1
+mac address-table notification change history-size 100
+mac address-table notification change

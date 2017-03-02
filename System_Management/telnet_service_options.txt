@@ -1,0 +1,15 @@
+
+R3:
+
+!
+service telnet-zeroidle
+ip telnet source-interface Loopback0
+ip telnet tos 60
+ip telnet quiet
+ip telnet hidden addresses
+!
+no ip domain-lookup
+ip host R4 155.1.146.4
+!
+busy-message R4 * Sorry, your connection failed *
+!

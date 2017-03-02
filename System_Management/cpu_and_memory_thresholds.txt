@@ -1,0 +1,8 @@
+
+R4:
+
+snmp-server enable traps cpu threshold
+!
+memory free low-watermark processor 1000
+process cpu threshold type total rising 50 interval 5
+memory reserve critical 512

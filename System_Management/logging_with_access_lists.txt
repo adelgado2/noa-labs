@@ -1,0 +1,13 @@
+
+R4:
+
+!
+access-list 100 permit eigrp any any log
+access-list 100 permit ip any any
+!
+ip access-list logging interval 10000
+ip access-list log-update threshold 2
+!
+interface GigabitEthernet0/1.146
+ ip access-group 100 in
+!

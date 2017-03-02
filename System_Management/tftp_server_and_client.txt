@@ -1,0 +1,14 @@
+
+R6:
+
+!
+access-list 10 permit host 150.1.1.1
+!
+tftp-server flash:cvac.log alias test 10
+!
+
+R1:
+
+!
+ip tftp source-interface Loopback0
+!

@@ -1,0 +1,11 @@
+
+R4:
+
+!
+snmp-server enable traps snmp linkdown linkup
+snmp-server host 155.1.146.100 inform version 2c CISCO
+snmp-server host 155.1.146.101 CISCO
+!
+interface GigabitEthernet0/1.146
+ no snmp trap link-status
+!

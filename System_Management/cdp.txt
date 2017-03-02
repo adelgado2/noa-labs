@@ -1,0 +1,11 @@
+
+R4:
+
+!
+cdp advertise-v2   ! Ya habilitado por defecto en VIRL
+cdp timer 10
+cdp hold 40
+!
+interface tunnel0
+ cdp enable
+!

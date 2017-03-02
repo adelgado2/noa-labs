@@ -1,0 +1,60 @@
+
+R4:
+
+!
+ntp master 5
+ntp peer 150.1.6.6
+ntp source Loopback0 
+!
+
+R6:
+
+!
+ntp master 5
+ntp peer 150.1.4.4 
+ntp source Loopback0 
+!
+interface GigabitEthernet0/1.67
+ ntp multicast 239.1.1.1
+!
+
+R5:
+
+!
+ntp server 150.1.4.4 source Loopback0 prefer
+ntp server 150.1.6.6 source Loopback0 
+!
+interface GigabitEthernet0/1.58
+ ntp broadcast destination 155.1.58.8
+!
+
+R8:
+
+!
+interface GigabitEthernet0/1.58
+ ntp broadcast client
+!
+
+R7:
+
+!
+ip multicast-routing
+!
+interface GigabitEthernet0/1.67
+ ntp multicast client 239.1.1.1
+ ip pim dense-mode
+!
+interface GigabitEthernet0/1.79
+ ip pim dense-mode
+!
+
+R9:
+
+!co
+ip multicast-routing
+!
+interface GigabitEthernet0/1.79
+ ip pim dense-mode
+ ntp multicast client 239.1.1.1
+!
+

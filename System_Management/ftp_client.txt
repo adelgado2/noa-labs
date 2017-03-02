@@ -1,0 +1,9 @@
+
+R4:
+
+!
+no ip ftp source-interface Loopback0
+ip ftp username CISCO
+ip ftp password CISCO
+ip ftp passive
+!

@@ -1,0 +1,27 @@
+
+R6:
+
+!
+username CISCO privilege 15 password 0 CISCO 
+!
+access-list 98 permit 150.1.0.0 0.0.255.255
+!
+ip http server
+ip http path flash:
+ip http port 8080
+ip http access-class 98
+ip http authentication local
+ip http max-connections 2
+ip http secure-server
+ip http secure-port 4043
+ip http secure-ciphersuite des-cbc-sha
+!
+
+R4:
+
+!
+ip http client source-interface Loopback0
+ip http client username CISCO
+ip http client password CISCO
+ip http client secure-ciphersuite des-cbc-sha
+!

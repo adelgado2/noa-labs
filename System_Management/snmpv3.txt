@@ -1,0 +1,21 @@
+
+R6:
+
+!
+access-list 98 permit 155.1.146.0 0.0.0.255
+!
+snmp-server ifindex persist 
+snmp-server view NORMAL iso included 
+snmp-server view RESTRICTED ifEntry.*.3 included 
+!
+snmp-server group NORMAL v3 priv read NORMAL write NORMAL  
+snmp-server user NORMAL NORMAL v3 auth sha CISCO priv 3des CISCO
+!
+snmp-server group RESTRICTED v3 auth write RESTRICTED access 98
+snmp-server user RESTRICTED RESTRICTED v3 auth sha CISCO
+!
+snmp-server group TRAP v3 priv
+snmp-server user TRAP TRAP v3 auth sha CISCO priv 3des CISCO
+snmp-server enable traps snmp linkdown linkup 
+snmp-server host 155.1.146.100 traps version 3 priv TRAP
+!
