@@ -1,0 +1,52 @@
+
+R4:
+
+!
+ntp master 5 
+ntp authenticate
+ntp authentication-key 46 md5 CISCO46
+ntp trusted-key 46
+ntp peer 150.1.6.6 key 46 source Loopback0
+ntp authentication-key 4 md5 CISCO4
+!
+
+R6:
+
+!
+ntp master 5 
+ntp authenticate
+ntp authentication-key 46 md5 CISCO46
+ntp trusted-key 46
+ntp peer 150.1.4.4 key 46 source Loopback0
+ntp authentication-key 6 md5 CISCO6
+!
+
+R5:
+
+!
+ntp authenticate 
+ntp authentication-key 58 md5 CISCO58
+!
+ntp server 150.1.4.4 key 4
+ntp authentication-key 4 md5 CISCO4 source Loopback0
+ntp trusted-key 4
+!
+ntp server 150.1.6.6 key 6
+ntp authentication-key 6 md5 CISCO6 source Loopback0
+ntp source Loopback0
+ntp trusted-key 6
+!
+interface GigabitEthernet0/1.58
+ ntp broadcast key 58
+!
+
+R8:
+
+!
+ntp authenticate
+ntp authentication-key 58 md5 CISCO58
+ntp trusted-key 58
+!
+interface GigabitEthernet0/1.58
+ ntp broadcast client
+!

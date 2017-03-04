@@ -1,0 +1,27 @@
+
+R1:
+
+!
+ntp master 5
+ntp peer 150.1.4.4 source Loopback0
+!
+
+R4:
+
+!
+access-list 10 permit host 150.1.6.6
+!
+ntp master 5
+ntp access-group serve-only 10
+ntp source Loopback0
+!
+
+R6:
+
+!
+access-list 10 permit host 150.1.4.4
+!
+ntp server 150.1.4.4 prefer source loopback0 
+ntp server 150.1.1.1 source loopback0
+ntp access-group peer 10
+!

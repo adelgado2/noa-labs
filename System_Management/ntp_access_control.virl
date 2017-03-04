@@ -1,7 +1,8 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes'?>
 <topology xmlns="http://www.cisco.com/VIRL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="0.9" simulationEngine="OPENSTACK" xsi:schemaLocation="http://www.cisco.com/VIRL https://raw.github.com/CiscoVIRL/schema/v0.9/virl.xsd">
     <node name="R1" type="SIMPLE" subtype="IOSv" location="57,131"><extensions><entry key="config" type="String">!
-! Last configuration change at 21:51:10 UTC Thu Mar 2 2017
+! Last configuration change at 20:22:10 UTC Fri Mar 3 2017
+! NVRAM config last updated at 20:22:10 UTC Fri Mar 3 2017
 !
 version 15.6
 no service timestamps debug uptime
@@ -49,8 +50,6 @@ multilink bundle-name authenticated
 redundancy
 !
 !
-ip rcmd remote-username RCP
-ip rcmd source-interface Loopback0
 ! 
 !
 !
@@ -97,7 +96,7 @@ interface Tunnel0
  tunnel protection ipsec profile DMVPN_PROFILE
 !
 interface GigabitEthernet0/0
- ip address 10.255.18.64 255.255.0.0
+ ip address 10.255.18.94 255.255.0.0
  shutdown
  duplex auto
  speed auto
@@ -179,13 +178,15 @@ line vty 0 4
  transport input none
 !
 no scheduler allocate
+ntp master 5
+ntp peer 150.1.4.4 source Loopback0
 !
 end</entry></extensions>
         <interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R2" type="SIMPLE" subtype="IOSv" location="58,197">
         <extensions><entry key="config" type="String">!
-! Last configuration change at 21:50:57 UTC Thu Mar 2 2017
+! Last configuration change at 20:22:24 UTC Fri Mar 3 2017
 !
 version 15.6
 no service timestamps debug uptime
@@ -279,7 +280,7 @@ interface Tunnel0
  tunnel protection ipsec profile DMVPN_PROFILE
 !
 interface GigabitEthernet0/0
- ip address 10.255.18.66 255.255.0.0
+ ip address 10.255.18.96 255.255.0.0
  shutdown
  duplex auto
  speed auto
@@ -361,7 +362,7 @@ end</entry></extensions><interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R3" type="SIMPLE" subtype="IOSv" location="59,270">
         <extensions><entry key="config" type="String">!
-! Last configuration change at 21:51:15 UTC Thu Mar 2 2017
+! Last configuration change at 20:22:18 UTC Fri Mar 3 2017
 !
 version 15.6
 no service timestamps debug uptime
@@ -455,7 +456,7 @@ interface Tunnel0
  tunnel protection ipsec profile DMVPN_PROFILE
 !
 interface GigabitEthernet0/0
- ip address 10.255.18.67 255.255.0.0
+ ip address 10.255.18.97 255.255.0.0
  shutdown
  duplex auto
  speed auto
@@ -547,8 +548,8 @@ end</entry></extensions><interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R4" type="SIMPLE" subtype="IOSv" location="58,345">
         <extensions><entry key="config" type="String">!
-! Last configuration change at 18:52:33 UTC Tue May 6 2014
-! NVRAM config last updated at 18:52:34 UTC Tue May 6 2014
+! Last configuration change at 20:22:24 UTC Fri Mar 3 2017
+! NVRAM config last updated at 20:22:24 UTC Fri Mar 3 2017
 !
 version 15.6
 no service timestamps debug uptime
@@ -642,7 +643,7 @@ interface Tunnel0
  tunnel protection ipsec profile DMVPN_PROFILE
 !
 interface GigabitEthernet0/0
- ip address 10.255.18.68 255.255.0.0
+ ip address 10.255.18.98 255.255.0.0
  shutdown
  duplex auto
  speed auto
@@ -682,6 +683,7 @@ no ip http secure-server
 !
 !
 !
+access-list 10 permit 150.1.6.6
 !
 control-plane
 !
@@ -725,15 +727,14 @@ line vty 0 4
 !
 no scheduler allocate
 ntp source Loopback0
+ntp access-group serve-only 10
 ntp master 5
-ntp peer 150.1.6.6
 !
 end</entry></extensions><interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R5" type="SIMPLE" subtype="IOSv" location="47,417">
         <extensions><entry key="config" type="String">!
-! Last configuration change at 18:52:36 UTC Tue May 6 2014
-! NVRAM config last updated at 18:52:36 UTC Tue May 6 2014
+! Last configuration change at 20:22:45 UTC Fri Mar 3 2017
 !
 version 15.6
 no service timestamps debug uptime
@@ -826,7 +827,7 @@ interface Tunnel0
  tunnel protection ipsec profile DMVPN_PROFILE
 !
 interface GigabitEthernet0/0
- ip address 10.255.18.69 255.255.0.0
+ ip address 10.255.18.99 255.255.0.0
  shutdown
  duplex auto
  speed auto
@@ -852,7 +853,6 @@ interface GigabitEthernet0/1.58
  encapsulation dot1Q 58
  ip address 155.1.58.5 255.255.255.0
  ipv6 address 2001:155:1:58::5/64
- ntp broadcast
 !
 interface GigabitEthernet0/1.100
  encapsulation dot1Q 100
@@ -914,15 +914,13 @@ line vty 0 4
  transport input none
 !
 no scheduler allocate
-ntp server 150.1.4.4 prefer source Loopback0
-ntp server 150.1.6.6 source Loopback0
 !
 end</entry></extensions><interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R6" type="SIMPLE" subtype="IOSv" location="49,474">
         <extensions><entry key="config" type="String">!
-! Last configuration change at 18:52:14 UTC Tue May 6 2014
-! NVRAM config last updated at 18:52:14 UTC Tue May 6 2014
+! Last configuration change at 20:22:27 UTC Fri Mar 3 2017
+! NVRAM config last updated at 20:22:27 UTC Fri Mar 3 2017
 !
 version 15.6
 no service timestamps debug uptime
@@ -970,10 +968,6 @@ multilink bundle-name authenticated
 redundancy
 !
 !
-ip rcmd rcp-enable
-ip rcmd rsh-enable
-ip rcmd remote-host R6 150.1.1.1 R1 enable
-ip rcmd remote-host RCP 150.1.1.1 R1 enable
 ! 
 !
 !
@@ -992,7 +986,7 @@ interface Loopback0
  ipv6 address 2001:150:6:6::6/128
 !
 interface GigabitEthernet0/0
- ip address 10.255.18.70 255.255.0.0
+ ip address 10.255.18.100 255.255.0.0
  shutdown
  duplex auto
  speed auto
@@ -1008,7 +1002,6 @@ interface GigabitEthernet0/1.67
  encapsulation dot1Q 67
  ip address 155.1.67.6 255.255.255.0
  ipv6 address 2001:155:1:67::6/64
- ntp multicast 239.1.1.1
 !
 interface GigabitEthernet0/1.146
  encapsulation dot1Q 146
@@ -1028,6 +1021,7 @@ no ip http secure-server
 !
 !
 !
+access-list 10 permit 150.1.4.4
 !
 control-plane
 !
@@ -1070,16 +1064,15 @@ line vty 0 4
  transport input none
 !
 no scheduler allocate
-ntp source Loopback0
-ntp master 5
-ntp peer 150.1.4.4
+ntp access-group peer 10
+ntp server 150.1.1.1 source Loopback0
+ntp server 150.1.4.4 prefer source Loopback0
 !
 end</entry></extensions><interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R7" type="SIMPLE" subtype="IOSv" location="43,552">
         <extensions><entry key="config" type="String">!
-! Last configuration change at 18:52:11 UTC Tue May 6 2014
-! NVRAM config last updated at 18:52:11 UTC Tue May 6 2014
+! Last configuration change at 20:23:05 UTC Fri Mar 3 2017
 !
 version 15.6
 no service timestamps debug uptime
@@ -1114,7 +1107,6 @@ mmi snmp-timeout 180
 !
 !
 no ip domain lookup
-ip multicast-routing 
 ip cef
 ipv6 unicast-routing
 ipv6 cef
@@ -1146,7 +1138,7 @@ interface Loopback0
  ipv6 address 2001:150:7:7::7/128
 !
 interface GigabitEthernet0/0
- ip address 10.255.18.71 255.255.0.0
+ ip address 10.255.18.101 255.255.0.0
  shutdown
  duplex auto
  speed auto
@@ -1171,14 +1163,11 @@ interface GigabitEthernet0/1.37
 interface GigabitEthernet0/1.67
  encapsulation dot1Q 67
  ip address 155.1.67.7 255.255.255.0
- ip pim dense-mode
  ipv6 address 2001:155:1:67::7/64
- ntp multicast client 239.1.1.1
 !
 interface GigabitEthernet0/1.79
  encapsulation dot1Q 79
  ip address 155.1.79.7 255.255.255.0
- ip pim dense-mode
  ipv6 address 2001:155:1:79::7/64
 !
 !
@@ -1241,8 +1230,7 @@ end</entry></extensions><interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R8" type="SIMPLE" subtype="IOSv" location="43,618">
         <extensions><entry key="config" type="String">!
-! Last configuration change at 18:52:53 UTC Tue May 6 2014
-! NVRAM config last updated at 18:52:53 UTC Tue May 6 2014
+! Last configuration change at 20:23:19 UTC Fri Mar 3 2017
 !
 version 15.6
 no service timestamps debug uptime
@@ -1308,7 +1296,7 @@ interface Loopback0
  ipv6 address 2001:150:8:8::8/128
 !
 interface GigabitEthernet0/0
- ip address 10.255.18.72 255.255.0.0
+ ip address 10.255.18.102 255.255.0.0
  shutdown
  duplex auto
  speed auto
@@ -1329,7 +1317,6 @@ interface GigabitEthernet0/1.58
  encapsulation dot1Q 58
  ip address 155.1.58.8 255.255.255.0
  ipv6 address 2001:155:1:58::8/64
- ntp broadcast client
 !
 interface GigabitEthernet0/1.108
  encapsulation dot1Q 108
@@ -1396,8 +1383,7 @@ end</entry></extensions><interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R9" type="SIMPLE" subtype="IOSv" location="37,675">
         <extensions><entry key="config" type="String">!
-! Last configuration change at 18:52:28 UTC Tue May 6 2014
-! NVRAM config last updated at 18:52:28 UTC Tue May 6 2014
+! Last configuration change at 20:23:24 UTC Fri Mar 3 2017
 !
 version 15.6
 no service timestamps debug uptime
@@ -1432,7 +1418,6 @@ mmi snmp-timeout 180
 !
 !
 no ip domain lookup
-ip multicast-routing 
 ip cef
 ipv6 unicast-routing
 ipv6 cef
@@ -1464,7 +1449,7 @@ interface Loopback0
  ipv6 address 2001:150:9:9::9/128
 !
 interface GigabitEthernet0/0
- ip address 10.255.18.73 255.255.0.0
+ ip address 10.255.18.103 255.255.0.0
  shutdown
  duplex auto
  speed auto
@@ -1481,15 +1466,10 @@ interface GigabitEthernet0/1.9
  ip address 155.1.9.9 255.255.255.0
  ipv6 address 2001:155:1:9::9/64
 !
-interface GigabitEthernet0/1.67
- ntp multicast client
-!
 interface GigabitEthernet0/1.79
  encapsulation dot1Q 79
  ip address 155.1.79.9 255.255.255.0
- ip pim dense-mode
  ipv6 address 2001:155:1:79::9/64
- ntp multicast client 239.1.1.1
 !
 !
 router eigrp 100
@@ -1551,7 +1531,7 @@ end</entry></extensions><interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R10" type="SIMPLE" subtype="IOSv" location="32,741">
         <extensions><entry key="config" type="String">!
-! Last configuration change at 21:51:13 UTC Thu Mar 2 2017
+! Last configuration change at 20:22:23 UTC Fri Mar 3 2017
 !
 version 15.6
 no service timestamps debug uptime
@@ -1617,7 +1597,7 @@ interface Loopback0
  ipv6 address 2001:150:10:10::10/128
 !
 interface GigabitEthernet0/0
- ip address 10.255.18.65 255.255.0.0
+ ip address 10.255.18.95 255.255.0.0
  shutdown
  duplex auto
  speed auto
@@ -1699,7 +1679,7 @@ end</entry></extensions><interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="SW1" type="SIMPLE" subtype="IOSvL2" location="346,347">
         <extensions><entry key="config" type="String">!
-! Last configuration change at 21:31:57 UTC Thu Mar 2 2017
+! Last configuration change at 20:18:39 UTC Fri Mar 3 2017
 !
 version 15.2
 service timestamps debug datetime msec
@@ -1834,7 +1814,7 @@ end</entry></extensions><interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="SW2" type="SIMPLE" subtype="IOSvL2" location="580,343">
         <extensions><entry key="config" type="String">!
-! Last configuration change at 21:35:09 UTC Thu Mar 2 2017
+! Last configuration change at 20:19:16 UTC Fri Mar 3 2017
 !
 version 15.2
 service timestamps debug datetime msec
@@ -1964,7 +1944,7 @@ end</entry></extensions><interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="SW3" type="SIMPLE" subtype="IOSvL2" location="339,520">
         <extensions><entry key="config" type="String">!
-! Last configuration change at 21:34:53 UTC Thu Mar 2 2017
+! Last configuration change at 20:20:02 UTC Fri Mar 3 2017
 !
 version 15.2
 service timestamps debug datetime msec
@@ -2094,7 +2074,7 @@ end</entry></extensions><interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="SW4" type="SIMPLE" subtype="IOSvL2" location="580,519">
         <extensions><entry key="config" type="String">!
-! Last configuration change at 21:35:43 UTC Thu Mar 2 2017
+! Last configuration change at 20:19:19 UTC Fri Mar 3 2017
 !
 version 15.2
 service timestamps debug datetime msec

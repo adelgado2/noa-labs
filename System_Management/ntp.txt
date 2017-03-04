@@ -25,7 +25,7 @@ ntp server 150.1.4.4 source Loopback0 prefer
 ntp server 150.1.6.6 source Loopback0 
 !
 interface GigabitEthernet0/1.58
- ntp broadcast destination 155.1.58.8
+ ntp broadcast 
 !
 
 R8:
