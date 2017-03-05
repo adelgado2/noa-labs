@@ -1,0 +1,16 @@
+
+R5:
+
+!
+ip nat inside source static 150.1.10.10 155.1.45.201 extendable
+ip nat inside source static 150.1.10.10 155.1.45.202 extendable
+!
+interface GigabitEthernet0/1.58
+ ip nat inside
+!
+interface GigabitEthernet0/1.45
+ ip nat outside
+!
+interface tunnel0
+ ip nat outside
+!

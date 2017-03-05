@@ -1,0 +1,30 @@
+
+R4:
+
+!
+key chain 1
+ key 1
+  key-string CISCO
+!
+interface GigabitEthernet0/1.146
+ standby 146 ip 155.1.146.254
+ standby 146 timers 1 3
+ standby 146 authentication md5 key-chain 1
+ standby 146 name VLAN146
+!
+
+R6:
+
+!
+key chain 1
+ key 1
+  key-string CISCO
+!
+interface GigabitEthernet0/1.146
+ standby 146 ip 155.1.146.254
+ standby 146 priority 110
+ standby 146 preempt
+ standby 146 timers 1 3
+ standby 146 authentication md5 key-chain 1
+ standby 146 name VLAN146
+!

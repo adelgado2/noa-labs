@@ -1,0 +1,40 @@
+
+R4:
+
+!
+interface GigabitEthernet0/1.146
+ standby 146 ip 155.1.146.254
+ standby 146 timers 1 3
+ standby 146 preempt
+ standby 146 name VLAN146
+!
+
+R6:
+
+!
+interface GigabitEthernet0/1.146
+ standby 146 ip 155.1.146.254
+ standby 146 priority 110
+ standby 146 preempt
+ standby 146 timers 1 3
+ standby 146 name VLAN146
+ standby 146 track 146 decrement 15
+!
+ip sla 1
+ icmp-echo 155.1.7.7
+ frequency 5
+!
+ip sla 2
+  tcp-connect 155.1.7.7 23 control disable
+!
+ip sla schedule 1 life forever start-time now 
+ip sla schedule 2 life forever start-time now
+!
+track 1 ip sla 1 reachability
+track 2 ip sla 2 state
+!
+track 146 list boolean and
+ object 1
+ object 2
+!
+ 

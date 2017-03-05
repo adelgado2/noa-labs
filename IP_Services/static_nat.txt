@@ -1,0 +1,12 @@
+
+R5:
+
+!
+interface GigabitEthernet0/1.45
+ ip nat outside
+!
+interface GigabitEthernet0/1.58 
+ ip nat inside
+!
+ip nat inside source static 155.1.58.8 155.1.45.8    ! IOS te añade keyword extendable
+!

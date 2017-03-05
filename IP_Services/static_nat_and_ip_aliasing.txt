@@ -1,0 +1,14 @@
+
+R5:
+
+
+!
+interface GigabitEthernet0/1.45
+ ip nat outside
+!
+interface GigabitEthernet0/1.58 
+ ip nat inside
+!
+ip nat inside source static tcp 155.1.8.8 23 155.1.45.44 8023 extendable no-alias
+ip nat inside source static tcp 155.1.10.10 23 155.1.45.44 10023 extendable no-alias
+!

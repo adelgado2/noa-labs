@@ -1,0 +1,8 @@
+
+R1:
+
+!
+service udp-small-servers
+service tcp-small-servers
+ip finger
+!

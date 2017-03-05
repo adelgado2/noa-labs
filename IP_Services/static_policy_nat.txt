@@ -1,0 +1,80 @@
+
+Forma A:
+
+R3:
+
+!
+access-list 10 permit 155.1.7.7
+!
+route-map MAP-A permit 10
+ match ip address 10
+ match interface GigabitEthernet0/1.13
+!
+route-map MAP-B permit 10
+ match ip address 10
+ match interface GigabitEthernet0/1.23
+!
+ip nat pool POOL-A 155.1.13.7 155.1.13.7 prefix-length 24
+ip nat pool POOL-B 155.1.23.7 155.1.23.7 prefix-length 24
+!
+ip nat inside source route-map MAP-A pool POOL-A
+ip nat inside source route-map MAP-B pool POOL-B
+!
+interface GigabitEthernet0/1.23
+ ip nat outside
+!
+interface GigabitEthernet0/1.13
+ ip nat outside
+!
+interface GigabitEthernet0/1.37
+ ip nat inside
+!
+
+Forma B:
+
+! Cleaning:
+
+!
+no access-list 10 permit 155.1.7.7
+no route-map MAP-A
+no route-map MAP-B
+no ip nat pool POOL-A 155.1.13.7 155.1.13.7 prefix-length 24
+no ip nat pool POOL-B 155.1.23.7 155.1.23.7 prefix-length 24
+no ip nat inside source route-map MAP-A pool POOL-A
+no ip nat inside source route-map MAP-B pool POOL-B
+!
+
+
+!
+route-map MAP-A
+ match interface GigabitEthernet0/1.13
+!
+route-map MAP-B
+ match interface GigabitEthernet0/1.23
+!
+ip nat inside source static 155.1.7.7 155.1.13.7 route-map MAP-A
+ip nat inside source static 155.1.7.7 155.1.23.7 route-map MAP-B
+!
+interface GigabitEthernet0/1.37
+ ip nat inside
+!
+interface GigabitEthernet0/1.13
+ ip nat outside
+!
+interface GigabitEthernet0/1.23
+ ip nat outside
+!
+
+
+--------------------------------------------------------------------
+
+! Apunte para testear en LAB:
+
+!
+no ip nat inside source static 155.1.7.7 155.1.13.7 route-map MAP-A
+no ip nat inside source static 155.1.7.7 155.1.23.7 route-map MAP-B
+ip nat inside source static 155.1.7.7 155.1.13.7 extendable 
+ip nat inside source static 155.1.7.7 155.1.23.7 extendable 
+!
+
+Documentación BUENA: http://www.cisco.com/en/US/technologies/tk648/tk361/tk438/technologies_white_paper09186a0080091cb9.html

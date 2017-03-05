@@ -1,0 +1,11 @@
+
+R1:
+
+!
+interface GigabitEthernet0/1.146
+ no ip unreachables
+ no ip redirects
+ no ip mask-reply
+!
+ip icmp rate-limit unreachable 500
+!

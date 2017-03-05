@@ -1,0 +1,22 @@
+
+R4:
+
+!
+interface GigabitEthernet0/1.146
+ vrrp 146 description VLAN146
+ vrrp 146 ip 155.1.146.253
+ vrrp 146 priority 110
+ vrrp 146 timers advertise 3
+ vrrp 146 authentication CISCO
+!
+
+
+R6:
+
+!
+interface GigabitEthernet0/1.146
+ vrrp 146 description VLAN146
+ vrrp 146 ip 155.1.146.253
+ vrrp 146 timers advertise 3
+ vrrp 146 authentication CISCO
+!

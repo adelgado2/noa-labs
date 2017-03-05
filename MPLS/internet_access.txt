@@ -1,0 +1,41 @@
+
+R6:
+
+!
+access-list 10 permit 150.1.0.0 0.0.255.255
+!
+access-list 20 permit 0.0.0.0
+!
+route-map DEFAULT permit 10
+ match ip address 20
+!
+interface GigabitEthernet0/1.106
+ encapsulation dot1q 106
+ ip address 160.1.106.6 255.255.255.0
+ ip nat outside
+!
+router bgp 100
+ neighbor 160.1.106.10 remote-as 106
+ address-family ipv4
+  neighbor 160.1.106.10 activate
+ address-family ipv4 vrf VPN_A
+  redistribute static route-map DEFAULT
+  default-information originate
+!
+ip route vrf VPN_A 0.0.0.0 0.0.0.0 GigabitEthernet0/1.106 160.1.106.10 global
+ip nat inside source list 10 interface GigabitEthernet0/1.106 vrf VPN_A overload 
+!
+interface GigabitEthernet0/1.67
+ ip nat inside
+! 
+
+R10:
+!
+interface GigabitEthernet0/1.106
+ encapsulation dot1q 106
+ ip address 160.1.106.10 255.255.255.0
+!
+router bgp 106 
+ network 150.1.10.10 mask 255.255.255.255
+ neighbor 160.1.106.6 remote-as 100
+!

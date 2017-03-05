@@ -1,0 +1,13 @@
+
+R1:
+
+!
+service nagle
+ip tcp window-size 8256
+ip tcp queuemax 16
+ip tcp synwait-time 5
+ip tcp path-mtu-discovery
+ip tcp ecn
+ip tcp selective-ack
+ip tcp timestamp
+!

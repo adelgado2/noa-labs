@@ -1,0 +1,24 @@
+
+R5:
+
+DOCU BUENA: http://brbccie.blogspot.com.es/2013/06/everything-nat.html
+
+!
+access-list 10 permit 150.1.10.10
+access-list 10 permit 155.1.108.10
+!
+interface Tunnel0
+ shut
+!
+route-map MAP-A permit 10
+ match ip address 10              ! Nota: No está soportado match en interfaz en NAT route-map with reversible keyword! Además lo pone en docu Cisco!
+!
+ip nat pool POOL-A 155.1.45.100 155.1.45.200 prefix-length 24
+ip nat inside source route-map MAP-A pool POOL-A reversible
+!
+interface GigabitEthernet0/1.45
+ ip nat outside
+!
+interface GigabitEthernet0/1.58
+ ip nat inside
+!

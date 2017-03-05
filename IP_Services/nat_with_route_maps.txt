@@ -1,0 +1,30 @@
+
+NAT multiple pools:  http://www.cisco.com/c/en/us/support/docs/ip/network-address-translation-nat/13739-nat-routemap.html
+Policy NAT with route-maps: http://ccietobe.blogspot.com.es/2008/08/nat-policy-nat-with-route-maps.html
+
+R2:
+
+!
+interface GigabitEthernet0/1.2
+ encapsulation dot1q 2
+ ip address 155.1.2.2 255.255.255.0
+!
+access-list 10 permit 150.1.2.2
+access-list 20 permit 155.1.2.2
+!
+route-map MAP-A permit 10
+ match ip address 10
+ match interface GigabitEthernet0/1.23
+!
+route-map MAP-B permit 10
+ match ip address 20
+ match interface GigabitEthernet0/1.23
+!
+ip nat pool NET-23-200 155.1.23.200 155.1.23.200 prefix-length 24
+!
+ip nat inside source route-map MAP-A interface GigabitEthernet0/1.23 overload
+ip nat inside source route-map MAP-B pool NET-23-200 overload
+!
+interface GigabitEthernet0/1.23
+ ip nat outside
+!

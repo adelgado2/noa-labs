@@ -1,0 +1,21 @@
+
+R5:
+
+!
+interface GigabitEthernet0/1.45
+ shutdown
+!
+access-list 10 permit 155.1.58.55
+!
+ip nat pool REAL-HOSTS 155.1.0.1 155.1.0.3 prefix-length 24 type rotary
+! 
+ip nat inside destination list 10 pool REAL-HOSTS
+!
+interface GigabitEthernet0/1.58
+ ip nat inside
+!
+interface Tunnel0
+ ip nat outside
+!
+ip alias 155.1.58.55 23
+!

@@ -1,0 +1,18 @@
+
+R5:
+
+!
+interface Tunnel0
+ shutdown
+!
+interface GigabitEthernet0/1.58
+ ip nat inside
+!
+interface GigabitEthernet0/1.45
+ ip nat outside
+!
+access-list 10 permit any
+!
+ip nat inside source list 10 interface Gi0/1.45 overload
+ip nat inside source static 150.1.8.8 interface Gi0/1.45
+!
