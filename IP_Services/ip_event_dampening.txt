@@ -1,0 +1,20 @@
+
+R6:
+
+!
+interface Tunnel67
+ ip address 169.254.67.6 255.255.255.0
+ tunnel source GigabitEthernet0/1.67
+ tunnel destination 155.1.67.7
+ dampening 30 1000 2000 60 restart 2000
+!
+
+R7:
+
+!
+interface Tunnel67
+ ip address 169.254.67.7 255.255.255.0
+ tunnel source GigabitEthernet0/1.67
+ tunnel destination 155.1.67.6
+!
+

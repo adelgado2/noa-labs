@@ -1,0 +1,35 @@
+
+tclsh 
+
+foreach X {
+10.1.1.1
+10.2.2.2
+10.3.3.3
+10.4.4.4
+10.5.5.5
+10.6.6.6
+10.9.9.9
+10.10.10.10
+173.1.123.1
+173.1.123.2
+173.1.123.3
+173.1.0.3
+173.1.0.4
+173.1.0.10
+173.1.36.3
+173.1.36.6
+173.1.0.210
+173.1.0.205
+173.1.0.206
+50.1.39.3
+50.1.39.9
+} { ping $X source Loopback0 }
+
+Notas:
+
+- En OSPF, al haber dos procesos he modificado el 1 para meter solo las interfaces pertinentes, sino rutas red overlay and underlay de la dmvpn mezcladas!
+- Para anunciar en red DMVPN int tu /24 en OSPF he cambiado de PtMtp a Broadcast, jugando con prioridades para DR.
+- La ruta externa introducida en EIGRP 100 por SW3 hace que haya que jugar con la AD en R5, y per se en SW4 y R3!
+- SW3 lo he hecho stub para que reciba de R3 por EIGRP ruta por defecto, porque las rutas del dominio OSPF por EIGRP no las va a recibir nunca ya que R3 forma parte de los dos mundos, no nos dejan hacer redistribución, y la EIGRP topology table vé las redes as infinity. 
+- R6 en EIGRP recibe rutas de R5, ok.
+

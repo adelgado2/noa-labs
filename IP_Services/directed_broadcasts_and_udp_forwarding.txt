@@ -1,0 +1,13 @@
+
+R5:
+
+!
+interface GigabitEthernet0/1.58
+ ip directed-broadcast
+ ip broadcast-address 155.1.58.255
+!
+interface GigabitEthernet0/1.45
+ ip helper-address 155.1.58.255
+!
+ip forward-protocol udp domain
+!

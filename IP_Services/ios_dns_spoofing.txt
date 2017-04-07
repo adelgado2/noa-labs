@@ -1,0 +1,16 @@
+
+R5:
+
+!
+ip domain lookup
+ip name-server 155.1.0.4
+ip dns spoofing 150.1.5.5
+ip dns server
+!
+
+R8:
+
+!
+ip domain-lookup
+ip name-server 155.1.58.5
+!

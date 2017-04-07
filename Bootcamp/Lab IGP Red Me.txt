@@ -1,0 +1,211 @@
+
+R1:
+
+!
+router eigrp 100
+ network 173.1.123.1 0.0.0.0
+ network 10.1.1.1 0.0.0.0
+!
+interface Tunnel0
+ no ip split-horizon eigrp 100
+!
+
+-------------------------------
+
+!
+router rip 
+ version 2
+ no auto-summary
+ network 173.1.0.0
+ passive-interface default
+ offset-list 1 out 9 Fa0/0.12
+!
+ip access-list standard 1
+ permit 173.1.1.0 0.0.0.255
+!
+ 
+R2:
+
+!
+interface Loopback2
+ ip address 173.1.2.2 255.255.255.0
+!
+router eigrp 100
+ network 173.1.123.2 0.0.0.0
+ network 10.2.2.2 0.0.0.0
+ network 173.1.24.2 0.0.0.0
+!
+
+--------------------------------
+
+!
+router rip 
+ version 2
+ no auto-summary
+ network 173.1.0.0
+ neighbor 173.1.12.1
+ passive-interface default
+!
+
+R3:
+
+!
+router eigrp 100
+ network 173.1.123.3 0.0.0.0
+ network 10.3.3.3 0.0.0.0
+!
+
+R4:
+
+!
+router eigrp 100
+ network 173.1.24.4 0.0.0.0
+ network 10.4.4.4 0.0.0.0
+!
+
+--------------------------------
+
+R4:
+
+!
+interface fa0/0.344
+ ip ospf 1 area 0
+!
+interface serial0/0/0
+ ip ospf 1 area 0
+!
+
+R3:
+
+!
+interface Fa0/0.344
+ ip ospf 1 area 0
+!
+interface fa0/0.36
+ ip ospf 1 area 0
+!
+interface Fa0/1
+ ip ospf 1 area 10
+! 
+router ospf 1
+ area 10 nssa no-summary default-information-originate
+!
+
+R6:
+
+!
+interface gi0/0.36
+ ip ospf 1 area 0
+!
+interface gi0/0.456
+ ip ospf 1 area 0
+!
+interface Loopback0
+ ip ospf 1 area 0
+!
+interface Gi0/1
+ ip ospf 1 area 10
+! 
+router ospf 1
+ area 10 nssa no-summary default-information-originate
+!
+
+
+R5:
+
+!
+interface fa0/0.456
+ ip ospf 1 area 0
+!
+interface serial0/0/0
+ ip ospf 1 area 0
+!
+interface Loopback0
+ ip ospf 1 area 0
+!
+
+SW4:
+
+!
+router ospf 1
+ network 0.0.0.0 255.255.255.255 area 0
+!
+
+SW3:
+
+!
+interface Vlan39
+ ip ospf 1 area 10
+!
+interface Vlan69
+ ip ospf 1 area 10
+!
+interface Loopback0
+ ip ospf 1 area 10
+!
+interface Loopback9
+ ip address 99.99.99.99 255.255.255.0
+!
+route-map CONNECTED permit 10
+ match interface Loopback9
+!
+router ospf 1
+ area 10 nssa
+ redistribute connected route-map CONNECTED subnets
+!
+
+---------------------------------------------------
+
+R1:
+
+!
+router rip
+ redistribute eigrp 100 metric 1
+!
+router eigrp 100
+ redistribute rip metric 10000 10 255 1 1500
+ distance eigrp 90 90
+!
+
+R2:
+
+!
+router rip
+ redistribute eigrp 100 metric 1
+!
+router eigrp 100
+ redistribute rip 10000 10 255 1 1500
+!
+
+
+R3:
+
+!
+router ospf 1
+ redistribute eigrp 100 subnets
+!
+router eigrp 100
+ redistribute ospf 1 metric 10000 10 255 1 1500
+!
+
+R4:
+
+!
+ip access-list standard 1
+ permit 10.9.9.9
+!
+router ospf 1
+ redistribute eigrp 100 subnets
+ distance 171 0.0.0.0 255.255.255.255 1
+!
+router eigrp 100
+ redistribute ospf 1 metric 10000 10 255 1 1500
+!
+
+
+Notas de mi solución: 
+
+- No hace falta añadir en NSSA area que NO traduzca ruta por defecto de Type 7 a Type 5, ya que 
+automáticamente un NSSA ASBR clears the P-Bit when sending default route to avoid loops.
+
+- Nos dijeron en el curso que si no lo indicaban, no hagamos por defecto como en producción el tag loop prevention.

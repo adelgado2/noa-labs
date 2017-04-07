@@ -1,0 +1,545 @@
+MPLS CORE
+
+-------------
+OSPF AREA 0
+-------------
+
+R3:
+
+!
+interface Loopback0
+ ip ospf 1 area 0
+ ip ospf prefix-suppression disable
+ ip ospf network point-to-point
+!
+interface Fa0/0.36
+ ip ospf 1 area 0
+!
+interface Fa0/0.344
+ ip ospf 1 area 0
+!
+router ospf 1
+ router-id 10.3.3.3
+ prefix-suppression
+!
+
+R4:
+
+!
+interface Loopback0 
+ ip ospf 1 area 0
+ ip ospf prefix-suppression disable
+ ip ospf network point-to-point
+!
+interface Fa0/0.344
+ ip ospf 1 area 0
+!
+interface serial0/0/0
+ ip ospf 1 area 0
+!
+router ospf 1
+ router-id 10.4.4.4
+ prefix-suppression
+!
+ 
+R5:
+
+!
+interface Loopback0
+ ip ospf 1 area 0
+ ip ospf prefix-suppression disable
+ ip ospf network point-to-point
+!
+interface serial0/0/0
+ ip ospf 1 area 0
+!
+interface Fa0/0.456
+ ip ospf 1 area 0
+!
+router ospf 1
+ router-id 10.5.5.5
+ prefix-suppression
+!
+
+R6:
+
+!
+interface Loopback0
+ ip ospf 1 area 0
+ ip ospf prefix-suppression disable
+ ip ospf network point-to-point
+!
+interface Gi0/0.36
+ ip ospf 1 area 0
+!
+interface Gi0/0.456
+ ip ospf 1 area 0
+!
+router ospf 1
+ router-id 10.6.6.6
+ prefix-suppression
+!
+
+--------------
+BGP Peering
+--------------
+
+R3:
+
+!
+router bgp 100
+ bgp router-id 10.3.3.3
+ no bgp default ipv4-unicast 
+ neighbor 10.6.6.6 remote-as 100
+ neighbor 10.6.6.6 update-source Loopback0
+ 
+ address-family vpnv4
+  neighbor 10.6.6.6 activate
+!
+
+R4:
+
+!
+router bgp 100
+ bgp router-id 10.4.4.4
+ no bgp default ipv4-unicast 
+ neighbor 10.6.6.6 remote-as 100
+ neighbor 10.6.6.6 update-source Loopback0
+ 
+ address-family vpnv4
+  neighbor 10.6.6.6 activate
+!
+
+R5:
+
+!
+router bgp 100
+ bgp router-id 10.5.5.5
+ no bgp default ipv4-unicast 
+ neighbor 10.6.6.6 remote-as 100
+ neighbor 10.6.6.6 update-source Loopback0
+ 
+ address-family vpnv4
+  neighbor 10.6.6.6 activate
+!
+ 
+R6:
+
+!
+router bgp 100
+ bgp router-id 10.6.6.6
+ no bgp default ipv4-unicast 
+ neighbor IBGP peer-group
+ neighbor IBGP remote-as 100
+ neighbor IBGP update-source Loopback0
+ neighbor 10.3.3.3 peer-group IBGP
+ neighbor 10.4.4.4 peer-group IBGP
+ neighbor 10.5.5.5 peer-group IBGP
+ 
+ address-family vpnv4
+  neighbor 10.3.3.3 activate
+  neighbor 10.4.4.4 activate
+  neighbor 10.5.5.5 activate
+  neighbor IBGP route-reflector-client
+!
+
+--------------
+MPLS Config
+--------------
+
+R3:
+
+!
+mpls ldp router-id Loopback0
+!
+router ospf 1
+ mpls ldp autoconfig area 0 
+!
+
+R4:
+
+!
+mpls ldp router-id Loopback0
+!
+router ospf 1
+ mpls ldp autoconfig area 0 
+!
+
+R5:
+
+!
+mpls ldp router-id Loopback0
+!
+router ospf 1
+ mpls ldp autoconfig area 0 
+!
+
+R6:
+
+!
+mpls ldp router-id Loopback0
+!
+router ospf 1
+ mpls ldp autoconfig area 0 
+!
+
+----------------------------
+Customer A VPN
+----------------------------
+
+SW1:
+
+!
+interface Loopback0
+ ip ospf 1 area 12
+!
+interface Vlan12
+ ip ospf 1 area 12
+!
+interface Vlan41
+ ip ospf 1 area 12
+!
+router ospf 1
+ router-id 10.7.7.7
+!
+
+
+SW2:
+
+!
+interface Loopback0
+ ip ospf 1 area 12
+!
+interface Vlan12
+ ip ospf 1 area 12
+!
+interface Vlan52
+ ip ospf 1 area 12
+!
+
+SW3:
+
+!
+interface Loopback0
+ ip ospf 1 area 0
+!
+interface Vlan39
+ ip ospf 1 area 0
+!
+interface Vlan69
+ ip ospf 1 area 0
+!
+router ospf 1
+ router-id 10.9.9.9 
+!
+
+R3:
+
+!
+ip prefix-list LOOPBACKS-SHAM-LINK permit 45.45.45.45/32
+ip prefix-list LOOPBACKS-SHAM-LINK permit 54.54.54.54/32
+!
+route-map RED-BGP-TO-OSPF deny 10
+ match ip address prefix-list LOOPBACKS-SHAM-LINK
+route-map RED-BGP-TO-OSPF permit 20
+! 
+
+!
+vrf definition Cust_A
+ rd 100:3
+ address-family ipv4
+  route-target import 100:4
+  route-target import 100:5
+  route-target import 100:6
+  route-target export 100:3
+!
+router bgp 100
+ address-family ipv4 vrf Cust_A
+  redistribute ospf 9
+!
+router ospf 9 vrf Cust_A
+ domain-id 11.11.11.11
+ router-id 3.3.3.3  
+ redistribute bgp subnets route-map RED-BGP-TO-OSPF
+!
+interface Fa0/1
+ vrf forwarding Cust_A
+ ip address 50.1.39.3 255.255.255.128
+ ip ospf 9 area 0
+!
+
+R6:
+
+!
+ip prefix-list LOOPBACKS-SHAM-LINK permit 45.45.45.45/32
+ip prefix-list LOOPBACKS-SHAM-LINK permit 54.54.54.54/32
+!
+route-map RED-BGP-TO-OSPF deny 10
+ match ip address prefix-list LOOPBACKS-SHAM-LINK
+route-map RED-BGP-TO-OSPF permit 20
+! 
+
+!
+vrf definition Cust_A
+ rd 100:6
+ address-family ipv4
+  route-target import 100:3
+  route-target import 100:4
+  route-target import 100:5
+  route-target export 100:6
+!
+router bgp 100
+ address-family ipv4 vrf Cust_A
+  redistribute ospf 9
+!
+router ospf 9 vrf Cust_A
+ domain-id 11.11.11.11
+ router-id 6.6.6.6
+ redistribute bgp 100 subnets route-map RED-BGP-TO-OSPF
+!
+interface Gi0/1
+ vrf forwarding Cust_A
+ ip address 50.1.69.6 255.255.255.0
+ ip ospf 9 area 0
+!
+
+R4:
+
+!
+ip prefix-list LOOPBACKS-SHAM-LINK permit 45.45.45.45/32
+ip prefix-list LOOPBACKS-SHAM-LINK permit 54.54.54.54/32
+!
+route-map RED-BGP-TO-OSPF deny 10
+ match ip address prefix-list LOOPBACKS-SHAM-LINK
+route-map RED-BGP-TO-OSPF permit 20
+! 
+
+!
+vrf definition Cust_A
+ rd 100:4
+ address-family ipv4
+  route-target import 100:3
+  route-target import 100:5
+  route-target import 100:6
+  route-target export 100:4
+!
+router bgp 100
+ address-family ipv4 vrf Cust_A
+  network 43.43.43.43 mask 255.255.255.255
+  redistribute ospf 7
+!
+router ospf 7 vrf Cust_A
+ router-id 7.7.7.7
+ domain-id 11.11.11.11
+ redistribute bgp 100 subnets route-map RED-BGP-TO-OSPF
+ area 12 sham-link 45.45.45.45 54.54.54.54 cost 1 
+!  
+interface Loopback45
+ vrf forwarding Cust_A
+ ip address 45.45.45.45 255.255.255.255 
+!
+interface Fa0/1
+ vrf forwarding Cust_A
+  ip address 50.1.41.4 255.255.255.0
+  ip ospf 7 area 12
+!
+
+R5:
+
+!
+ip prefix-list LOOPBACKS-SHAM-LINK permit 45.45.45.45/32
+ip prefix-list LOOPBACKS-SHAM-LINK permit 54.54.54.54/32
+!
+route-map RED-BGP-TO-OSPF deny 10
+ match ip address prefix-list LOOPBACKS-SHAM-LINK
+route-map RED-BGP-TO-OSPF permit 20
+! 
+
+!
+vrf definition Cust_A
+ rd 100:5
+ address-family ipv4
+  route-target import 100:3
+  route-target import 100:4
+  route-target import 100:6
+  route-target export 100:5
+!
+router bgp 100
+ address-family ipv4 vrf Cust_A
+  network 54.54.54.54 mask 255.255.255.255
+  redistribute ospf 8 
+!
+router ospf 8 vrf Cust_A
+ domain-id 11.11.11.11
+ router-id 8.8.8.8
+ redistribute bgp 100 subnets route-map RED-BGP-TO-OSPF
+ area 12 sham-link 54.54.54.54 45.45.45.45 cost 1
+!  
+interface Loopback54
+ vrf forwarding Cust_A
+ ip address 54.54.54.54 255.255.255.255
+!
+interface Fa0/1
+ vrf forwarding Cust_A
+ ip address 50.1.52.5 255.255.255.0
+ ip ospf 8 area 12
+!
+
+-------------------------------------------------
+Customer B VPN
+-------------------------------------------------
+
+R4:
+
+!
+vrf definition Cust_B
+ rd 2400:4
+ address-family ipv4
+  route-target import 2400:3
+  route-target export 2400:4
+!
+interface Fa0/0.24
+ vrf forwarding Cust_B
+ ip address 173.1.24.4 255.255.255.0
+!
+router bgp 100
+ address-family ipv4 vrf Cust_B
+  neighbor 173.1.24.2 remote-as 2400
+  neighbor 173.1.24.2 activate
+  neighbor 173.1.24.2 as-override
+!
+  
+R3:
+
+!
+vrf definition Cust_B
+ rd 2400:3
+ address-family ipv4
+  route-target import 2400:4
+  route-target export 2400:3
+!
+interface Fa0/0.34
+vrf forwarding Cust_B
+ ip address 173.1.34.3 255.255.255.0
+!
+router bgp 100
+ address-family ipv4 vrf Cust_B
+  neighbor 173.1.34.10 remote-as 2400
+  neighbor 173.1.34.10 activate
+  neighbor 1731.34.10 as-override
+!
+
+R2:
+
+!
+router bgp 2400
+ neighbor 173.1.24.4 remote-as 100
+ address-family ipv4
+  neighbor 173.1.24.4 activate
+  network 10.2.2.0 mask 255.255.255.0
+!  
+  
+Sw4:
+
+!
+router bgp 2400
+ neighbor 173.1.34.3 remote-as 100
+ address-family ipv4
+  neighbor 173.1.34.3 activate
+  network 10.10.10.0 mask 255.255.255.0
+!
+
+-------------------------------------------------
+Overlapping VPN
+-------------------------------------------------
+
+R6:
+
+!
+vrf definition Cust_A
+ address-family ipv4
+  route-target import 2400:4
+!
+
+R4:
+
+!
+vrf definition Cust_B
+ address-family ipv4
+  route-target import 100:6
+!  
+
+-------------------------------------------------
+Central Services VPN
+-------------------------------------------------
+
+R1:
+
+!
+router bgp 1000
+ neighbor 173.1.123.3 remote-as 100
+ address-family ipv4
+ neighbor 173.1.123.3 activate
+ network 10.1.1.0 mask 255.255.255.0
+!
+
+R3:
+
+!
+vrf definition Central
+ rd 1000:3
+ address-family ipv4
+  route-target export 1000:3
+  route-target import 1000:120
+!
+interface serial0/0/0
+ vrf forwarding Central
+ ip address 173.1.123.3 255.255.255.0
+!
+router bgp 100
+ address-family ipv4 vrf Central
+  neighbor 173.1.123.1 remote-as 1000
+  neighbor 173.1.123.1 activate
+!
+
+R3:
+
+!
+vrf definition Cust_A
+ address-family ipv4
+ route-target import 1000:3
+ route-target export 1000:120
+!
+vrf definition Cust_B
+ address-family ipv4
+ route-target import 1000:3
+ route-target export 1000:120
+!
+
+R4:
+
+!
+vrf definition Cust_A
+ address-family ipv4
+ route-target import 1000:3
+ route-target export 1000:120
+!
+
+R5:
+
+!
+vrf definition Cust_A
+ address-family ipv4
+ route-target import 1000:3
+ route-target export 1000:120
+!
+
+R6:
+
+!
+vrf definition Cust_A
+ address-family ipv4
+ route-target import 1000:3
+ route-target export 1000:120
+!
+

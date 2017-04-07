@@ -1,0 +1,95 @@
+R1:
+
+!
+router bgp 1000
+ neighbor 173.1.123.3 remote-as 100
+ network 10.1.1.1 mask 255.255.255.255
+!
+
+R2:
+
+!
+router bgp 2000
+ neighbor 173.1.24.4 remote-as 100
+ network 10.2.2.2 mask 255.255.255.255
+!
+
+R3:
+
+!
+router bgp 65001
+ bgp router-id 3.3.3.3
+ bgp confederation identifier 100
+ bgp confederation peers 65002 
+ neighbor 10.6.6.6 remote-as 65001
+ neighbor 10.6.6.6 update-source Loopback0
+ neighbor 10.6.6.6 next-hop-self
+ neighbor 10.4.4.4 remote-as 65002
+ neighbor 10.4.4.4 update-source Loopback0
+ neighbor 10.4.4.4 ebgp-multihop 2
+ neighbor 10.4.4.4 next-hop-self
+ neighbor 173.1.123.1 remote-as 1000
+!
+router ospf 1
+ redistribute bgp 65001 subnets
+!
+
+R4:
+
+!
+router bgp 65002
+ bgp confederation identifier 100
+ bgp confederation peers 65001 
+ neighbor 10.5.5.5 remote-as 65002
+ neighbor 10.5.5.5 update-source Loopback0
+ neighbor 10.5.5.5 next-hop-self
+ neighbor 10.3.3.3 remote-as 65001
+ neighbor 10.3.3.3 update-source Loopback0
+ neighbor 10.3.3.3 ebgp-multihop 2
+ neighbor 10.3.3.3 next-hop-self
+ neighbor 173.1.24.2 remote-as 2000
+ distance bgp 20 100 200
+!
+
+R5:
+
+!
+ip prefix-list NET-10-1-1-1 seq 5 permit 10.1.1.1/32
+!
+route-map LOOP deny 10
+ match ip address prefix-list NET-10-1-1-1
+route-map LOOP permit 20
+!
+router bgp 65002
+ table-map LOOP filter
+ bgp confederation identifier 100
+ neighbor 10.4.4.4 remote-as 65002
+ neighbor 10.4.4.4 update-source Loopback0
+ distance bgp 20 100 200 
+!
+
+R6:
+
+!
+router bpg 65001
+ synchronization
+ bgp confederation identifier 100
+ neighbor 10.3.3.3 remote-as 65001
+ neighbor 10.3.3.3 update-source Loopback0
+ neighbor 50.1.69.9 remote-as 65001
+ neighbor 50.1.69.9 route-reflector-client
+ neighbor 50.1.69.9 route-map RM_TO_SW3 out
+!
+route-map RM_TO_SW3 permit 10
+ set ip next-hop 50.1.69.6
+!
+
+SW3:
+
+!
+router bgp 65001
+ bgp confederation identifier 100
+ neighbor 50.1.69.6 remote-as 65001
+!
+
+OJO con el eBGP Multihop. Y con el significado tercer campo bgp distance, q es para backdoors.

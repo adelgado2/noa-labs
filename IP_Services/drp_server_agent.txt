@@ -1,0 +1,16 @@
+
+
+R1:
+
+!
+access-list 10 permit 155.1.146.0 0.0.0.255
+!
+ip drp access-group 10
+ip drp authentication key-chain 1
+!
+key chain 1
+ key 1
+  key-string CISCO
+!
+ip drp server
+!

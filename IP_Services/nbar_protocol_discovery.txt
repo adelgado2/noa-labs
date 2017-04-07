@@ -1,0 +1,11 @@
+
+R4:
+
+!
+interface GigabitEthernet0/1.45
+ ip nbar protocol-discovery
+!
+ip nbar custom HTTP_PROXY destination tcp 3128 8080
+ip nbar port-map SOCKS tcp 2080
+ip nbar custom TEST 0 ascii A destination tcp 3001
+!

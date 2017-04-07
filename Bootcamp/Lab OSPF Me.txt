@@ -1,0 +1,206 @@
+R1:
+
+!
+interface tunnel0
+ ip ospf 1 area 0
+ ip ospf network point-to-multipoint non-broadcast
+ ip ospf message-digest-key 1 md5 0 CISCO
+!
+router ospf 1
+ router-id 10.1.1.1
+ neighbor 173.1.123.2
+ neighbor 173.1.123.3
+ area 0 authentication message-digest
+ area 12 virtual-link 204.186.23.2 message-digest-key 1 md5 CISCO
+!
+interface Loopback0
+ ip ospf 1 area 0
+!
+interface FastEthernet0/0.12
+ ip ospf 1 area 12
+!
+
+R2:
+
+!
+interface tunnel0
+ ip ospf 1 area 0
+ ip ospf network point-to-multipoint non-broadcast
+ ip ospf message-digest-key 1 md5 0 CISCO
+!
+interface fa0/0
+ ip ospf 1 area 0
+!
+interface Loopback0
+ ip ospf 1 area 0
+!
+router ospf 1
+ router-id 204.186.23.2
+ area 0 authentication message-digest
+ area 12 virtual-link 10.1.1.1 message-digest-key 1 md5 CISCO
+!
+interface FastEthernet0/0.12
+ ip ospf 1 area 12
+!
+
+R3:
+
+!
+interface tunnel0
+ ip ospf 1 area 0
+ ip ospf network point-to-multipoint non-broadcast
+ ip ospf message-digest-key 1 md5 0 CISCO
+!
+interface fa0/0.344
+ ip ospf 1 area 0 
+ ip ospf message-digest-key 1 md5 0 CISCO
+!
+interface Loopback0
+ ip ospf 1 area 0
+!
+interface FastEthernet0/1
+ ip ospf 1 area 369
+!
+interface FastEthernet0/0.36
+ ip ospf 1 area 369
+!
+router ospf 1
+ area 0 authentication message-digest
+!
+
+R4:
+
+!
+interface fa0/0.344
+ ip ospf 1 area 0
+ ip ospf message-digest-key 1 md5 0 CISCO
+!
+interface fa0/0.24
+ ip ospf 1 area 0
+ ip ospf message-digest-key 1 md5 0 CISCO
+!
+interface serial0/0/0
+ ip ospf 1 area 45
+ ip ospf dead-interval minimal hello-multiplier 4
+!
+interface Loopback0
+ ip ospf 1 area 45
+!
+interface FastEthernet0/0.100
+ encapsulation dot1q 100
+ ip address 173.1.100.4 255.255.255.0
+ ip ospf 1 area 100
+!
+interface Loopback44
+ ip address 44.0.0.4 255.255.255.0
+!
+ip prefix-list CONN-ROUTES permit 44.0.0.0/24
+!
+route-map CONN-ROUTES permit 10
+ match ip address prefix-list CONN-ROUTES
+!
+router ospf 1
+ router-id 10.4.4.4
+ redistribute connected route-map CONN-ROUTES
+ area 0 authentication message-digest
+ area 45 stub no-summary
+ area 100 virtual-link 10.5.5.5 message-digest-key 1 md5 0 CISCO 
+!
+
+R5:
+
+!
+interface serial0/0/0
+ ip ospf 1 area 45
+ ip ospf dead-interval minimal hello-multiplier 4
+!
+interface Loopback0
+ ip ospf 1 area 45
+!
+interface FastEthernet0/1
+ ip ospf 1 area 0
+ ip ospf message-digest-key 1 md5 0 CISCO
+!
+interface FastEthernet0/0.456
+ ip ospf 1 area 0
+ ip ospf message-digest-key 1 md5 0 CISCO
+!
+interface FastEthernet0/0.100
+ encapsulation dot1q 100
+ ip address 173.1.100.5 255.255.255.0
+ ip ospf 1 area 100
+!
+router ospf 1
+ router-id 10.5.5.5
+ area 0 authentication message-digest
+ area 45 stub
+ area 100 virtual-link 10.4.4.4 message-digest-key 1 md5 0 CISCO 
+ redistribute eigrp 100 subnets
+!
+
+!
+router eigrp 100
+ network 173.1.0.205 0.0.0.0
+ redistribute ospf 1 metric 10000 10 255 1 1500
+!
+
+SW2:
+
+!
+interface Loopback0
+ ip ospf 1 area 0
+!
+interface Vlan52
+ ip ospf 1 area 0
+ ip ospf message-digest-key 1 md5 0 CISCO
+!
+router ospf 1
+ router-id 10.8.8.8
+ area 0 authentication message-digest
+ area 100 virtual-link 10.5.5.5
+!
+
+SW4:
+
+!
+router eigrp 100
+ router-id 10.10.10.10
+ network 173.1.0.210 0.0.0.0
+ network 10.10.10.10 0.0.0.0
+!
+
+R6:
+
+!
+interface GigabitEthernet0/0.36
+ ip ospf 1 area 369
+!
+interface GigabitEthernet0/1
+ ip ospf 1 area 369
+!
+interface Loopback0
+ ip ospf 1 area 369
+!
+router ospf 1
+ router-id 10.6.6.6
+ local-rib-criteria forwarding-address
+!
+
+SW3:
+
+!
+router ospf 1 
+ router-id 10.9.9.9
+ network 0.0.0.0 0.0.0.0 area 369
+!
+
+-------------------
+
+sh ip ospf neigh
+sh ip ospf database
+sh ip ospf int brief
+
+sh ip ospf rib
+traceroute 10.1.1.1
+
+sh ip ospf 1 0.0.0.45 int
