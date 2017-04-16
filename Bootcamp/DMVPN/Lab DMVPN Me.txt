@@ -1,0 +1,184 @@
+
+PWD CISCO, AES 256 Encryption, SHA1 Authentication, 2048 Key exchange.
+
+R1:
+
+!
+interface Tunnel0
+ ip address 192.168.100.1 255.255.255.0
+ ip nhrp redirect
+ ip nhrp map multicast dynamic
+ ip nhrp network-id 100
+ ip nhrp authentication CISCO
+ tunnel source Fa0/0.15 
+ tunnel mode gre multipoint
+!
+router eigrp LAB
+ address-family ipv4 unicast autonomous-system 100
+  network 192.168.0.0 0.0.255.255
+  af-interface Fa0/0.15
+   shutdown
+  af-interface Tunnel0
+   no split-horizon
+   summary-address 0.0.0.0 0.0.0.0
+  af-interface Loopback0
+   passive-interface
+!
+
+!
+crypto isakmp policy 10
+ encryption aes 256
+ authentication pre-share
+ group 14
+ hash sha        ! Por defecto, por eso en el show run no sale
+!
+crypto isakmp key CISCO address 0.0.0.0 0.0.0.0
+! 
+crypto ipsec transform-set ESP-AES-256-SHA1 esp-aes 256 esp-sha-hmac
+ mode transport  ! Por defecto tunnel mode
+!
+crypto ipsec profile LAB-Profile
+ set transform-set ESP-AES-256-SHA1
+!
+interface Tunnel0
+ tunnel protection ipsec profile LAB-Profile
+!
+
+R2:
+
+!
+interface Tunnel0
+ ip address 192.168.100.2 255.255.255.0
+ ip nhrp shortcut
+ ip nhrp network-id 100
+ ip nhrp map 192.168.100.1 173.1.15.1
+ ip nhrp map multicast 173.1.15.1
+ ip nhrp nhs 192.168.100.1
+ ip nhrp authentication CISCO
+ tunnel source Fa0/0.25
+ tunnel mode gre multipoint
+!
+router eigrp LAB
+ address-family ipv4 unicast autonomous-system 100
+  network 192.168.0.0 0.0.255.255
+  af-interface Fa0/0.25
+   shutdown   
+!
+
+!
+crypto isakmp policy 10
+ encryption aes 256
+ authentication pre-share
+ group 14
+ hash sha
+!
+crypto isakmp key CISCO address 0.0.0.0 0.0.0.0
+! 
+crypto ipsec transform-set ESP-AES-256-SHA1 esp-aes 256 esp-sha-hmac
+ mode transport
+!
+crypto ipsec profile LAB-Profile
+ set transform-set ESP-AES-256-SHA1
+!
+interface Tunnel0
+ tunnel protection ipsec profile LAB-Profile
+!
+
+
+R3:
+
+!
+interface Tunnel0
+ ip address 192.168.100.3 255.255.255.0
+ ip nhrp shortcut
+ ip nhrp network-id 100
+ ip nhrp map 192.168.100.1 173.1.15.1
+ ip nhrp map multicast 173.1.15.1
+ ip nhrp nhs 192.168.100.1
+ ip nhrp authentication CISCO
+ tunnel source Fa0/0.36
+ tunnel mode gre multipoint
+!
+router eigrp LAB
+ address-family ipv4 unicast autonomous-system 100
+  network 192.168.0.0 0.0.255.255
+  af-interface Fa0/0.36
+   shutdown
+!
+
+!
+crypto isakmp policy 10
+ encryption aes 256
+ authentication pre-share
+ group 14
+ hash sha
+!
+crypto isakmp key CISCO address 0.0.0.0 0.0.0.0
+! 
+crypto ipsec transform-set ESP-AES-256-SHA1 esp-aes 256 esp-sha-hmac
+ mode transport
+!
+crypto ipsec profile LAB-Profile
+ set transform-set ESP-AES-256-SHA1
+!
+interface Tunnel0
+ tunnel protection ipsec profile LAB-Profile
+!
+
+
+R4:
+
+!
+interface Tunnel0
+ ip address 192.168.100.4 255.255.255.0
+ ip nhrp shortcut
+ ip nhrp network-id 100
+ ip nhrp map 192.168.100.1 173.1.15.1
+ ip nhrp map multicast 173.1.15.1
+ ip nhrp nhs 192.168.100.1
+ ip nhrp authentication CISCO
+ tunnel source Fa0/0.46
+ tunnel mode gre multipoint
+!
+router eigrp LAB
+ address-family ipv4 unicast autonomous-system 100
+  network 192.168.0.0 0.0.255.255
+  af-interface Fa0/0.46
+   shutdown
+!
+
+!
+crypto isakmp policy 10
+ encryption aes 256
+ authentication pre-share
+ group 14
+ hash sha
+!
+crypto isakmp key CISCO address 0.0.0.0 0.0.0.0
+! 
+crypto ipsec transform-set ESP-AES-256-SHA1 esp-aes 256 esp-sha-hmac
+ mode transport
+!
+crypto ipsec profile LAB-Profile
+ set transform-set ESP-AES-256-SHA1
+!
+interface Tunnel0
+ tunnel protection ipsec profile LAB-Profile
+!
+
+SW1, SW2, SW3, SW4:
+
+!
+router eigrp LAB
+ !
+ address-family ipv4 unicast autonomous-system 100
+  !
+  topology base
+  exit-af-topology
+  network 192.168.0.0 0.0.255.255
+ exit-address-family
+!
+
+-----------------------------------------------------
+
+Tras trastear transport vs tunnel mode, 'clear crypto session'

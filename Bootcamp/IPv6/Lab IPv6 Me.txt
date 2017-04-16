@@ -1,0 +1,721 @@
+
+R2:
+
+!
+ipv6 unicast-routing
+!
+ipv6 cef
+!
+interface Loopback0
+ ipv6 address FE80::2 link-local
+ ipv6 address 2001:dead:beef::2/128
+!
+interface FastEthernet0/0
+ ipv6 address FE80::2 link-local
+ ipv6 address autoconfig
+!
+
+R4:
+
+!
+ipv6 unicast-routing
+!
+ipv6 cef
+!
+interface Loopback0
+ ipv6 address FE80::4 link-local
+ ipv6 address 2001:dead:beef::4/128
+!
+interface FastEthernet0/0.24
+ ipv6 address FE80::4 link-local
+ ipv6 address 2001:dead:beef:24::4/64
+!
+
+R3:
+
+!
+ipv6 unicast-routing
+!
+ipv6 cef
+!
+interface FastEthernet0/0.36
+ ipv6 address FE80::3 link-local
+ ipv6 address 2001:dead:beef:36::3/64
+!
+interface FastEthernet0/0.344
+ ipv6 address FE80::3 link-local
+ ipv6 address 2001:DEAD:BEEF:344::3/64
+! 
+interface Fa0/1
+ ipv6 address FE80::3 link-local
+ ipv6 address 2001:dead:beef:39::3/64
+!
+interface Tunnel0
+ ipv6 address FE80::3 link-local
+ ipv6 address 2001:dead:beef:123::3/64
+!
+interface Loopback0
+ ipv6 address FE80::3 link-local
+ ipv6 address 2001:dead:beef::3/128
+!
+ipv6 local pool CLIENT_PREFIX_POOL1 2001:DEAD:BEEF::/48 48
+!
+ipv6 dhcp pool POOL
+ prefix-delegation pool CLIENT_PREFIX_POOL1 lifetime 1800 600
+ dns-server 2002:dead:beef::1
+ domain-name inelab.com
+!
+interface FastEthernet0/0.36
+ ipv6 dhcp server POOL
+!
+
+R6:
+
+!
+ipv6 unicast-routing
+!
+ipv6 cef
+!
+interface Loopback0
+ ipv6 address FE80::6 link-local
+ ipv6 address 2001:dead:beef::6/128
+!
+interface GigabitEthernet0/0.36
+ ipv6 address FE80::6 link-local
+ ipv6 address autoconfig 
+ ipv6 dhcp client pd PREFIX_FROM_PROVIDER
+!
+interface GigabitEthernet0/0.456
+ ipv6 address FE80::6 link-local
+ ipv6 address PREFIX_FROM_PROVIDER ::456:0:0:0:6/64
+ ipv6 nd other-config-flag
+ ipv6 dhcp relay destination 2001:DEAD:BEEF:36::3 GigabitEthernet0/0.36
+!
+
+R5:
+
+!
+ipv6 unicast-routing
+!
+ipv6 cef
+!
+interface Loopback0
+ ipv6 address FE80::5 link-local
+ ipv6 address 2001:dead:beef::5/128
+!
+interface FastEthernet0/0.456
+ ipv6 address FE80::5 link-local
+ ipv6 address autoconfig
+!
+
+--------------- Remaining interfaces ------------- 
+
+R4:
+ 
+!
+interface Fa0/0.344
+ ipv6 address FE80::4 link-local
+ ipv6 address 2001:dead:beef:344::4/64
+!
+interface Fa0/1
+ ipv6 address FE80::4 link-local
+ ipv6 address 2001:dead:beef:41::4/64
+!
+
+R5:
+
+!
+interface Fa0/1
+ ipv6 address FE80::5 link-local
+ ipv6 address 2001:dead:beef:52::5/64
+!
+
+R1:
+
+!
+ipv6 unicast-routing
+!
+ipv6 cef
+!
+interface Loopback0
+ ipv6 address FE80::1 link-local
+ ipv6 address 2002:dead:beef::1/128
+!
+interface Tunnel0
+ ipv6 address FE80::1 link-local
+ ipv6 address 2001:dead:beef:123::1/64
+!
+
+R2:
+
+!
+interface Tunnel0
+ ipv6 address FE80::2 link-local
+ ipv6 address 2001:dead:beef:123::2/64
+!
+
+R6:
+
+!
+interface Gi0/1
+ ipv6 address FE80::6 link-local
+ ipv6 address 2001:dead:beef:69::6/64
+!
+
+Nota: Para hacer que switches rack rental soporten ipv6:
+
+!
+sdm prefer dual default
+!
+
+Y reload. Puedes chequear que aplica template para ipv4 e ipv6 con 'show sdm prefer'
+
+SW1:
+
+!
+ipv6 unicast-routing
+!
+ipv6 cef
+!
+interface Loopback0
+ ipv6 address FE80::7 link-local
+ ipv6 address 2001:dead:beef::7/128
+!
+interface Vlan41
+ ipv6 address FE80::7 link-local
+ ipv6 address 2001:dead:beef:41::7/64
+!
+interface Vlan12
+ ipv6 address FE80::7 link-local
+ ipv6 address 2001:dead:beef:12::7/64
+!
+
+SW2:
+
+!
+ipv6 unicast-routing
+!
+ipv6 cef
+!
+interface Loopback0
+ ipv6 address FE80::8 link-local
+ ipv6 address 2001:dead:beef::8/128
+!
+interface Vlan52
+ ipv6 address FE80::8 link-local
+ ipv6 address 2001:dead:beef:52::8/64
+!
+interface Vlan12
+ ipv6 address FE80::8 link-local
+ ipv6 address 2001:dead:beef:12::8/64
+!
+
+SW3:
+
+!
+ipv6 unicast-routing
+!
+ipv6 cef
+!
+interface Loopback0
+ ipv6 address FE80::9 link-local
+ ipv6 address 2001:dead:beef::9/128
+!
+interface Vlan39
+ ipv6 address FE80::9 link-local
+ ipv6 address 2001:dead:beef:39::9/64
+!
+interface Vlan69
+ ipv6 address FE80::9 link-local
+ ipv6 address 2001:dead:beef:69::9/64
+!
+
+--------------- Tras screenshot vlans ------------
+
+R4:
+
+!
+interface serial0/0/0
+ ipv6 address FE80::4 link-local
+ ipv6 unnumbered fa0/0.344
+!
+
+R5:
+
+!
+interface serial0/0/0
+ ipv6 address FE80::5 link-local
+ ipv6 unnumbered fa0/0.456
+!
+
+--------------------------OSPF--------------------------
+
+Nota: SW1 y SW2 no soportan OSPFv3!!!
+
+R2:
+
+!
+interface Fa0/0
+ ospfv3 1 ipv6 area 0
+ ospfv3 authentication ipsec spi 256 sha1 1111111111222222222233333333334444444444
+!
+
+R4:
+
+!
+interface Fa0/0.24
+ ospfv3 1 ipv6 area 0
+!
+interface Fa0/0.344
+ ospfv3 1 ipv6 area 0
+!
+interface serial0/0/0
+ ospfv3 1 ipv6 area 0
+!
+router ospfv3 1
+ area 0 authentication ipsec spi 256 sha1 1111111111222222222233333333334444444444
+ area 100 nssa no-summary
+!
+interface Fa0/1
+ ospfv3 1 ipv6 area 100
+!
+ 
+R3:
+
+!
+interface Fa0/0.344
+ ospfv3 1 ipv6 area 0
+ ospfv3 authentication ipsec spi 256 sha1 1111111111222222222233333333334444444444
+!
+
+R5:
+
+!
+interface serial0/0/0
+ ospfv3 1 ipv6 area 0
+ ospfv3 authentication ipsec spi 256 sha1 1111111111222222222233333333334444444444
+!
+interface Fa0/1
+ ospfv3 1 ipv6 area 100
+!
+router ospfv3 1
+ area 100 nssa no-summary
+!
+
+SW1:
+
+!
+interface Vlan41
+ ipv6 ospf 1 area 100
+!
+interface Vlan12
+ ipv6 ospf 1 area 100
+!
+ipv6 router ospf 1 
+ area 100 nssa 
+!
+
+SW2:
+
+!
+interface Vlan52
+ ipv6 ospf 1 area 100
+!
+interface Vlan12
+ ipv6 ospf 1 area 100
+!
+ipv6 router ospf 1 
+ area 100 nssa 
+!
+
+--------------------------EIGRP--------------------------
+
+R3:
+
+!
+router eigrp LAB
+ address-family ipv6 unicast autonomous-system 100
+  af-interface default
+   shutdown
+  af-interface FastEthernet0/0.36
+   no shutdown
+!
+
+R6:
+
+!
+router eigrp LAB
+ address-family ipv6 unicast autonomous-system 100
+  af-interface default
+   shutdown
+  af-interface GigabitEthernet0/0.36
+   no shutdown
+  af-interface GigabitEthernet0/0.456
+   no shutdown
+!
+
+R5:
+
+!
+router eigrp LAB
+ address-family ipv6 unicast autonomous-system 100
+  af-interface default
+   shutdown
+  af-interface FastEthernet0/0.456
+   no shutdown
+!
+
+--------------------------RIPng--------------------------
+
+R3:
+
+!
+interface Fa0/1
+ ipv6 rip RIPNG enable
+!
+
+SW3:
+
+!
+interface Vlan39
+ ipv6 rip RIPNG enable
+!
+interface Vlan69
+ ipv6 rip RIPNG enable
+!
+
+R6:
+
+!
+interface Gi0/1
+ ipv6 rip RIPNG enable
+!
+
+--------------------------Advertise Loopbacks----------------------
+
+(R1 anunciaremos la loopback0 en la parte de BGP)
+
+R2:
+
+!
+interface Loopback0
+ ospfv3 1 ipv6 area 0
+!
+
+R3:
+
+!
+router eigrp LAB
+ address-family ipv6 unicast autonomous-system 100
+  af-interface Loopback0 
+   no shut
+   passive-interface
+!
+
+R4:
+
+!
+interface Loopback0
+ ospfv3 1 ipv6 area 0
+!
+
+R5:
+
+!
+router eigrp LAB
+ address-family ipv6 unicast autonomous-system 100
+  af-interface Loopback0 
+   no shut
+   passive-interface
+!
+
+R6:
+
+!
+router eigrp LAB
+ address-family ipv6 unicast autonomous-system 100
+  af-interface Loopback0 
+   no shut
+   passive-interface
+!
+
+SW1:
+
+!
+route-map RED-CONN-TO-OSPFv3 permit 10
+ match interface Loopback0
+!
+ipv6 router ospf 1
+  redistribute connected route-map RED-CONN-TO-OSPFv3 
+!
+
+SW2:
+
+!
+route-map RED-CONN-TO-OSPFv3 permit 10
+ match interface Loopback0
+!
+ipv6 router ospf 1
+  redistribute connected route-map RED-CONN-TO-OSPFv3 subnets
+!
+
+SW3:
+
+!
+interface Loopback0
+ ipv6 rip RIPNG enable
+!
+
+--------------------------Before BGP, we need DMVPN ready------------------
+
+R1:
+
+!
+interface Tunnel0
+ ipv6 nhrp network-id 99
+ ipv6 nhrp map multicast dynamic
+ ipv6 mtu 1400
+!
+
+R2:
+
+!
+interface Tunnel0
+ ipv6 nhrp network-id 99
+ ipv6 nhrp nhs 2001:dead:beef:123::1 nbma 204.186.13.1 multicast
+ ipv6 mtu 1400
+!
+
+R3:
+
+!
+interface Tunnel0
+ ipv6 nhrp network-id 99
+ ipv6 nhrp nhs 2001:dead:beef:123::1 nbma 204.186.13.1 multicast
+ ipv6 mtu 1400
+!
+
+--------------------------BGP---------------------------------
+
+R1:
+
+!
+router bgp 1000
+ bgp router-id 1.1.1.1
+ no bgp default ipv4-unicast 
+ no bgp default ipv6-nexthop
+ neighbor 173.1.123.2 remote-as 100
+ neighbor 173.1.123.2 ebgp-multihop 2
+ neighbor 173.1.123.3 remote-as 100
+ neighbor 173.1.123.3 ebgp-multihop 2 
+ !
+ address-family ipv6 unicast
+  neighbor 173.1.123.2 activate
+  neighbor 173.1.123.3 activate
+  network 2002:dead:beef::1/128
+!
+  
+R2:
+
+!
+router bgp 100
+ bgp router-id 2.2.2.2
+ no bgp default ipv4-unicast 
+ no bgp default ipv6-next hop
+ neighbor 173.1.123.1 remote-as 1000
+ neighbor 173.1.123.1 ebgp-multihop 2
+ !
+ address-family ipv6 unicast
+  neighbor 173.1.123.1 activate
+  redistribute ospf 1 match external internal include-connected
+!
+router ospfv3 1
+ address-family ipv6 unicast
+  default-information originate always
+!
+
+R3:
+
+!
+router bgp 100
+ bgp router-id 3.3.3.3
+ no bgp default ipv4-unicast 
+ no bgp default ipv6-next hop
+ neighbor 173.1.123.1 remote-as 1000
+ neighbor 173.1.123.1 ebgp-multihop 2
+ !
+ address-family ipv6 unicast
+  neighbor 173.1.123.1 activate
+  redistribute ospf 1 match external internal include-connected
+  aggregate-address 2001:dead:beef::/48 summary-only
+!
+router ospfv3 1
+ address-family ipv6 unicast
+  default-information originate always metric-type 1
+!
+
+---------------------- Redistribution ----------------------
+
+R3:
+
+!
+router ospfv3 1
+ address-family ipv6 unicast
+  redistribute rip RIPNG include-connected
+!
+ipv6 router rip RIPNG
+ redistribute ospf 1 metric 5 include-connected
+!
+
+R6:
+
+!
+router eigrp LAB
+ address-family ipv6 unicast autonomous-system 100
+  topology base 
+   redistribute rip RIPNG include-connected metric 10000 1000 255 1 1500
+!
+ipv6 router rip RIPNG
+ redistribute eigrp 100 metric 5 include-connected
+!
+
+R5:
+
+!
+router eigrp LAB
+ address-family ipv6 unicast autonomous-system 100
+  topology base 
+   redistribute ospf 1 include-connected metric 10000 1000 255 1 1500
+!
+router ospfv3 1 
+ address-family ipv6 unicast 
+  redistribute eigrp 100 include-connected 
+!
+
+------------------------- FHRP -------------------------
+
+R3:
+
+!
+interface Fa0/0.344
+ glbp 1 ipv6 FE80::
+ glbp 1 load-balancing host-dependent
+!
+
+R4:
+
+!
+interface Fa0/0.344
+ glbp 1 ipv6 FE80::
+ glbp 1 load-balancing host-dependent
+!
+
+Trastear más aparte.
+
+------------------------- SCRIPT -----------------------
+
+tclsh 
+
+foreach X {
+
+2001:dead:beef::2
+2001:dead:beef::3
+2001:dead:beef::4
+2001:dead:beef::5
+2001:dead:beef::6
+2001:dead:beef::7
+2001:dead:beef::8
+2001:dead:beef::9
+2001:dead:beef:12::7
+2001:dead:beef:12::8
+2001:dead:beef:24::2
+2001:dead:beef:24::4
+2001:dead:beef:36::3
+2001:dead:beef:36::6
+2001:dead:beef:39::3
+2001:dead:beef:39::9
+2001:dead:beef:41::4
+2001:dead:beef:41::7
+2001:dead:beef:52::5
+2001:dead:beef:52::8
+2001:dead:beef:69::6
+2001:dead:beef:69::9
+2001:dead:beef:344::3
+2001:dead:beef:344::4
+2001:dead:beef:456::5
+2001:dead:beef:456::6
+2001:dead:beef:123::1
+2001:dead:beef:123::2
+2001:dead:beef:123::3
+
+} { ping $X source Loopback0 }
+
+**************************** Resultados *****************************
+
+R1 OK, R3 OK, R4 OK, R5 OK, R6 OK, SW1 OK, SW2 OK, SW3 OK
+
+R2 issue: R5 no estaba redistribuyendo la conectada activada en EIGRP Fa0/0.456 a pesar de incluir
+keyword 'include-connected'. Hasta que no he forzado a mano la ip en Fa0/0.456 no ha funcionado 
+(es decir, he quitado el ipv6 address autoconfigure de la pata). PREGUNTAR.
+
+**************************** Pruebas *****************************
+
+R3:
+
+No existe exclude addresses in IPv6 DHCP Pool!
+
+Para conseguir lo siguiente, asegurarse de poner las ips en todas las interfaces ANTES de 
+configurar el pool!! Sino, luego router se queja al intentar configurar la interfaz con el
+pool ya creado.
+
+!
+interface Fa0/0.36
+ ipv6 address 2001:DEAD:BEEF:36::3/64
+ ipv6 dhcp server POOL
+!
+interface Fa0/0.344
+ ipv6 address 2001:dead:beef:344::3/64
+!
+
+--------------------------------------
+
+Parece que me funciona ospfv3 addr fam ipv6 en un lado e ipv6 router ospf 1 en otro (por los switches)
+
+--------------------------------------
+ 
+Probar a quitar y poner ipv6 mtu 1400
+
+'sh ipv6 int tu0' se vé que automáticamente pone 1472
+
+Nota: spokes se enteran de la link-local address del HUB a través de NHRP.
+
+Rack1R3#sh ipv6 nhrp
+2001:DEAD:BEEF:123::1/128 via 2001:DEAD:BEEF:123::1
+   Tunnel0 created 00:01:39, never expire 
+   Type: static, Flags: used 
+   NBMA address: 204.186.13.1 
+FE80::444/128 via FE80::444    ! Cambie para probar link-local en HUB por esta
+   Tunnel0 created 00:01:38, never expire 
+   Type: static, Flags: used nhs-ll 
+   NBMA address: 204.186.13.1 
+
+---------------------------------------
+
+Parte BGP para NH, si en vez de route-map poner 'no bgp default ipv6-nexthop' para ver que utiliza como NH global routable address.
+
+--------------------------------------
+
+red ospf si pones solo match external luego en show run ves que lo desglosa tipo 1 y tipo 2
+
+--------------------------------------
+
+De verdad hace falta generar en rip ruta por defecto en R3 fa0/1? Si luego redistribuimos y se cuela ruta por defecto. Revisar si la propaga luego, que lo mismo no y por eso hay que hacerlo. -> Pues no hace
+falta generar en rip ruta por defecto porque al redistribuir de ospf ya la tenemos y se propaga.
+
+---------------------------------------
+
+Red ospf a eigrp por defecto todo, comprobar, no como red ospf a bgp.
+
+----------------------------------------
+
+GLBP va a la vez para ipv4, y para ipv4, solo hace falta activar una vip (o ipv4 o ipv6), trastear y ver qué pasa si pongo parte final link local.

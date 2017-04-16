@@ -1,0 +1,177 @@
+***************************************************************************************************
+
+Troubleshooting
+
+***************************************************************************************************
+
+1.1 Faults
+
+----------------------------------------------------------------------------------------------------
+
+VIRL algunas interfaces en shutdown.
+
+Corregida subred entre R10 y SW4. En mi caso R1 basic config tiene la ip correcta.
+
+ping 255.255.255.255 en todos los routes, pero falta parte de nivel 2, luego lo repetiremos.
+
+***************************************************************************************************
+
+LAN Switching
+
+***************************************************************************************************
+
+2.1 EtherChannel & 2.2 Trunking
+
+----------------------------------------------------------------------------------------------------
+
+SW1:
+
+!
+interface range gi0/1 - 2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 13 mode active
+!
+interface range gi1/1 - 2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 12 mode active
+!
+interface gi0/3
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 14 mode active
+!
+interface gi1/0
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 14 mode active
+!
+interface gi1/3
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+!
+
+SW2:
+
+!
+interface range gi1/1 - 2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 12 mode passive
+!
+
+SW3:
+
+!
+interface range gi0/1 - 2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 13 mode passive
+!
+
+SW4:
+
+!
+interface gi0/3
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 14 mode passive
+!
+interface gi1/0
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 14 mode passive
+!
+
+----------------------------------------------------------------------------------------------------
+
+2.3 VTP
+
+----------------------------------------------------------------------------------------------------
+
+SW1:
+
+!
+vtp domain CCIE
+vtp mode server
+!
+vlan 21
+vlan 22
+vlan 121
+vlan 122
+vlan 124
+vlan 221
+vlan 222
+vlan 239
+!
+
+SW2, SW3, SW4:
+
+!
+vtp mode client
+!
+
+----------------------------------------------------------------------------------------------------
+
+2.4 Spanning-Tree
+
+----------------------------------------------------------------------------------------------------
+
+SW1:
+
+!
+spanning-tree mode rapid-pvst 
+spanning-tree vlan 21-22,121-122,124,221-222,239 priority 0 
+!
+interface gi1/3
+ spanning-tree portfast edge
+!
+int Po12
+ spanning-tree link-type point-to-point
+!
+int Po13
+ spanning-tree link-type point-to-point
+!
+int Po14
+ spanning-tree link-type point-to-point
+!
+int gi1/3
+ spanning-tree link-type point-to-point
+!
+
+SW2:
+
+!
+spanning-tree mode rapid-pvst 
+!
+int Po12
+ spanning-tree link-type point-to-point
+!
+
+SW3:
+
+!
+spanning-tree mode rapid-pvst 
+!
+int Po13
+ spanning-tree link-type point-to-point
+!
+
+SW4:
+
+!
+spanning-tree mode rapid-pvst 
+!
+int Po14
+ spanning-tree link-type point-to-point
+!

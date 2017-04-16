@@ -1,0 +1,162 @@
+R1:
+
+!
+ip multicast-routing
+!
+interface tunnel0
+ ip pim sparse-mode
+ ip pim dr-priority 100
+!
+interface Loopback1
+ ip address 100.1.1.1 255.255.255.255
+!
+ip pim rp-address 100.1.1.1 override
+ip msdp peer 10.3.3.3 connect-source Loopback0 
+!
+
+R2:
+
+!
+ip multicast-routing
+!
+interface tunnel0
+ ip pim sparse-mode
+ ip igmp join-group 225.7.7.7
+!
+ip pim rp-address 100.1.1.1 override
+!
+
+R3:
+
+!
+ip multicast-routing
+!
+interface tunnel0
+ ip pim sparse-mode
+!
+interface fa0/0.344
+ ip pim sparse-mode
+!
+interface fa0/0.36
+ ip pim sparse-mode
+!
+interface Loopback1
+ ip address 100.1.1.1 255.255.255.255
+!
+ip pim rp-address 100.1.1.1 override
+ip msdp peer 10.1.1.1 connect-source Loopback0 
+ip msdp peer 10.6.6.6 connect-source Loopback0 
+!
+
+R4:
+
+!
+ip multicast-routing
+!
+interface fa0/0.344
+ ip pim sparse-mode
+!
+interface fa0/1
+ ip pim sparse-mode
+!
+ip pim rp-address 100.1.1.1 override
+!
+
+R5:
+
+!
+ip multicast-routing
+!
+interface fa0/0.456
+ ip pim sparse-mode
+!
+interface fa0/1
+ ip pim sparse-mode
+ ip pim dr-priority 2 
+!
+ip pim autorp listener
+!
+
+R6:
+
+!
+ip multicast-routing
+!
+interface Loopback0
+ ip pim sparse-mode
+!
+interface gi0/0.36
+ ip pim sparse-mode
+!
+interface gi0/0.456
+ ip pim sparse-mode
+!
+ip access-list standard 1
+ permit 224.0.0.0 1.255.255.255
+!
+ip pim send-rp-announce Loopback0 scope 1 group-list 1
+ip pim send-rp-discovery Loopback0 scope 2
+ip msdp peer 10.3.3.3 connect-source Loopback0 
+!
+
+SW2:
+
+!
+ip multicast-routing distributed
+!
+interface Vlan52
+ ip pim sparse-mode
+ ip igmp join-group 225.7.7.7
+!
+interface Vlan12
+ ip ospf cost 5
+!
+
+SW4:
+
+!
+interface Vlan344
+ ip ospf cost 5
+!
+
+**************************************
+
+Pruebas
+
+***************************************
+
+Probar con/sin msdp originator-id: ip msdp originator-id Loopback 0
+debug ip msdp peer se vé, no veo otra forma. Es para loop prevention. Tenerlo en cuenta.
+
+-----------------------------------------
+
+Hace falta override? Sí por lo que te piden en enunciado más que nada.
+
+------------------------------------------
+
+Caso de poner en R6 'ip pim send-rp-announce Loopback0 scope 1 group-list 1':
+
+Para que no se cuelen mensajes Auto-RP en R3: 'ip multicast boundary filter-autorp 2'
+
+Standard IP access list 2
+    10 deny   any
+	
+¡Pero te dicen en enunciado usar en total 1 ACL, y ya estás usando una para el group-list!	
+
+Así que mejor jugar con scope:
+
+R6: 'ip pim send-rp-announce Loopback0 scope 1 group-list 1'
+
+Además, si usamos opción multicast boundary no funciona bien, sólo llega un ping a 50.1.52.8, se está filtrando algo.
+
+----------------------------------------
+
+In all current and supported software releases, caching of MSDP SA messages is mandatory and cannot be manually enabled or disabled. By default, when an MSDP peer is configured, the ip multicast cache-sa-state command will automatically be added to the running configuration. 
+
+OK, ocurre.
+
+----------------------------------------
+
+'ip pim nbma-mode' solo con DMVPN Sparse mode en HUB.
+
+Si DMVPN y Dense mode, hacer túnel entre RP spoke y MA en otro spoke (con uso mroute static probablemente). Mirar workbook Auto-RP and RP/MA Placement.
