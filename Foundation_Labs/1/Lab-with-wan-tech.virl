@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes'?>
 <topology xmlns="http://www.cisco.com/VIRL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="0.9" simulationEngine="OPENSTACK" xsi:schemaLocation="http://www.cisco.com/VIRL https://raw.github.com/CiscoVIRL/schema/v0.9/virl.xsd">
     <node name="R1" type="SIMPLE" subtype="IOSv" location="57,131"><extensions><entry key="config" type="String">!
-! Last configuration change at 13:32:14 UTC Sun Apr 16 2017
+! Last configuration change at 11:36:46 UTC Mon Apr 17 2017
 !
 version 15.6
 service timestamps debug datetime msec
@@ -45,6 +45,7 @@ multilink bundle-name authenticated
 !
 !
 !
+username R3 password 0 RSv5
 !
 redundancy
 !
@@ -86,8 +87,9 @@ interface GigabitEthernet0/1.12
 !
 interface GigabitEthernet0/1.13
  encapsulation dot1Q 13
- ip address 100.1.13.1 255.255.255.0
  ipv6 address 2001:100:1:13::1/64
+ pppoe enable group global
+ pppoe-client dial-pool-number 1
 !
 interface GigabitEthernet0/1.121
  encapsulation dot1Q 121
@@ -98,6 +100,12 @@ interface GigabitEthernet0/1.122
  encapsulation dot1Q 122
  ip address 10.1.122.1 255.255.255.0
  ipv6 address 2001:10:1:122::1/64
+!
+interface Dialer1
+ ip address 100.1.13.1 255.255.255.0
+ encapsulation ppp
+ dialer pool 1
+ ppp authentication chap
 !
 ip forward-protocol nd
 !
@@ -150,7 +158,7 @@ end</entry></extensions>
         <interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R2" type="SIMPLE" subtype="IOSv" location="58,197"><extensions><entry key="config" type="String">!
-! Last configuration change at 13:32:26 UTC Sun Apr 16 2017
+! Last configuration change at 00:37:47 UTC Mon Apr 17 2017
 !
 version 15.6
 service timestamps debug datetime msec
@@ -299,7 +307,7 @@ end</entry></extensions>
         <interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R3" type="SIMPLE" subtype="IOSv" location="59,270"><extensions><entry key="config" type="String">!
-! Last configuration change at 13:32:56 UTC Sun Apr 16 2017
+! Last configuration change at 11:36:45 UTC Mon Apr 17 2017
 !
 version 15.6
 service timestamps debug datetime msec
@@ -343,6 +351,7 @@ multilink bundle-name authenticated
 !
 !
 !
+username R1 password 0 RSv5
 !
 redundancy
 !
@@ -358,6 +367,9 @@ redundancy
 !
 !
 !
+!
+bba-group pppoe PPPoE_Server
+ virtual-template 1
 !
 !
 interface Loopback0
@@ -379,8 +391,8 @@ interface GigabitEthernet0/1
 !
 interface GigabitEthernet0/1.13
  encapsulation dot1Q 13
- ip address 100.1.13.3 255.255.255.0
  ipv6 address 2001:100:1:13::3/64
+ pppoe enable group PPPoE_Server
 !
 interface GigabitEthernet0/1.35
  encapsulation dot1Q 35
@@ -396,6 +408,10 @@ interface GigabitEthernet0/1.103
  encapsulation dot1Q 103
  ip address 100.1.103.3 255.255.255.0
  ipv6 address 2001:100:1:103::3/64
+!
+interface Virtual-Template1
+ ip address 100.1.13.3 255.255.255.0
+ ppp authentication chap
 !
 router bgp 3
  bgp log-neighbor-changes
@@ -476,7 +492,7 @@ end</entry></extensions>
         <interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R4" type="SIMPLE" subtype="IOSv" location="58,345"><extensions><entry key="config" type="String">!
-! Last configuration change at 13:33:32 UTC Sun Apr 16 2017
+! Last configuration change at 00:37:40 UTC Mon Apr 17 2017
 !
 version 15.6
 service timestamps debug datetime msec
@@ -649,7 +665,7 @@ end</entry></extensions>
         <interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R5" type="SIMPLE" subtype="IOSv" location="47,417"><extensions><entry key="config" type="String">!
-! Last configuration change at 13:34:30 UTC Sun Apr 16 2017
+! Last configuration change at 00:42:42 UTC Mon Apr 17 2017
 !
 version 15.6
 service timestamps debug datetime msec
@@ -793,7 +809,7 @@ end</entry></extensions>
         <interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R6" type="SIMPLE" subtype="IOSv" location="49,474"><extensions><entry key="config" type="String">!
-! Last configuration change at 13:33:27 UTC Sun Apr 16 2017
+! Last configuration change at 00:40:41 UTC Mon Apr 17 2017
 !
 version 15.6
 service timestamps debug datetime msec
@@ -937,7 +953,7 @@ end</entry></extensions>
         <interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R7" type="SIMPLE" subtype="IOSv" location="43,552"><extensions><entry key="config" type="String">!
-! Last configuration change at 13:31:55 UTC Sun Apr 16 2017
+! Last configuration change at 00:35:34 UTC Mon Apr 17 2017
 !
 version 15.6
 service timestamps debug datetime msec
@@ -1071,7 +1087,7 @@ end</entry></extensions>
         <interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R8" type="SIMPLE" subtype="IOSv" location="43,618"><extensions><entry key="config" type="String">!
-! Last configuration change at 13:32:42 UTC Sun Apr 16 2017
+! Last configuration change at 00:40:00 UTC Mon Apr 17 2017
 !
 version 15.6
 service timestamps debug datetime msec
@@ -1205,7 +1221,7 @@ end</entry></extensions>
         <interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R9" type="SIMPLE" subtype="IOSv" location="37,675"><extensions><entry key="config" type="String">!
-! Last configuration change at 13:32:56 UTC Sun Apr 16 2017
+! Last configuration change at 00:39:27 UTC Mon Apr 17 2017
 !
 version 15.6
 service timestamps debug datetime msec
@@ -1344,7 +1360,7 @@ end</entry></extensions>
         <interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="R10" type="SIMPLE" subtype="IOSv" location="32,741"><extensions><entry key="config" type="String">!
-! Last configuration change at 13:32:21 UTC Sun Apr 16 2017
+! Last configuration change at 00:35:20 UTC Mon Apr 17 2017
 !
 version 15.6
 service timestamps debug datetime msec
@@ -1484,7 +1500,7 @@ end</entry></extensions>
         <interface id="0" name="GigabitEthernet0/1"/>
     </node>
     <node name="SW1" type="SIMPLE" subtype="IOSvL2" location="346,347"><extensions><entry key="config" type="String">!
-! Last configuration change at 22:42:19 UTC Sat Apr 15 2017
+! Last configuration change at 22:28:04 UTC Sun Apr 16 2017
 !
 version 15.2
 service timestamps debug datetime msec
@@ -1516,7 +1532,7 @@ no ipv6 cef
 !
 spanning-tree mode rapid-pvst
 spanning-tree extend system-id
-spanning-tree vlan 21-22,121-122,124,221-222,239 priority 0
+spanning-tree vlan 1,21-22,121-122,124,221-222,239 priority 0
 !
 vlan internal allocation policy ascending
 !
@@ -1537,7 +1553,7 @@ interface Loopback0
  ip address 21.21.21.21 255.255.255.255
  ipv6 address 2001:21:21:21::21/128
 !
-interface Port-channel14
+interface Port-channel12
  switchport trunk encapsulation dot1q
  switchport mode trunk
  switchport nonegotiate
@@ -1549,7 +1565,7 @@ interface Port-channel13
  switchport nonegotiate
  spanning-tree link-type point-to-point
 !
-interface Port-channel12
+interface Port-channel14
  switchport trunk encapsulation dot1q
  switchport mode trunk
  switchport nonegotiate
@@ -1558,6 +1574,7 @@ interface Port-channel12
 interface GigabitEthernet0/0
  media-type rj45
  negotiation auto
+ spanning-tree link-type point-to-point
 !
 interface GigabitEthernet0/1
  switchport trunk encapsulation dot1q
@@ -1611,7 +1628,6 @@ interface GigabitEthernet1/3
  switchport trunk encapsulation dot1q
  switchport mode trunk
  switchport nonegotiate
- media-type rj45
  negotiation auto
  spanning-tree portfast edge
  spanning-tree link-type point-to-point
@@ -1671,6 +1687,7 @@ banner login `
 line con 0
 line aux 0
 line vty 0 4
+ login
 !
 !
 end</entry></extensions>
@@ -1683,7 +1700,7 @@ end</entry></extensions>
         <interface id="6" name="GigabitEthernet1/3"/>
     </node>
     <node name="SW2" type="SIMPLE" subtype="IOSvL2" location="580,343"><extensions><entry key="config" type="String">!
-! Last configuration change at 13:13:49 UTC Sun Apr 16 2017
+! Last configuration change at 22:51:22 UTC Sun Apr 16 2017
 !
 version 15.2
 service timestamps debug datetime msec
@@ -1847,7 +1864,7 @@ end</entry></extensions>
         <interface id="5" name="GigabitEthernet1/2"/>
     </node>
     <node name="SW3" type="SIMPLE" subtype="IOSvL2" location="339,520"><extensions><entry key="config" type="String">!
-! Last configuration change at 13:04:49 UTC Sun Apr 16 2017
+! Last configuration change at 21:57:37 UTC Sun Apr 16 2017
 !
 version 15.2
 service timestamps debug datetime msec
@@ -2011,7 +2028,7 @@ end</entry></extensions>
         <interface id="5" name="GigabitEthernet1/2"/>
     </node>
     <node name="SW4" type="SIMPLE" subtype="IOSvL2" location="580,519"><extensions><entry key="config" type="String">!
-! Last configuration change at 13:04:47 UTC Sun Apr 16 2017
+! Last configuration change at 22:03:58 UTC Sun Apr 16 2017
 !
 version 15.2
 service timestamps debug datetime msec

@@ -12,6 +12,8 @@ VIRL algunas interfaces en shutdown.
 
 Corregida subred entre R10 y SW4. En mi caso R1 basic config tiene la ip correcta.
 
+Corregida subred entre R2 y R4. IP correcta, pero subinterfaz mal.
+
 ping 255.255.255.255 en todos los routes, pero falta parte de nivel 2, luego lo repetiremos.
 
 ***************************************************************************************************
@@ -131,10 +133,13 @@ SW1:
 
 !
 spanning-tree mode rapid-pvst 
-spanning-tree vlan 21-22,121-122,124,221-222,239 priority 0 
+spanning-tree vlan 1,21-22,121-122,124,221-222,239 priority 0 
 !
 interface gi1/3
  spanning-tree portfast edge
+!
+int gi0/0
+ spanning-tree link-type point-to-point
 !
 int Po12
  spanning-tree link-type point-to-point
@@ -157,6 +162,12 @@ spanning-tree mode rapid-pvst
 int Po12
  spanning-tree link-type point-to-point
 !
+int range gi0/0 - 3
+ spanning-tree link-type point-to-point
+!
+int gi1/0
+ spanning-tree link-type point-to-point
+!
 
 SW3:
 
@@ -164,6 +175,15 @@ SW3:
 spanning-tree mode rapid-pvst 
 !
 int Po13
+ spanning-tree link-type point-to-point
+!
+int gi0/0
+ spanning-tree link-type point-to-point
+!
+int gi0/3
+ spanning-tree link-type point-to-point
+!
+int range gi1/0 - 2
  spanning-tree link-type point-to-point
 !
 
@@ -175,3 +195,504 @@ spanning-tree mode rapid-pvst
 int Po14
  spanning-tree link-type point-to-point
 !
+int range gi0/0 - 2
+ spanning-tree link-type point-to-point
+!
+int range gi1/1 - 2
+ spanning-tree link-type point-to-point
+!
+
+***************************************************************************************************
+
+WAN Technologies
+
+***************************************************************************************************
+
+3.1 PPPoE & 3.2 PPPoE Authentication
+
+----------------------------------------------------------------------------------------------------
+
+R1:
+
+!
+username R3 password 0 RSv5
+!
+interface GigabitEthernet0/1.13
+ no ip address
+ pppoe enable
+ pppoe-client dial-pool-number 1
+!
+int dialer 1
+ encapsulation ppp
+ ip address 100.1.13.1 255.255.255.0
+ dialer pool 1
+ ppp authentication chap
+!
+
+R3:
+
+!
+username R1 password 0 RSv5
+!
+interface GigabitEthernet0/1.13
+ no ip address
+ pppoe enable group PPPoE_Server
+!
+bba-group pppoe PPPoE_Server
+ virtual-template 1
+!
+interface Virtual-template 1
+ ip address 100.1.13.3 255.255.255.0
+ ppp authentication chap
+!
+ 
+***************************************************************************************************
+
+IGP Routing
+
+***************************************************************************************************
+
+4.1 EIGRP
+
+----------------------------------------------------------------------------------------------------
+
+R1:
+
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+router eigrp 1
+ router-id 1.1.1.1
+ network 10.1.0.0 0.0.255.255
+ redistribute connected route-map RED-CONN
+!
+
+R2:
+
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+router eigrp 1
+ router-id 2.2.2.2
+ network 10.1.0.0 0.0.255.255
+ redistribute connected route-map RED-CONN
+!
+
+R5:
+
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+router eigrp 1
+ router-id 3.3.3.3
+ network 10.1.0.0 0.0.255.255
+ redistribute connected route-map RED-CONN
+!
+
+R6:
+
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+router eigrp 1
+ router-id 6.6.6.6
+ network 10.1.0.0 0.0.255.255
+ redistribute connected route-map RED-CONN
+!
+
+R7:
+
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+router eigrp 1
+ router-id 7.7.7.7
+ network 10.1.0.0 0.0.255.255
+ redistribute connected route-map RED-CONN
+!
+
+R8:
+
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+router eigrp 1
+ router-id 8.8.8.8
+ network 10.1.0.0 0.0.255.255
+ redistribute connected route-map RED-CONN
+!
+
+R9:
+
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+router eigrp 1
+ router-id 9.9.9.9
+ network 10.1.0.0 0.0.255.255
+ redistribute connected route-map RED-CONN
+!
+
+R10:
+
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+router eigrp 1
+ router-id 10.10.10.10
+ network 10.1.0.0 0.0.255.255
+ redistribute connected route-map RED-CONN
+!
+
+SW1:
+
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+router eigrp 1
+ router-id 21.21.21.21
+ network 10.1.0.0 0.0.255.255
+ redistribute connected route-map RED-CONN
+!
+
+SW2:
+
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+router eigrp 1
+ router-id 22.22.22.22
+ network 10.1.0.0 0.0.255.255
+ redistribute connected route-map RED-CONN
+!
+
+SW3:
+
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+router eigrp 1
+ router-id 23.23.23.23
+ network 10.1.0.0 0.0.255.255
+ redistribute connected route-map RED-CONN
+!
+
+SW4:
+
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+router eigrp 1
+ router-id 24.24.24.24
+ network 10.1.0.0 0.0.255.255
+ redistribute connected route-map RED-CONN
+!
+
+
+----------------------------------------------------------------------------------------------------
+
+4.2 EIGRP Auth
+
+----------------------------------------------------------------------------------------------------
+
+R1:
+
+!
+key chain KEY_0
+ key 0 
+ key-string SW!_Key
+!
+key chain KEY_5
+ key 5 
+ key-string SW@_Key
+!
+int Gi0/1.121
+ ip authentication mode eigrp 1 md5 
+ ip authentication key-chain eigrp 1 KEY_0 
+!
+int Gi0/1.122
+ ip authentication mode eigrp 1 md5 
+ ip authentication key-chain eigrp 1 KEY_5 
+!
+
+R2:
+
+!
+key chain KEY_0
+ key 0 
+ key-string SW!_Key
+!
+key chain KEY_5
+ key 5 
+ key-string SW@_Key
+!
+int Gi0/1.221
+ ip authentication mode eigrp 1 md5 
+ ip authentication key-chain eigrp 1 KEY_0 
+!
+int Gi0/1.222
+ ip authentication mode eigrp 1 md5 
+ ip authentication key-chain eigrp 1 KEY_5 
+!
+
+SW1:
+
+!
+key chain KEY_0
+ key 0 
+ key-string SW!_Key
+!
+int Vlan121
+ ip authentication mode eigrp 1 md5 
+ ip authentication key-chain eigrp 1 KEY_0 
+!
+int Vlan221
+ ip authentication mode eigrp 1 md5 
+ ip authentication key-chain eigrp 1 KEY_0 
+!
+
+SW2:
+
+!
+key chain KEY_5
+ key 5 
+ key-string SW@_Key
+!
+int Vlan122
+ ip authentication mode eigrp 1 md5 
+ ip authentication key-chain eigrp 1 KEY_5
+!
+int Vlan222
+ ip authentication mode eigrp 1 md5 
+ ip authentication key-chain eigrp 1 KEY_5
+!
+
+----------------------------------------------------------------------------------------------------
+
+4.3 EIGRP Optimization
+
+----------------------------------------------------------------------------------------------------
+
+R5:
+
+!
+router eigrp 1
+ passive-interface GigabitEthernet0/1.35
+!
+
+R6:
+
+!
+service timestamps log datetime msec localtime
+!
+interface GigabitEthernet0/1.68
+ ip hello-interval eigrp 1 1
+ ip hold-time eigrp 1 5
+!
+
+R8:
+
+!
+service timestamps log datetime msec localtime
+!
+interface GigabitEthernet0/1.68
+ ip hello-interval eigrp 1 1
+ ip hold-time eigrp 1 5
+!
+
+***************************************************************************************************
+
+EGP Routing
+
+***************************************************************************************************
+
+5.1 EBGP & 5.3 BGP Authentication
+
+----------------------------------------------------------------------------------------------------
+
+R1:
+
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+router bgp 65012
+ bgp router-id 1.1.1.1
+ neighbor 100.1.13.3 remote-as 3
+ neighbor 2001:100:1:13::3 remote-as 3
+ no bgp default ipv4-unicast 
+ !
+ address-family ipv4 unicast
+  neighbor 100.1.13.3 activate
+  redistribute connected route-map RED-CONN
+ !
+ address-family ipv6 unicast
+  neighbor 2001:100:1:13::3 activate
+!
+
+R2:
+
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+router bgp 65012
+ bgp router-id 2.2.2.2
+ neighbor 200.1.24.4 remote-as 4
+ neighbor 2001:200:1:24::4 remote-as 4
+ no bgp default ipv4-unicast 
+ !
+ address-family ipv4 unicast
+  neighbor 200.1.24.4 activate
+  redistribute connected route-map RED-CONN
+ !
+ address-family ipv6 unicast
+  neighbor 2001:200:1:24::4 activate
+!
+
+
+R5:
+
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+router bgp 65056
+ bgp router-id 5.5.5.5
+ neighbor 100.1.35.3 remote-as 3
+ neighbor 2001:100:1:35::3 remote-as 3
+ no bgp default ipv4-unicast 
+ !
+ address-family ipv4 unicast
+  neighbor 100.1.35.3 activate
+  redistribute connected route-map RED-CONN
+ !
+ address-family ipv6 unicast
+  neighbor 2001:100:1:35::3 activate
+!
+
+R6:
+
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+router bgp 65056
+ bgp router-id 6.6.6.6
+ neighbor 200.1.46.4 remote-as 4
+ neighbor 2001:200:1:46::4 remote-as 4
+ no bgp default ipv4-unicast 
+ !
+ address-family ipv4 unicast
+  neighbor 200.1.46.4 activate
+  redistribute connected route-map RED-CONN
+ !
+ address-family ipv6 unicast
+  neighbor 2001:200:1:46::4 activate
+!
+
+R9:
+
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+router bgp 65009
+ bgp router-id 9.9.9.9
+ neighbor 100.1.39.3 remote-as 3
+ neighbor 2001:100:1:39::3 remote-as 3
+ neighbor 2001:100:1:39::3 password BGP_PASS!
+ no bgp default ipv4-unicast 
+ !
+ address-family ipv4 unicast
+  neighbor 100.1.39.3 activate
+  redistribute connected route-map RED-CONN
+ !
+ address-family ipv6 unicast
+  neighbor 2001:100:1:39::3 activate
+!
+
+R10:
+
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+router bgp 65010
+ bgp router-id 10.10.10.10
+ neighbor 100.1.103.3 remote-as 3
+ neighbor 2001:100:1:103::3 remote-as 3
+ neighbor 2001:100:1:103::3 password BGP_PASS!
+ no bgp default ipv4-unicast 
+ !
+ address-family ipv4 unicast
+  neighbor 100.1.103.3 activate
+  redistribute connected route-map RED-CONN
+ !
+ address-family ipv6 unicast
+  neighbor 2001:100:1:103::3 activate
+!
+
+R3:
+
+!
+router bgp 3
+  neighbor 2001:100:1:39::9 password BGP_PASS!
+  neighbor 2001:100:1:103::10 password BGP_PASS!
+!
+
+R3
+
+ping 1.1.1.1 source Loopback0
+ping 5.5.5.5 source Loopback0
+ping 9.9.9.9 source Loopback0
+ping 10.10.10.10 source Loopback0
+
+R4:
+
+ping vrf 1 2.2.2.2 source Loopback0
+ping vrf 1 6.6.6.6 source Loopback0
+
+----------------------------------------------------------------------------------------------------
+
+5.2 IBGP
+
+----------------------------------------------------------------------------------------------------
+
+R1:
+
+R2:
+
+R5:
+
+R6:
+
+----------------------------------------------------------------------------------------------------
+
+5.4 BGP Aggregation
+
+----------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+----------------------------------------------------------------------------------------------------
+
+5.5 BGP Path Selection
+
+----------------------------------------------------------------------------------------------------
