@@ -1,0 +1,181 @@
+line con 0
+ logging synchronous
+ no login
+!
+version 15.0
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname SW3
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+system mtu routing 1500
+vtp file vlan.dat
+ip routing
+no ip domain-lookup
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+spanning-tree mode rapid-pvst
+spanning-tree extend system-id
+!
+vlan internal allocation policy ascending
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 23.23.23.23 255.255.255.255
+ no shutdown
+!
+interface Port-channel13
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+ no shutdown
+!
+interface FastEthernet0/1
+ no shutdown
+!
+interface FastEthernet0/2
+ no shutdown
+!
+interface FastEthernet0/3
+ no shutdown
+!
+interface FastEthernet0/4
+ no shutdown
+!
+interface FastEthernet0/5
+ no shutdown
+!
+interface FastEthernet0/6
+ no shutdown
+!
+interface FastEthernet0/7
+ no shutdown
+!
+interface FastEthernet0/8
+ no shutdown
+!
+interface FastEthernet0/9
+ no shutdown
+!
+interface FastEthernet0/10
+ no shutdown
+!
+interface FastEthernet0/11
+ no shutdown
+!
+interface FastEthernet0/12
+ no shutdown
+!
+interface FastEthernet0/13
+ no shutdown
+!
+interface FastEthernet0/14
+ no shutdown
+!
+interface FastEthernet0/15
+ no shutdown
+!
+interface FastEthernet0/16
+ no shutdown
+!
+interface FastEthernet0/17
+ no shutdown
+!
+interface FastEthernet0/18
+ no shutdown
+!
+interface FastEthernet0/19
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 13 mode passive
+ no shutdown
+!
+interface FastEthernet0/20
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 13 mode passive
+ no shutdown
+!
+interface FastEthernet0/21
+ no shutdown
+!
+interface FastEthernet0/22
+ no shutdown
+!
+interface FastEthernet0/23
+ no shutdown
+!
+interface FastEthernet0/24
+ no shutdown
+!
+interface GigabitEthernet0/1
+ no shutdown
+!
+interface GigabitEthernet0/2
+ no shutdown
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan239
+ ip address 10.1.239.23 255.255.255.0
+ no shutdown
+!
+!
+router eigrp 1
+ network 10.1.0.0 0.0.255.255
+ redistribute connected route-map RED-CONN
+ eigrp router-id 23.23.23.23
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+!
+!
+!
+line vty 0 4
+ login
+line vty 5 15
+ login
+!
+end

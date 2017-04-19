@@ -1,0 +1,241 @@
+line con 0
+ logging synchronous
+ no login
+!
+! Last configuration change at 00:31:34 UTC Mon Mar 1 1993
+!
+version 15.0
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname SW1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+system mtu routing 1500
+vtp file vlan.dat
+ip routing
+no ip domain-lookup
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+key chain KEY_0
+ key 0
+  key-string SW!_Key
+!
+!
+!
+!
+!
+!
+!
+!
+spanning-tree mode rapid-pvst
+spanning-tree extend system-id
+spanning-tree vlan 1,21-22,121-122,124,221-222,239 priority 0
+!
+vlan internal allocation policy ascending
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 21.21.21.21 255.255.255.255
+ ipv6 address 2001:21:21:21::21/128
+ ipv6 eigrp 1
+ no shutdown
+!
+interface Port-channel12
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+ no shutdown
+!
+interface Port-channel13
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+ no shutdown
+!
+interface Port-channel14
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+ no shutdown
+!
+interface FastEthernet0/1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree portfast trunk
+ no shutdown
+!
+interface FastEthernet0/2
+ no shutdown
+!
+interface FastEthernet0/3
+ no shutdown
+!
+interface FastEthernet0/4
+ no shutdown
+!
+interface FastEthernet0/5
+ no shutdown
+!
+interface FastEthernet0/6
+ no shutdown
+!
+interface FastEthernet0/7
+ no shutdown
+!
+interface FastEthernet0/8
+ no shutdown
+!
+interface FastEthernet0/9
+ no shutdown
+!
+interface FastEthernet0/10
+ no shutdown
+!
+interface FastEthernet0/11
+ no shutdown
+!
+interface FastEthernet0/12
+ no shutdown
+!
+interface FastEthernet0/13
+ no shutdown
+!
+interface FastEthernet0/14
+ no shutdown
+!
+interface FastEthernet0/15
+ no shutdown
+!
+interface FastEthernet0/16
+ no shutdown
+!
+interface FastEthernet0/17
+ no shutdown
+!
+interface FastEthernet0/18
+ no shutdown
+!
+interface FastEthernet0/19
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 13 mode active
+ no shutdown
+!
+interface FastEthernet0/20
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 13 mode active
+ no shutdown
+!
+interface FastEthernet0/21
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 14 mode active
+ no shutdown
+!
+interface FastEthernet0/22
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 14 mode active
+ no shutdown
+!
+interface FastEthernet0/23
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 12 mode active
+ no shutdown
+!
+interface FastEthernet0/24
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+ channel-group 12 mode active
+ no shutdown
+!
+interface GigabitEthernet0/1
+ no shutdown
+!
+interface GigabitEthernet0/2
+ no shutdown
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan21
+ ip address 10.1.21.21 255.255.255.0
+ no shutdown
+!
+interface Vlan121
+ ip address 10.1.121.21 255.255.255.0
+ ip authentication mode eigrp 1 md5
+ ip authentication key-chain eigrp 1 KEY_0
+ ipv6 address 2001:10:1:121::21/64
+ ipv6 eigrp 1
+ no shutdown
+!
+interface Vlan221
+ ip address 10.1.221.21 255.255.255.0
+ ip authentication mode eigrp 1 md5
+ ip authentication key-chain eigrp 1 KEY_0
+ ipv6 address 2001:10:1:221::21/64
+ ipv6 eigrp 1
+ no shutdown
+!
+!
+router eigrp 1
+ network 10.1.0.0 0.0.255.255
+ redistribute connected route-map RED-CONN
+ eigrp router-id 21.21.21.21
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+ipv6 router eigrp 1
+!
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+!
+!
+!
+line vty 0 4
+ login
+line vty 5 15
+ login
+!
+end

@@ -1,0 +1,132 @@
+!
+! Last configuration change at 17:30:27 UTC Wed Apr 19 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec localtime
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R8
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 8.8.8.8 255.255.255.255
+ ipv6 address 2001:8:8:8::8/128
+ ipv6 eigrp 1
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.68
+ encapsulation dot1Q 68
+ ip address 10.1.68.8 255.255.255.0
+ ip hello-interval eigrp 1 1
+ ip hold-time eigrp 1 5
+ ipv6 address 2001:10:1:68::8/64
+ ipv6 eigrp 1
+ no shutdown
+!
+!
+!
+router eigrp 1
+ network 10.1.0.0 0.0.255.255
+ redistribute connected route-map RED-CONN
+ eigrp router-id 8.8.8.8
+!
+!
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+ipv6 router eigrp 1
+!
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ logging synchronous
+ stopbits 1
+line vty 0 4
+ no login
+!
+!
+end

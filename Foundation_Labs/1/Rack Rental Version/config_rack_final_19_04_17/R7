@@ -1,0 +1,145 @@
+!
+! Last configuration change at 17:30:27 UTC Wed Apr 19 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R7
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 7.7.7.7 255.255.255.255
+ ipv6 address 2001:7:7:7::7/128
+ ipv6 eigrp 1
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.57
+ encapsulation dot1Q 57
+ ip address 10.1.57.7 255.255.255.0
+ ipv6 address 2001:10:1:57::7/64
+ ipv6 eigrp 1
+ no shutdown
+!
+!
+!
+router eigrp 1
+ network 10.1.0.0 0.0.255.255
+ redistribute connected route-map RED-CONN
+ eigrp router-id 7.7.7.7
+!
+router bgp 65056
+ bgp router-id 7.7.7.7
+ bgp log-neighbor-changes
+ neighbor 5.5.5.5 remote-as 65056
+ neighbor 5.5.5.5 update-source Loopback0
+ neighbor 6.6.6.6 remote-as 65056
+ neighbor 6.6.6.6 update-source Loopback0
+ !
+ address-family ipv4
+  neighbor 5.5.5.5 activate
+  neighbor 5.5.5.5 route-reflector-client
+  neighbor 6.6.6.6 activate
+  neighbor 6.6.6.6 route-reflector-client
+ exit-address-family
+!
+!
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+ipv6 router eigrp 1
+!
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ logging synchronous
+ stopbits 1
+line vty 0 4
+ no login
+!
+!
+end

@@ -1,0 +1,189 @@
+!
+! Last configuration change at 17:30:27 UTC Wed Apr 19 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R2
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+key chain KEY_0
+ key 0
+   key-string SW!_Key
+key chain KEY_5
+ key 5
+   key-string SW@_Key
+!
+!
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 2.2.2.2 255.255.255.255
+ ipv6 address 2001:2:2:2::2/128
+ ipv6 eigrp 1
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.12
+ encapsulation dot1Q 12
+ ip address 10.1.12.2 255.255.255.0
+ ipv6 address 2001:10:1:12::2/64
+ ipv6 eigrp 1
+ no shutdown
+!
+interface GigabitEthernet1.24
+ encapsulation dot1Q 24
+ ip address 200.1.24.2 255.255.255.0
+ ipv6 address 2001:200:1:24::2/64
+ no shutdown
+!
+interface GigabitEthernet1.221
+ encapsulation dot1Q 221
+ ip address 10.1.221.2 255.255.255.0
+ ip authentication mode eigrp 1 md5
+ ip authentication key-chain eigrp 1 KEY_0
+ ipv6 address 2001:10:1:221::2/64
+ ipv6 eigrp 1
+ no shutdown
+!
+interface GigabitEthernet1.222
+ encapsulation dot1Q 222
+ ip address 10.1.222.2 255.255.255.0
+ ip authentication mode eigrp 1 md5
+ ip authentication key-chain eigrp 1 KEY_5
+ ipv6 address 2001:10:1:222::2/64
+ ipv6 eigrp 1
+ no shutdown
+!
+!
+!
+router eigrp 1
+ network 10.1.0.0 0.0.255.255
+ redistribute connected route-map RED-CONN
+ eigrp router-id 2.2.2.2
+!
+router bgp 65012
+ bgp router-id 2.2.2.2
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 22.22.22.22 remote-as 65012
+ neighbor 22.22.22.22 update-source Loopback0
+ neighbor 2001:200:1:24::4 remote-as 4
+ neighbor 200.1.24.4 remote-as 4
+ !
+ address-family ipv4
+  redistribute connected route-map RED-CONN
+  neighbor 22.22.22.22 activate
+  neighbor 22.22.22.22 next-hop-self
+  neighbor 200.1.24.4 activate
+  neighbor 200.1.24.4 route-map BGP-FROM-R4 in
+ exit-address-family
+ !
+ address-family ipv6
+  neighbor 2001:200:1:24::4 activate
+ exit-address-family
+!
+!
+!
+ip forward-protocol nd
+!
+ip as-path access-list 1 permit _65056$
+no ip http server
+no ip http secure-server
+!
+ipv6 router eigrp 1
+!
+!
+route-map BGP-FROM-R4 permit 10
+ match as-path 1
+ set local-preference 500
+!
+route-map BGP-FROM-R4 permit 20
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ logging synchronous
+ stopbits 1
+line vty 0 4
+ no login
+!
+!
+end

@@ -1,0 +1,177 @@
+!
+! Last configuration change at 17:24:47 UTC Wed Apr 19 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R10
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+crypto isakmp policy 10
+ encr aes 192
+ hash sha256
+ authentication pre-share
+ group 5
+crypto isakmp key CCIE_DMVPN address 0.0.0.0
+!
+!
+crypto ipsec transform-set AES-256-SHA-512 esp-aes 256 esp-sha512-hmac
+ mode transport
+!
+crypto ipsec profile DMVPN_PROFILE
+ set transform-set AES-256-SHA-512
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 10.10.10.10 255.255.255.255
+ ipv6 address 2001:10:10:10::10/128
+ no shutdown
+!
+interface Tunnel0
+ ip address 10.1.0.10 255.255.255.0
+ no ip redirects
+ ip nhrp authentication DMVPN
+ ip nhrp map 10.1.0.1 1.1.1.1
+ ip nhrp map multicast 1.1.1.1
+ ip nhrp network-id 1
+ ip nhrp nhs 10.1.0.1
+ ip nhrp shortcut
+ tunnel source Loopback0
+ tunnel mode gre multipoint
+ tunnel key 2
+ tunnel protection ipsec profile DMVPN_PROFILE
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.103
+ encapsulation dot1Q 103
+ ip address 100.1.103.10 255.255.255.0
+ ipv6 address 2001:100:1:103::10/64
+ no shutdown
+!
+interface GigabitEthernet1.124
+ encapsulation dot1Q 124
+ ip address 10.1.124.10 255.255.255.0
+ ipv6 address 2001:10:1:124::10/64
+ no shutdown
+!
+!
+!
+router eigrp 1
+ network 10.1.0.0 0.0.255.255
+ redistribute connected route-map RED-CONN
+ eigrp router-id 10.10.10.10
+!
+router bgp 65010
+ bgp router-id 10.10.10.10
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 2001:100:1:103::3 remote-as 3
+ neighbor 2001:100:1:103::3 password BGP_PASS!
+ neighbor 100.1.103.3 remote-as 3
+ !
+ address-family ipv4
+  redistribute connected route-map RED-CONN
+  neighbor 100.1.103.3 activate
+ exit-address-family
+ !
+ address-family ipv6
+  neighbor 2001:100:1:103::3 activate
+ exit-address-family
+!
+!
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ logging synchronous
+ stopbits 1
+line vty 0 4
+ privilege level 15
+ no login
+!
+!
+end

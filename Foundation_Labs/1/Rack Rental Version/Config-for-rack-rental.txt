@@ -1053,6 +1053,14 @@ IPv6
 SW1:
 
 !
+sdm prefer dual default
+!
+
+!
+reload
+!
+
+!
 ipv6 unicast-routing
 !
 interface Loopback0
@@ -1065,10 +1073,19 @@ interface Vlan221
  ipv6 eigrp 1
 !
 ipv6 router eigrp 1 
+ no shut
 !
 
 
 SW2:
+
+!
+sdm prefer dual default
+!
+
+!
+reload
+!
 
 !
 ipv6 unicast-routing
@@ -1083,6 +1100,7 @@ interface Vlan222
  ipv6 eigrp 1
 !
 ipv6 router eigrp 1 
+ no shut
 !
 
 R1:

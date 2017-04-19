@@ -1,0 +1,174 @@
+!
+! Last configuration change at 17:24:47 UTC Wed Apr 19 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R3
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+spanning-tree extend system-id
+!
+username R1 password 0 RSv5
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+bba-group pppoe PPPoE_Server
+ virtual-template 1
+!
+!
+interface Loopback0
+ ip address 3.3.3.3 255.255.255.255
+ ipv6 address 2001:3:3:3::3/128
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.13
+ encapsulation dot1Q 13
+ ipv6 address 2001:100:1:13::3/64
+ pppoe enable group PPPoE_Server
+ no shutdown
+!
+interface GigabitEthernet1.35
+ encapsulation dot1Q 35
+ ip address 100.1.35.3 255.255.255.0
+ ipv6 address 2001:100:1:35::3/64
+ no shutdown
+!
+interface GigabitEthernet1.39
+ encapsulation dot1Q 39
+ ip address 100.1.39.3 255.255.255.0
+ ipv6 address 2001:100:1:39::3/64
+ no shutdown
+!
+interface GigabitEthernet1.103
+ encapsulation dot1Q 103
+ ip address 100.1.103.3 255.255.255.0
+ ipv6 address 2001:100:1:103::3/64
+ no shutdown
+!
+!
+interface Virtual-Template1
+ ip address 100.1.13.3 255.255.255.0
+ ppp authentication chap
+ no shutdown
+!
+router bgp 3
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 2001:100:1:13::1 remote-as 65012
+ neighbor 2001:100:1:35::5 remote-as 65056
+ neighbor 2001:100:1:39::9 remote-as 65009
+ neighbor 2001:100:1:39::9 password BGP_PASS!
+ neighbor 2001:100:1:103::10 remote-as 65010
+ neighbor 2001:100:1:103::10 password BGP_PASS!
+ neighbor 100.1.13.1 remote-as 65012
+ neighbor 100.1.35.5 remote-as 65056
+ neighbor 100.1.39.9 remote-as 65009
+ neighbor 100.1.103.10 remote-as 65010
+ !
+ address-family ipv4
+  redistribute connected
+  neighbor 100.1.13.1 activate
+  neighbor 100.1.35.5 activate
+  neighbor 100.1.39.9 activate
+  neighbor 100.1.103.10 activate
+ exit-address-family
+ !
+ address-family ipv6
+  redistribute connected
+  neighbor 2001:100:1:13::1 activate
+  neighbor 2001:100:1:35::5 activate
+  neighbor 2001:100:1:39::9 activate
+  neighbor 2001:100:1:103::10 activate
+ exit-address-family
+!
+!
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ logging synchronous
+ stopbits 1
+line vty 0 4
+ no login
+!
+!
+end
