@@ -8,11 +8,138 @@ Troubleshooting
 
 ----------------------------------------------------------------------------------------------------
 
-VIRL algunas interfaces en shutdown.
+R1 basic config tiene la ip incorrecta en int Gi1.12. Algunos routers interfaces en shut. 
+Subinterfaz en R2 hacia R4 hay que cambiarla.
 
-Corregida subred entre R10 y SW4. En mi caso R1 basic config tiene la ip correcta.
+R1:
 
-Corregida subred entre R2 y R4. IP correcta, pero subinterfaz mal.
+!
+interface Gi1.12
+ no ip address
+ ip address 10.1.12.1 255.255.255.0
+!
+int gi1
+ no shut
+!
+int gi1.12
+ no shut
+!
+int gi1.13
+ no shut
+!
+int gi1.121
+ no shut
+!
+int gi1.122
+ no shut
+!
+
+R2:
+
+!
+int gi1
+ no shut
+!
+int gi1.12
+ no shut
+! 
+int gi1.221
+ no shut
+!
+int gi1.222
+ no shut
+!
+no int gi1.212
+!
+int gi1.24
+ encapsulation dot1Q 24
+ ip address 200.1.24.2 255.255.255.0
+ ipv6 address 2001:200:1:24::2/64
+ no shut
+!
+
+R5:
+
+!
+int gi1
+ no shut
+!
+int gi1.35
+ no shut
+!
+int gi1.56
+ no shut
+!
+int gi1.57
+ no shut
+!
+
+R6:
+
+!
+int gi1
+ no shut
+!
+int gi1.46
+ no shut
+!
+int gi1.56
+ no shut
+!
+int gi1.68
+ no shut
+!
+
+R7:
+
+!
+int gi1
+ no shut
+!
+int gi1.57
+ no shut
+!
+
+R8:
+
+!
+int gi1
+ no shut
+!
+int gi1.68
+ no shut
+!
+
+R9:
+
+!
+int gi1
+ no shut
+!
+int gi1.239
+ no shut
+!
+no int gi1.119
+!
+int gi1.39
+ encapsulation dot1Q 39
+ ip address 100.1.39.9 255.255.255.0
+ ipv6 address 2001:100:1:39::9/64
+ no shut
+!
+
+R10:
+
+!
+int gi1
+ no shut
+!
+int gi1.103
+ no shut
+!
+int gi1.124
+ no shut
+!
 
 ping 255.255.255.255 en todos los routes, pero falta parte de nivel 2, luego lo repetiremos.
 
@@ -29,31 +156,25 @@ LAN Switching
 SW1:
 
 !
-interface range gi0/1 - 2
+interface range fa0/19 - 20
  switchport trunk encapsulation dot1q
  switchport mode trunk
  switchport nonegotiate
  channel-group 13 mode active
 !
-interface range gi1/1 - 2
+interface range fa0/23 - 24
  switchport trunk encapsulation dot1q
  switchport mode trunk
  switchport nonegotiate
  channel-group 12 mode active
 !
-interface gi0/3
+interface range fa0/21 - 22
  switchport trunk encapsulation dot1q
  switchport mode trunk
  switchport nonegotiate
  channel-group 14 mode active
 !
-interface gi1/0
- switchport trunk encapsulation dot1q
- switchport mode trunk
- switchport nonegotiate
- channel-group 14 mode active
-!
-interface gi1/3
+interface fa0/1
  switchport trunk encapsulation dot1q
  switchport mode trunk
  switchport nonegotiate
@@ -62,7 +183,7 @@ interface gi1/3
 SW2:
 
 !
-interface range gi1/1 - 2
+interface range fa0/23 - 24
  switchport trunk encapsulation dot1q
  switchport mode trunk
  switchport nonegotiate
@@ -72,7 +193,7 @@ interface range gi1/1 - 2
 SW3:
 
 !
-interface range gi0/1 - 2
+interface range fa0/19 - 20
  switchport trunk encapsulation dot1q
  switchport mode trunk
  switchport nonegotiate
@@ -82,13 +203,7 @@ interface range gi0/1 - 2
 SW4:
 
 !
-interface gi0/3
- switchport trunk encapsulation dot1q
- switchport mode trunk
- switchport nonegotiate
- channel-group 14 mode passive
-!
-interface gi1/0
+interface range fa0/21 - 22
  switchport trunk encapsulation dot1q
  switchport mode trunk
  switchport nonegotiate
@@ -121,6 +236,7 @@ SW2, SW3, SW4:
 
 !
 vtp mode client
+vtp domain CCIE
 !
 
 ----------------------------------------------------------------------------------------------------
@@ -135,23 +251,8 @@ SW1:
 spanning-tree mode rapid-pvst 
 spanning-tree vlan 1,21-22,121-122,124,221-222,239 priority 0 
 !
-interface gi1/3
- spanning-tree portfast edge
-!
-int gi0/0
- spanning-tree link-type point-to-point
-!
-int Po12
- spanning-tree link-type point-to-point
-!
-int Po13
- spanning-tree link-type point-to-point
-!
-int Po14
- spanning-tree link-type point-to-point
-!
-int gi1/3
- spanning-tree link-type point-to-point
+interface fa0/1
+ spanning-tree portfast trunk
 !
 
 SW2:
@@ -159,47 +260,17 @@ SW2:
 !
 spanning-tree mode rapid-pvst 
 !
-int Po12
- spanning-tree link-type point-to-point
-!
-int range gi0/0 - 3
- spanning-tree link-type point-to-point
-!
-int gi1/0
- spanning-tree link-type point-to-point
-!
 
 SW3:
 
 !
 spanning-tree mode rapid-pvst 
 !
-int Po13
- spanning-tree link-type point-to-point
-!
-int gi0/0
- spanning-tree link-type point-to-point
-!
-int gi0/3
- spanning-tree link-type point-to-point
-!
-int range gi1/0 - 2
- spanning-tree link-type point-to-point
-!
 
 SW4:
 
 !
 spanning-tree mode rapid-pvst 
-!
-int Po14
- spanning-tree link-type point-to-point
-!
-int range gi0/0 - 2
- spanning-tree link-type point-to-point
-!
-int range gi1/1 - 2
- spanning-tree link-type point-to-point
 !
 
 ***************************************************************************************************
@@ -217,7 +288,7 @@ R1:
 !
 username R3 password 0 RSv5
 !
-interface GigabitEthernet0/1.13
+interface GigabitEthernet1.13
  no ip address
  pppoe enable
  pppoe-client dial-pool-number 1
@@ -234,7 +305,7 @@ R3:
 !
 username R1 password 0 RSv5
 !
-interface GigabitEthernet0/1.13
+interface GigabitEthernet1.13
  no ip address
  pppoe enable group PPPoE_Server
 !
@@ -355,6 +426,8 @@ router eigrp 1
 SW1:
 
 !
+ip routing            ! OJO
+!
 route-map RED-CONN permit 10
  match interface Loopback0
 !
@@ -366,6 +439,8 @@ router eigrp 1
 
 SW2:
 
+!
+ip routing            ! OJO
 !
 route-map RED-CONN permit 10
  match interface Loopback0
@@ -379,6 +454,8 @@ router eigrp 1
 SW3:
 
 !
+ip routing            ! OJO
+!
 route-map RED-CONN permit 10
  match interface Loopback0
 !
@@ -390,6 +467,8 @@ router eigrp 1
 
 SW4:
 
+!
+ip routing            ! OJO
 !
 route-map RED-CONN permit 10
  match interface Loopback0
@@ -418,11 +497,11 @@ key chain KEY_5
  key 5 
  key-string SW@_Key
 !
-int Gi0/1.121
+int Gi1.121
  ip authentication mode eigrp 1 md5 
  ip authentication key-chain eigrp 1 KEY_0 
 !
-int Gi0/1.122
+int Gi1.122
  ip authentication mode eigrp 1 md5 
  ip authentication key-chain eigrp 1 KEY_5 
 !
@@ -438,11 +517,11 @@ key chain KEY_5
  key 5 
  key-string SW@_Key
 !
-int Gi0/1.221
+int Gi1.221
  ip authentication mode eigrp 1 md5 
  ip authentication key-chain eigrp 1 KEY_0 
 !
-int Gi0/1.222
+int Gi1.222
  ip authentication mode eigrp 1 md5 
  ip authentication key-chain eigrp 1 KEY_5 
 !
@@ -489,7 +568,7 @@ R5:
 
 !
 router eigrp 1
- passive-interface GigabitEthernet0/1.35
+ passive-interface GigabitEthernet1.35
 !
 
 R6:
@@ -497,7 +576,7 @@ R6:
 !
 service timestamps log datetime msec localtime
 !
-interface GigabitEthernet0/1.68
+interface GigabitEthernet1.68
  ip hello-interval eigrp 1 1
  ip hold-time eigrp 1 5
 !
@@ -507,7 +586,7 @@ R8:
 !
 service timestamps log datetime msec localtime
 !
-interface GigabitEthernet0/1.68
+interface GigabitEthernet1.68
  ip hello-interval eigrp 1 1
  ip hold-time eigrp 1 5
 !
@@ -653,6 +732,8 @@ router bgp 3
   neighbor 2001:100:1:103::10 password BGP_PASS!
 !
 
+Tests: Lo que ya sé +
+
 R3
 
 ping 1.1.1.1 source Loopback0
@@ -665,6 +746,12 @@ R4:
 ping vrf 1 2.2.2.2 source Loopback0
 ping vrf 1 6.6.6.6 source Loopback0
 
+Para Auth:
+
+R3:
+
+show bgp ipv6 unicast neighbors 2001:100:1:39::9 | inc md5
+
 ----------------------------------------------------------------------------------------------------
 
 5.2 IBGP
@@ -673,11 +760,100 @@ ping vrf 1 6.6.6.6 source Loopback0
 
 R1:
 
+!
+router bgp 65012
+ neighbor 22.22.22.22 remote-as 65012
+ neighbor 22.22.22.22 update-source Loopback0
+ address-family ipv4 unicast
+  neighbor 22.22.22.22 activate
+  neighbor 22.22.22.22 next-hop-self
+!
+
+SW2:
+
+!
+router bgp 65012
+ bgp router-id 22.22.22.22
+ no bgp default ipv4-unicast
+ neighbor 1.1.1.1 remote-as 65012
+ neighbor 1.1.1.1 update-source Loopback0
+ neighbor 2.2.2.2 remote-as 65012
+ neighbor 2.2.2.2 update-source Loopback0
+ address-family ipv4 unicast
+  neighbor 1.1.1.1 activate
+  neighbor 1.1.1.1 route-reflector-client
+  neighbor 2.2.2.2 activate
+  neighbor 2.2.2.2 route-reflector-client
+!
+
 R2:
+
+!
+router bgp 65012
+ neighbor 22.22.22.22 remote-as 65012
+ neighbor 22.22.22.22 update-source Loopback0
+ address-family ipv4 unicast
+  neighbor 22.22.22.22 activate
+  neighbor 22.22.22.22 next-hop-self
+!
 
 R5:
 
+!
+router bgp 65056
+ neighbor 7.7.7.7 remote-as 65056
+ neighbor 7.7.7.7 update-source Loopback0
+ address-family ipv4 unicast
+  neighbor 7.7.7.7 activate
+  neighbor 7.7.7.7 next-hop-self
+!
+
 R6:
+
+!
+router bgp 65056
+ neighbor 7.7.7.7 remote-as 65056
+ neighbor 7.7.7.7 update-source Loopback0
+ address-family ipv4 unicast
+  neighbor 7.7.7.7 activate
+  neighbor 7.7.7.7 next-hop-self  
+!
+
+R7:
+
+!
+router bgp 65056
+ bgp router-id 7.7.7.7
+ neighbor 5.5.5.5 remote-as 65056
+ neighbor 5.5.5.5 update-source Loopback0
+ neighbor 6.6.6.6 remote-as 65056
+ neighbor 6.6.6.6 update-source Loopback0 
+ address-family ipv4 unicast
+  neighbor 5.5.5.5 activate 
+  neighbor 5.5.5.5 route-reflector-client
+  neighbor 6.6.6.6 activate
+  neighbor 6.6.6.6 route-reflector-client
+!
+
+Tests: Lo que ya sé +
+
+R1:
+
+int gi1.122
+ shut
+
+R3:
+
+int gi1.13
+ shut 
+ 
+R4: 
+ 
+int gi1.46
+ shut 
+ 
+Otra variante (no te indican cómo solucionarlo en pregunta): en vez de usar
+next-hop-self, anunciar el next-hop de BGP en EIGRP. 
 
 ----------------------------------------------------------------------------------------------------
 
@@ -685,14 +861,365 @@ R6:
 
 ----------------------------------------------------------------------------------------------------
 
+R9:
 
+!
+interface Loopback150
+ ip address 119.150.0.9 255.255.255.255
+!
+interface Loopback151
+ ip address 119.151.0.9 255.255.255.255
+!
+interface Loopback160
+ ip address 119.160.0.9 255.255.255.255
+!
+interface Loopback163
+ ip address 119.163.0.9 255.255.255.255
+!
+router bgp 65009
+ address-family ipv4 unicast
+  network 119.150.0.9 mask 255.255.255.255
+  network 119.151.0.9 mask 255.255.255.255
+  network 119.160.0.9 mask 255.255.255.255
+  network 119.163.0.9 mask 255.255.255.255
+  aggregate-address 119.128.0.0 255.192.0.0 summary-only
+!
 
-
-
-
+También se pueden redistribuir Loopbacks a BGP, tal y como está el enunciado no especifican.
 
 ----------------------------------------------------------------------------------------------------
 
 5.5 BGP Path Selection
 
 ----------------------------------------------------------------------------------------------------
+
+show bgp ipv4 unicast regexp _65056$
+
+R1:
+
+!
+ip as-path access-list 1 permit _65056$
+!
+route-map BGP-FROM-R3 permit 10
+ match as-path 1
+ set local-preference 1000
+route-map BGP-FROM-R3 permit 20 
+!
+router bgp 65012
+ address-family ipv4 unicast
+  neighbor 100.1.13.3 route-map BGP-FROM-R3 in
+!
+
+R2:
+
+!
+ip as-path access-list 1 permit _65056$
+!
+route-map BGP-FROM-R4 permit 10
+ match as-path 1
+ set local-preference 500
+route-map BGP-FROM-R4 permit 20 
+!
+router bgp 65012
+ address-family ipv4 unicast
+  neighbor 200.1.24.4 route-map BGP-FROM-R4 in
+!
+
+Esta solución es válida, pero si te piden sólo configurar un router se puede tomar LP por
+defecto en R2 (100) y poner otro más alto en R1 y así sólo configuras R1.
+
+***************************************************************************************************
+
+DMVPN
+
+***************************************************************************************************
+
+6.1 IPv4 over DMVPN
+
+----------------------------------------------------------------------------------------------------
+
+R1:
+
+!
+interface Tunnel0
+ ip address 10.1.0.1 255.255.255.0
+ ip nhrp map multicast dynamic 
+ ip nhrp network-id 1
+ ip nhrp authentication DMVPN
+ ip nhrp redirect
+ tunnel mode gre multipoint
+ tunnel source Loopback0
+ tunnel key 2
+!
+
+R5:
+
+!
+interface Tunnel0
+ ip address 10.1.0.5 255.255.255.0
+ ip nhrp map 10.1.0.1 1.1.1.1 
+ ip nhrp map multicast 1.1.1.1
+ ip nhrp nhs 10.1.0.1
+ ip nhrp network-id 1
+ ip nhrp authentication DMVPN
+ ip nhrp shortcut
+ tunnel mode gre multipoint 
+ tunnel source Loopback0
+ tunnel key 2
+!
+
+R9:
+
+!
+interface Tunnel0
+ ip address 10.1.0.9 255.255.255.0
+ ip nhrp map 10.1.0.1 1.1.1.1 
+ ip nhrp map multicast 1.1.1.1
+ ip nhrp nhs 10.1.0.1
+ ip nhrp network-id 1
+ ip nhrp authentication DMVPN
+ ip nhrp shortcut
+ tunnel mode gre multipoint 
+ tunnel source Loopback0
+ tunnel key 2
+!
+
+R10:
+
+!
+interface Tunnel0
+ ip address 10.1.0.10 255.255.255.0
+ ip nhrp map 10.1.0.1 1.1.1.1 
+ ip nhrp map multicast 1.1.1.1
+ ip nhrp nhs 10.1.0.1
+ ip nhrp network-id 1
+ ip nhrp authentication DMVPN
+ ip nhrp shortcut
+ tunnel mode gre multipoint 
+ tunnel source Loopback0
+ tunnel key 2
+!
+
+----------------------------------------------------------------------------------------------------
+
+6.2 EIGRP over DMVPN
+
+----------------------------------------------------------------------------------------------------
+
+R1:
+
+!
+interface Tunnel0
+ ip summary-address eigrp 1 0.0.0.0/0
+!
+
+----------------------------------------------------------------------------------------------------
+
+6.3 IPsec over DMVPN
+
+----------------------------------------------------------------------------------------------------
+
+R1, R5, R9, R10:
+
+!
+crypto isakmp policy 10
+ authentication pre-share 
+ encryption aes 192
+ hash sha256
+ group 5
+!
+crypto isakmp key 0 CCIE_DMVPN address 0.0.0.0 
+!
+crypto ipsec transform-set AES-256-SHA-512 esp-aes 256 esp-sha512-hmac
+ mode transport
+!
+crypto ipsec profile DMVPN_PROFILE
+ set transform-set  AES-256-SHA-512
+!
+interface tunnel 0
+ tunnel protection ipsec profile DMVPN_PROFILE
+!
+
+***************************************************************************************************
+
+IPv6
+
+***************************************************************************************************
+
+7.1 IPv6 EIGRP
+
+----------------------------------------------------------------------------------------------------
+
+SW1:
+
+!
+ipv6 unicast-routing
+!
+interface Loopback0
+ ipv6 eigrp 1
+!
+interface Vlan121
+ ipv6 eigrp 1
+!
+interface Vlan221
+ ipv6 eigrp 1
+!
+ipv6 router eigrp 1 
+!
+
+
+SW2:
+
+!
+ipv6 unicast-routing
+!
+interface Loopback0
+ ipv6 eigrp 1
+!
+interface Vlan221
+ ipv6 eigrp 1
+!
+interface Vlan222
+ ipv6 eigrp 1
+!
+ipv6 router eigrp 1 
+!
+
+R1:
+
+!
+interface Loopback0
+ ipv6 eigrp 1
+!
+interface Gi1.12
+ ipv6 eigrp 1
+!
+interface Gi1.121
+ ipv6 eigrp 1
+!
+interface Gi1.122
+ ipv6 eigrp 1
+!
+ipv6 router eigrp 1 
+!
+
+R2:
+
+!
+interface Loopback0
+ ipv6 eigrp 1
+!
+interface Gi1.12
+ ipv6 eigrp 1
+!
+interface Gi1.221
+ ipv6 eigrp 1
+!
+interface Gi1.222
+ ipv6 eigrp 1
+!
+ipv6 router eigrp 1 
+!
+
+R5:
+
+!
+interface Loopback0
+ ipv6 eigrp 1
+!
+interface Gi1.56
+ ipv6 eigrp 1
+!
+interface Gi1.57
+ ipv6 eigrp 1
+!
+ipv6 router eigrp 1 
+!
+
+
+R6:
+
+!
+interface Loopback0
+ ipv6 eigrp 1
+!
+interface Gi1.56
+ ipv6 eigrp 1
+!
+interface Gi1.68
+ ipv6 eigrp 1
+!
+ipv6 router eigrp 1 
+!
+
+R7:
+
+!
+interface Loopback0
+ ipv6 eigrp 1
+!
+interface Gi1.57
+ ipv6 eigrp 1
+!
+ipv6 router eigrp 1 
+!
+
+R8:
+
+!
+interface Loopback0
+ ipv6 eigrp 1
+!
+interface Gi1.68
+ ipv6 eigrp 1
+!
+ipv6 router eigrp 1 
+!
+
+----------------------------------------------------------------------------------------------------
+
+7.2 IPv6 Redistribution
+
+----------------------------------------------------------------------------------------------------
+
+R1:
+
+!
+router bgp 65012
+ address-family ipv6 unicast
+  redistribute eigrp 1 include-connected
+!
+ipv6 router eigrp 1
+ redistribute bgp 65012 metric 10000 1000 255 1 1500
+!
+
+R5:
+
+!
+router bgp 65056
+ address-family ipv6 unicast
+  redistribute eigrp 1 include-connected
+!
+ipv6 router eigrp 1
+ redistribute bgp 65056 metric 10000 1000 255 1 1500
+!
+
+-----------------------------------------------------------------------------------------------------
+Lo siguiente no debería ser necesario para rack rental:
+-----------------------------------------------------------------------------------------------------
+
+Nota aparte para que no flapee tanto PPPoE en VIRL:
+
+R1:
+
+!
+int dialer 1
+ no keepalive
+!
+
+R3:
+
+!
+int virtual-template
+ no keepalive
+!

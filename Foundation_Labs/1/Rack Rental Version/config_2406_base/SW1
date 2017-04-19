@@ -1,0 +1,30 @@
+version 15
+line con 0
+ logging synchronous
+ no login
+hostname SW1
+!
+no ip domain-lookup
+!
+interface Loopback0
+ ip address 21.21.21.21 255.255.255.255
+ ipv6 address 2001:21:21:21::21/128
+ no shutdown
+!
+interface Vlan121
+ ip address 10.1.121.21 255.255.255.0
+ ipv6 address 2001:10:1:121::21/64
+ no shutdown
+!
+interface Vlan21
+ ip address 10.1.21.21 255.255.255.0
+ ipv6 address 2001:10:1:21::21/64
+ no shutdown
+!
+interface Vlan221
+ ip address 10.1.221.21 255.255.255.0
+ ipv6 address 2001:10:1:221::21/64
+ no shutdown
+!
+!
+end
