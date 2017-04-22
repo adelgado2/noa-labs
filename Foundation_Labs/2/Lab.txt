@@ -1,0 +1,365 @@
+***************************************************************************************************
+
+Troubleshooting
+
+***************************************************************************************************
+
+1.1 Faults
+
+----------------------------------------------------------------------------------------------------
+
+R4:
+
+!
+interface GigabitEthernet0/1.24
+ encapsulation dot1q 24
+!
+
+***************************************************************************************************
+
+LAN Switching
+
+***************************************************************************************************
+
+2.1 Trunking
+
+----------------------------------------------------------------------------------------------------
+
+SW1:
+
+!
+interface range Gi0/1 - 2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree link-type point-to-point
+!
+interface Gi1/3
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree link-type point-to-point
+!
+ 
+SW3:
+
+!
+interface range Gi0/1 - 2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree link-type point-to-point
+!
+
+----------------------------------------------------------------------------------------------------
+
+2.2 EtherChannel 
+
+----------------------------------------------------------------------------------------------------
+
+SW3:
+
+!
+interface Gi0/3
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree link-type point-to-point
+ channel-group 23 mode active
+!
+interface Gi1/0
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree link-type point-to-point
+ channel-group 23 mode active
+!
+interface range Gi1/1 - 2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree link-type point-to-point
+ channel-group 24 mode desirable
+!
+int Po23
+ spanning-tree link-type point-to-point
+!
+int Po24
+ spanning-tree link-type point-to-point
+!
+ 
+SW2:
+
+!
+interface Gi0/3
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree link-type point-to-point
+ channel-group 23 mode passive
+!
+interface Gi1/0
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree link-type point-to-point
+ channel-group 23 mode passive
+!
+int Po23
+ spanning-tree link-type point-to-point
+!
+
+SW4:
+
+!
+interface range Gi1/1 - 2
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree link-type point-to-point
+ channel-group 24 mode auto
+!
+int Po24
+ spanning-tree link-type point-to-point
+!
+
+----------------------------------------------------------------------------------------------------
+
+2.3 VTP 
+
+----------------------------------------------------------------------------------------------------
+
+SW1:
+
+!
+vtp version 2
+vtp domain CCIE_VTP
+vtp mode client
+vtp password CCIE_PASS
+!
+
+
+SW2:
+
+!
+vtp version 2
+vtp domain CCIE_VTP
+vtp mode server
+vtp password CCIE_PASS
+!
+vlan 121,124,222,239
+!
+
+
+SW3:
+
+!
+vtp version 2
+vtp domain CCIE_VTP
+vtp mode client
+vtp password CCIE_PASS
+!
+
+SW4:
+
+!
+vtp version 2
+vtp domain CCIE_VTP
+vtp mode client
+vtp password CCIE_PASS
+!
+
+----------------------------------------------------------------------------------------------------
+
+2.4 Spanning-Tree - MST
+
+----------------------------------------------------------------------------------------------------
+
+SW1:
+
+!
+spanning-tree mode mst
+!
+spanning-tree mst configuration
+ instance 100 vlan 124,222
+ instance 101 vlan 121,239
+ revision 50
+ name REGION123
+!
+
+SW2:
+
+!
+spanning-tree mode mst
+!
+spanning-tree mst configuration
+ instance 100 vlan 124,222
+ instance 101 vlan 121,239
+ revision 50
+ name REGION123
+!
+
+SW3:
+
+!
+spanning-tree mode mst
+!
+spanning-tree mst configuration
+ instance 100 vlan 124,222
+ instance 101 vlan 121,239
+ revision 50
+ name REGION123
+!
+
+SW4:
+
+!
+spanning-tree mode mst
+!
+spanning-tree mst configuration
+ instance 100 vlan 124,222
+ instance 101 vlan 121,239
+ revision 50
+ name REGION124
+!
+
+SW1:
+
+!
+int Gi0/0
+ shut
+!
+interface range Gi0/3
+ shut
+!
+interface range Gi1/0
+ shut
+!
+
+SW2:
+
+!
+interface range Gi0/0 - 2
+ shut
+!
+interface range Gi1/1 - 2
+ shut
+!
+
+SW3:
+
+!
+interface range Gi0/0
+ shut
+!
+
+SW4:
+
+!
+int Gi0/0
+ shut
+!
+interface range Gi0/0 - 3
+ shut
+!
+interface range Gi1/0
+ shut
+!
+
+----------------------------------------------------------------------------------------------------
+
+2.5 Spanning-Tree - Advanced
+
+----------------------------------------------------------------------------------------------------
+
+SW2:
+
+!
+spanning-tree mst 100 root primary
+spanning-tree mst 101 root primary
+!
+
+SW3:
+
+!
+spanning-tree mst 0 priority 4096
+!
+
+SW4:
+
+!
+spanning-tree mst 0 priority 8192
+!
+
+SW1:
+
+!
+interface GigabitEthernet1/3
+ spanning-tree bpduguard enable
+!
+
+----------------------------------------------------------------------------------------------------
+
+2.6 L3 Etherchannel
+
+----------------------------------------------------------------------------------------------------
+
+SW1:
+
+!
+interface range Gi1/1 - 2
+ no switchport
+ channel-group 12 mode on
+ no shut
+!
+interface Po12
+ ip address 156.1.221.21 255.255.255.0
+ ipv6 address 2001:156:1:221::21/64
+!
+
+SW2:
+
+!
+interface range Gi1/1 - 2
+ no switchport
+ channel-group 12 mode on
+ no shut
+!
+interface Po12
+ ip address 156.1.221.22 255.255.255.0
+ ipv6 address 2001:156:1:221::22/64
+!
+
+Apaño para VIRL, porque no funciona con Port-channels nivel 3:
+
+SW1:
+
+!
+int po12
+ shut
+!
+int gi1/1
+ no channel-group 12 mode on
+ ip address 156.1.221.21 255.255.255.0
+ ipv6 address 2001:156:1:221::21/64
+ no shut
+!
+int gi1/2
+ shut
+!
+
+SW2:
+
+!
+int po12
+ shut
+!
+int gi1/1
+ no channel-group 12 mode on
+ ip address 156.1.221.22 255.255.255.0
+ ipv6 address 2001:156:1:221::22/64
+ no shut 
+!
+int gi1/2
+ shut
+!
