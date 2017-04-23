@@ -15,6 +15,13 @@ interface GigabitEthernet0/1.24
  encapsulation dot1q 24
 !
 
+R6:
+
+!
+ip access-list extended 100
+ 5 permit ip any any
+!
+
 ***************************************************************************************************
 
 LAN Switching
@@ -37,7 +44,6 @@ interface range Gi0/1 - 2
 interface Gi1/3
  switchport trunk encapsulation dot1q
  switchport mode trunk
- switchport nonegotiate
  spanning-tree link-type point-to-point
 !
  
@@ -63,21 +69,18 @@ SW3:
 interface Gi0/3
  switchport trunk encapsulation dot1q
  switchport mode trunk
- switchport nonegotiate
  spanning-tree link-type point-to-point
  channel-group 23 mode active
 !
 interface Gi1/0
  switchport trunk encapsulation dot1q
  switchport mode trunk
- switchport nonegotiate
  spanning-tree link-type point-to-point
  channel-group 23 mode active
 !
 interface range Gi1/1 - 2
  switchport trunk encapsulation dot1q
  switchport mode trunk
- switchport nonegotiate
  spanning-tree link-type point-to-point
  channel-group 24 mode desirable
 !
@@ -94,14 +97,12 @@ SW2:
 interface Gi0/3
  switchport trunk encapsulation dot1q
  switchport mode trunk
- switchport nonegotiate
  spanning-tree link-type point-to-point
  channel-group 23 mode passive
 !
 interface Gi1/0
  switchport trunk encapsulation dot1q
  switchport mode trunk
- switchport nonegotiate
  spanning-tree link-type point-to-point
  channel-group 23 mode passive
 !
@@ -115,7 +116,6 @@ SW4:
 interface range Gi1/1 - 2
  switchport trunk encapsulation dot1q
  switchport mode trunk
- switchport nonegotiate
  spanning-tree link-type point-to-point
  channel-group 24 mode auto
 !
@@ -182,7 +182,7 @@ spanning-tree mode mst
 !
 spanning-tree mst configuration
  instance 100 vlan 124,222
- instance 101 vlan 121,239
+ instance 101 vlan 1,121,239
  revision 50
  name REGION123
 !
@@ -194,7 +194,7 @@ spanning-tree mode mst
 !
 spanning-tree mst configuration
  instance 100 vlan 124,222
- instance 101 vlan 121,239
+ instance 101 vlan 1,121,239
  revision 50
  name REGION123
 !
@@ -206,7 +206,7 @@ spanning-tree mode mst
 !
 spanning-tree mst configuration
  instance 100 vlan 124,222
- instance 101 vlan 121,239
+ instance 101 vlan 1,121,239
  revision 50
  name REGION123
 !
@@ -217,8 +217,6 @@ SW4:
 spanning-tree mode mst
 !
 spanning-tree mst configuration
- instance 100 vlan 124,222
- instance 101 vlan 121,239
  revision 50
  name REGION124
 !
@@ -363,3 +361,567 @@ int gi1/1
 int gi1/2
  shut
 !
+
+***************************************************************************************************
+
+WAN Technologies
+
+***************************************************************************************************
+
+3.1 PPPoE and 3.2 PPPoE Authentication
+
+----------------------------------------------------------------------------------------------------
+
+R3:
+
+!
+interface Gi0/1.103
+ pppoe-client dial-pool-number 1
+!
+int dialer 1
+ encapsulation ppp
+ ip unnumbered GigabitEthernet0/1.103
+ dialer pool 1
+ no peer neighbor-route 
+ ppp pap sent-username R3_PPP password SECRET!
+!
+ 
+R10:
+
+!
+username R3_PPP password SECRET!
+!
+interface Gi0/1.103
+ pppoe enable group SERVER
+!
+int virtual-template 1
+ ip unnumbered GigabitEthernet0/1.103
+ no peer neighbor-route 
+ ppp authentication pap 
+!
+bba-group pppoe SERVER
+ virtual-template 1
+!
+ 
+***************************************************************************************************
+
+IGP
+
+***************************************************************************************************
+
+4.1 RIPv2
+
+---------------------------------------------------------------------------------------------------- 
+
+R3:
+
+!
+ip access-list standard 1
+ permit 156.1.39.9
+!
+router rip 
+ version 2
+ network 156.1.0.0
+ passive-interface default
+ no passive-interface Gi0/1.39
+ distribute-list gateway 1 in Gi0/1.39
+!
+
+ 
+
+R9:
+
+!
+router rip 
+ version 2
+ network 156.1.0.0
+ passive-interface default
+ no passive-interface Gi0/1.39 
+!
+
+----------------------------------------------------------------------------------------------------
+
+4.2 RIPv2
+
+----------------------------------------------------------------------------------------------------
+
+R3, R9:
+
+!
+route-map RED-CONN-TO-RIP permit 10
+ match interface Loopback0
+!
+router rip
+ no auto-summary
+ redistribute connected route-map RED-CONN-TO-RIP
+! 
+ 
+!
+int gi0/1.39
+ ip rip authentication mode md5 
+ ip rip authentication key-chain 1
+!
+key chain 1
+ key 0
+  key-string RIPv2_KEY!
+!
+ 
+
+----------------------------------------------------------------------------------------------------
+
+4.3 OSPF
+
+----------------------------------------------------------------------------------------------------
+
+R3:
+
+!
+router ospf 1
+ router-id 3.3.3.3
+ network 156.1.35.3 0.0.0.0 area 0
+ area 0 authentication message-digest
+!
+interface Gi0/1.35
+ ip ospf message-digest-key 1 md5 !_AM_AREA_0!
+!
+
+R5:
+
+!
+router ospf 1
+ router-id 5.5.5.5
+ network 156.1.35.5 0.0.0.0 area 0
+ area 0 authentication message-digest
+!
+interface Gi0/1.56
+ ip ospf network point-to-point
+ ip ospf 1 area 0
+ ip ospf message-digest-key 1 md5 !_AM_AREA_0!
+!
+interface Gi0/1.35
+ ip ospf message-digest-key 1 md5 !_AM_AREA_0!
+!
+
+R6:
+
+!
+router ospf 1
+ router-id 6.6.6.6
+ network 156.1.46.6 0.0.0.0 area 0
+ neighbor 156.1.46.4
+ area 0 authentication message-digest
+!
+interface Gi0/1.56
+ ip ospf network point-to-point
+ ip ospf 1 area 0
+ ip ospf message-digest-key 1 md5 !_AM_AREA_0!
+!
+int gi0/1.46
+ ip ospf network non-broadcast
+ ip ospf hello-interval 10
+ ip ospf message-digest-key 1 md5 !_AM_AREA_0!
+!
+
+R4:
+
+!
+router ospf 1
+ router-id 4.4.4.4
+ network 156.1.46.4 0.0.0.0 area 0
+ neighbor 156.1.46.6
+ area 0 authentication message-digest
+!
+int gi0/1.46
+ ip ospf network non-broadcast
+ ip ospf hello-interval 10
+ ip ospf message-digest-key 1 md5 !_AM_AREA_0!
+!
+
+R3, R4, R5, R6:
+
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+router ospf 1
+ redistribute connected subnets route-map RED-CONN
+! 
+
+----------------------------------------------------------------------------------------------------
+
+4.4 OSPF
+
+----------------------------------------------------------------------------------------------------
+
+R3:
+
+!
+interface Gi0/1.103
+ ip ospf 1 area 51
+ bfd interval 50 min_rx 50 multiplier 3
+ ip ospf bfd
+!
+interface dialer1
+ ip ospf 1 area 51
+ ip ospf mtu-ignore
+ ip ospf cost 1
+!
+router ospf 1
+ area 51 nssa no-summary
+ area 51 range 10.10.10.0 255.255.255.0
+!
+
+R10:
+
+!
+interface loopback0
+ ip ospf 1 area 51
+!
+interface Gi0/1.124
+ ip ospf 1 area 51  
+!
+interface Gi0/1.103
+ ip ospf 1 area 51
+ ip ospf bfd
+ bfd interval 50 min_rx 50 multiplier 3
+!
+interface virtual-template1
+ ip ospf 1 area 51
+ ip ospf mtu-ignore
+!
+router ospf 1
+ router-id 10.10.10.10
+ area 51 nssa
+!
+
+----------------------------------------------------------------------------------------------------
+
+4.5 OSPF
+
+----------------------------------------------------------------------------------------------------
+
+R6:
+
+!
+route-map RED-CONN permit 10      ! Aparte de lo que ya habia
+ match interface Gi0/1.68
+!
+route-map RED-CONN-2 permit 10
+ match interface Loopback0 Gi0/1.46 Gi0/1.56
+!
+interface Gi0/1.68
+ ip ospf 2 area 52
+!
+router ospf 2
+ redistribute ospf 1 subnets
+ redistribute connected subnets route-map RED-CONN-2
+!
+router ospf 1
+ redistribute ospf 2 subnets
+!
+
+R8:
+
+!
+interface Loopback0
+ ip ospf 2 area 52
+!
+interface Gi0/1.68
+ ip ospf 2 area 52
+!
+router ospf 2
+ router-id 8.8.8.8
+!
+
+Script:
+
+tclsh
+
+foreach i {
+3.3.3.3
+4.4.4.4
+5.5.5.5
+6.6.6.6
+8.8.8.8
+10.10.10.10
+156.1.46.4
+156.1.46.6
+156.1.68.6
+156.1.68.8
+156.1.56.5
+156.1.56.6
+156.1.35.5
+156.1.35.3
+156.1.103.3
+156.1.103.10
+} { ping $i }
+
+
+----------------------------------------------------------------------------------------------------
+
+4.6 EIGRP
+
+----------------------------------------------------------------------------------------------------
+
+SW1:
+
+!
+route-map RED-CONN permit 10
+ match interface Loopback0 Vlan121
+!
+router eigrp CCIE
+ address-family ipv4 unicast autonomous-system 5
+  eigrp router-id 21.21.21.21
+  network 156.1.221.21 0.0.0.0
+  topology base
+   redistribute connected route-map RED-CONN
+!
+
+SW2:
+
+!
+router eigrp CCIE
+ address-family ipv4 unicast autonomous-system 5
+  eigrp router-id 22.22.22.22
+  network 156.1.221.22 0.0.0.0
+  network 156.1.222.22 0.0.0.0
+  network 22.22.22.22 0.0.0.0
+!
+
+R2:
+
+!
+router eigrp CCIE
+ address-family ipv4 unicast autonomous-system 5
+  eigrp router-id 2.2.2.2
+  network 156.1.24.2 0.0.0.0
+  network 156.1.222.2 0.0.0.0
+  network 2.2.2.2 0.0.0.0
+!
+
+R4:
+
+!
+router eigrp CCIE
+ address-family ipv4 unicast autonomous-system 5
+  eigrp router-id 4.4.4.4
+  network 156.1.24.4 0.0.0.0
+  network 156.1.146.4 0.0.0.0
+!
+
+R6:
+
+!
+router eigrp CCIE
+ address-family ipv4 unicast autonomous-system 5
+  eigrp router-id 6.6.6.6
+  network 156.1.146.6 0.0.0.0
+!
+
+
+----------------------------------------------------------------------------------------------------
+
+4.7 IGP Redistribution
+
+----------------------------------------------------------------------------------------------------
+
+R3:
+
+!
+route-map RED-CONN-TO-RIP permit 10
+ match interface Gi0/1.103 Gi0/1.35  ! Añadir a lo que ya habia
+!
+router rip 
+ redistribute ospf 1 metric 2
+!
+route-map RED-CONN permit 10   ! Añadir a lo que ya habia
+ match interface Gi0/1.39
+!
+router ospf 1
+ redistribute rip subnets metric-type 1
+!
+
+R4:
+
+!
+route-map RED-CONN-TO-EIGRP permit 10
+ match interface Loopback0 Gi0/1.46
+!
+route-map RED-CONN permit 10
+ match interface Gi0/1.146 Gi0/1.24  ! Añadir a lo que ya habia
+!
+router eigrp CCIE
+ address-family ipv4 unicast autonomous-system 5
+  topology base
+   redistribute ospf 1 metric 10000 1000 255 1 1500
+   redistribute connected route-map RED-CONN-TO-EIGRP
+!
+ip access-list standard SW1_NET
+ permit host 21.21.21.21
+ permit 155.1.121.0 0.0.0.255
+!
+router ospf 1
+ redistribute eigrp 5 subnets
+ distance 200 6.6.6.6 0.0.0.0 SW1_NET
+!
+
+R6:
+
+!
+route-map RED-CONN-TO-EIGRP permit 10
+ match interface Loopback0 Gi0/1.46 Gi0/1.68 Gi0/1.56
+!
+route-map RED-CONN permit 10   ! Añadir a lo que ya habia
+ match interface Gi0/1.146
+!
+route-map RED-CONN-2 permit 10   ! Añadir a lo que ya habia
+ match interface Gi0/1.146
+!
+router eigrp CCIE
+ address-family ipv4 unicast autonomous-system 5
+  topology base
+   redistribute ospf 1 metric 10000 1000 255 1 1500 
+   redistribute ospf 2 metric 10000 1000 255 1 1500 
+   redistribute connected route-map RED-CONN-TO-EIGRP
+!
+ip access-list standard SW1_NET
+ permit host 21.21.21.21
+ permit 156.1.121.0 0.0.0.255
+!
+router ospf 1
+ redistribute eigrp 5 subnets
+ distance 200 4.4.4.4 0.0.0.0 SW1_NET
+!
+router ospf 2
+ redistribute eigrp 5 subnets
+!
+
+
+Script:
+
+tclsh
+
+foreach i {
+21.21.21.21
+22.22.22.22
+2.2.2.2
+3.3.3.3
+4.4.4.4
+5.5.5.5
+6.6.6.6
+8.8.8.8
+9.9.9.9
+10.10.10.10
+156.1.221.21
+156.1.221.22
+156.1.222.22
+156.1.222.2
+156.1.24.2
+156.1.24.4
+156.1.146.4
+156.1.146.6
+156.1.39.9
+156.1.39.3
+156.1.46.4
+156.1.46.6
+156.1.68.6
+156.1.68.8
+156.1.56.5
+156.1.56.6
+156.1.35.5
+156.1.35.3
+156.1.103.3
+156.1.103.10
+
+} { ping $i }
+
+***************************************************************************************************
+
+Exterior Gateway Protocol Routing
+
+***************************************************************************************************
+
+5.1 BGP
+
+----------------------------------------------------------------------------------------------------
+
+R3:
+
+!
+router bgp 65300
+ bgp router-id 3.3.3.3
+ 
+
+R9:
+
+!
+router bgp 65300
+ bgp router-id 3.3.3.3
+
+R10:
+
+!
+router bgp 65300
+ bgp router-id 3.3.3.3
+
+R5:
+
+R6:
+
+R2:
+
+R4:
+
+SW1:
+
+SW2:
+
+
+
+
+
+----------------------------------------------------------------------------------------------------
+
+5.2 BGP
+
+----------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+----------------------------------------------------------------------------------------------------
+
+5.3 BGP
+
+----------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
