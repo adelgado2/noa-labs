@@ -737,8 +737,13 @@ router rip
 route-map RED-CONN permit 10   ! Añadir a lo que ya habia
  match interface Gi0/1.39
 !
+ip access-list standard Loopback9
+ permit host 9.9.9.9
+ permit 156.1.239.0 0.0.0.255
+!
 router ospf 1
  redistribute rip subnets metric-type 1
+ distance 200 4.4.4.4 0.0.0.0 Loopback9
 !
 
 R4:
@@ -758,7 +763,7 @@ router eigrp CCIE
 !
 ip access-list standard SW1_NET
  permit host 21.21.21.21
- permit 155.1.121.0 0.0.0.255
+ permit 156.1.121.0 0.0.0.255
 !
 router ospf 1
  redistribute eigrp 5 subnets
@@ -850,33 +855,181 @@ R3:
 !
 router bgp 65300
  bgp router-id 3.3.3.3
- 
+ bgp confederation identifier 5555
+ bgp confederation peers 65200
+ no bgp default ipv4-unicast 
+ neighbor GROUP1 peer-group 
+ neighbor GROUP1 remote-as 65300
+ neighbor GROUP1 update-source Loopback0
+ neighbor 9.9.9.9 peer-group GROUP1
+ neighbor 10.10.10.10 peer-group GROUP1
+ neighbor GROUP2 peer-group
+ neighbor GROUP2 remote-as 65200
+ neighbor GROUP2 update-source Loopback0
+ neighbor GROUP2 ebgp-multihop 2
+ neighbor 5.5.5.5 peer-group GROUP2
+ !
+ address-family ipv4 unicast
+  neighbor 9.9.9.9 activate
+  neighbor 10.10.10.10 activate
+  neighbor 5.5.5.5 activate
+  neighbor GROUP1 route-reflector-client
+!
 
 R9:
 
 !
 router bgp 65300
- bgp router-id 3.3.3.3
+ bgp router-id 9.9.9.9
+ bgp confederation identifier 5555
+ no bgp default ipv4-unicast 
+ neighbor GROUP1 peer-group 
+ neighbor GROUP1 remote-as 65300
+ neighbor GROUP1 update-source Loopback0
+ neighbor 3.3.3.3 peer-group GROUP1
+ !
+ address-family ipv4 unicast
+  neighbor 3.3.3.3 activate
+!
+ 
 
 R10:
 
 !
 router bgp 65300
- bgp router-id 3.3.3.3
+ bgp router-id 10.10.10.10
+ bgp confederation identifier 5555
+ no bgp default ipv4-unicast 
+ neighbor GROUP1 peer-group 
+ neighbor GROUP1 remote-as 65300
+ neighbor GROUP1 update-source Loopback0
+ neighbor 3.3.3.3 peer-group GROUP1
+ !
+ address-family ipv4 unicast
+  neighbor 3.3.3.3 activate
+!
 
 R5:
 
+!
+router bgp 65200
+ bgp router-id 5.5.5.5
+ bgp confederation identifier 5555
+ bgp confederation peers 65300
+ no bgp default ipv4-unicast 
+ neighbor GROUP1 peer-group
+ neighbor GROUP1 remote-as 65200
+ neighbor GROUP1 update-source Loopback0
+ neighbor 6.6.6.6 peer-group GROUP1
+ neighbor GROUP2 peer-group
+ neighbor GROUP2 remote-as 65300
+ neighbor GROUP2 update-source Loopback0
+ neighbor GROUP2 ebgp-multihop 2
+ neighbor 3.3.3.3 peer-group GROUP2
+ !
+ address-family ipv4 unicast
+  neighbor 6.6.6.6 activate
+  neighbor 3.3.3.3 activate
+!
+
 R6:
+
+!
+router bgp 65200
+ bgp router-id 6.6.6.6
+ bgp confederation identifier 5555
+ bgp confederation peers 65100
+ no bgp default ipv4-unicast 
+ neighbor GROUP1 peer-group 
+ neighbor GROUP1 remote-as 65200
+ neighbor GROUP1 update-source Loopback0
+ neighbor GROUP2 peer-group 
+ neighbor GROUP2 remote-as 65100
+ neighbor GROUP2 update-source Loopback0
+ neighbor GROUP2 ebgp-multihop 2
+ neighbor 5.5.5.5 peer-group GROUP1
+ neighbor 4.4.4.4 peer-group GROUP2
+ !
+ address-family ipv4 unicast
+  neighbor 5.5.5.5 activate
+  neighbor 4.4.4.4 activate
+!
 
 R2:
 
+!
+router bgp 65100
+ bgp router-id 2.2.2.2
+ bgp confederation identifier 5555
+ no bgp default ipv4-unicast 
+ neighbor GROUP1 peer-group 
+ neighbor GROUP1 remote-as 65100
+ neighbor GROUP1 update-source Loopback0
+ neighbor 4.4.4.4 peer-group GROUP1
+ !
+ address-family ipv4 unicast
+  neighbor 4.4.4.4 activate
+!
+
 R4:
+
+!
+router bgp 65100
+ bgp router-id 4.4.4.4
+ bgp confederation identifier 5555
+ bgp confederation peers 65200
+ no bgp default ipv4-unicast 
+ neighbor GROUP1 peer-group 
+ neighbor GROUP1 remote-as 65100
+ neighbor GROUP1 update-source Loopback0
+ neighbor 2.2.2.2 peer-group GROUP1
+ neighbor 22.22.22.22 peer-group GROUP1
+ neighbor 21.21.21.21 peer-group GROUP1
+ neighbor GROUP2 peer-group
+ neighbor GROUP2 remote-as 65200
+ neighbor GROUP2 update-source Loopback0
+ neighbor GROUP2 ebgp-multihop 2
+ neighbor 6.6.6.6 peer-group GROUP2
+ !
+ address-family ipv4 unicast
+  neighbor 2.2.2.2 activate
+  neighbor 22.22.22.22 activate
+  neighbor 21.21.21.21 activate
+  neighbor 6.6.6.6 activate
+  neighbor GROUP1 route-reflector-client
+!
 
 SW1:
 
+!
+router bgp 65100
+ bgp router-id 21.21.21.21
+ bgp confederation identifier 5555
+ no bgp default ipv4-unicast 
+ neighbor GROUP1 peer-group 
+ neighbor GROUP1 remote-as 65100
+ neighbor GROUP1 update-source Loopback0
+ neighbor 4.4.4.4 peer-group GROUP1
+ !
+ address-family ipv4 unicast
+  neighbor 4.4.4.4 activate
+!
+
 SW2:
 
-
+!
+router bgp 65100
+ bgp router-id 22.22.22.22
+ bgp confederation identifier 5555
+ no bgp default ipv4-unicast 
+ neighbor GROUP1 peer-group 
+ neighbor GROUP1 remote-as 65100
+ neighbor GROUP1 update-source Loopback0
+ neighbor 4.4.4.4 peer-group GROUP1
+ !
+ address-family ipv4 unicast
+  neighbor 4.4.4.4 activate
+!
 
 
 
@@ -886,13 +1039,111 @@ SW2:
 
 ----------------------------------------------------------------------------------------------------
 
+R1:
+
+!
+router bgp 100
+ bgp router-id 1.1.1.1
+ neighbor 156.1.121.21 remote-as 5555
+ no bgp default ipv4-unicast 
+ !
+ address-family ipv4 unicast
+  neighbor 156.1.121.21 activate
+  network 1.1.1.1 mask 255.255.255.255
+!
+
+R8:
+
+!
+router bgp 800
+ bgp router-id 8.8.8.8
+ neighbor 156.1.68.6 remote-as 5555
+ no bgp default ipv4-unicast 
+ !
+ address-family ipv4 unicast
+  neighbor 156.1.68.6 activate
+  network 8.8.8.8 mask 255.255.255.255
+!
+
+SW3:
+
+!
+router bgp 300
+ bgp router-id 23.23.23.23
+ neighbor 156.1.239.9 remote-as 5555
+ no bgp default ipv4-unicast 
+ !
+ address-family ipv4 unicast
+  neighbor 156.1.239.9 activate
+  network 23.23.23.23 mask 255.255.255.255
+!
+
+SW4:
+
+!
+router bgp 400
+ bgp router-id 24.24.24.24
+ neighbor 156.1.124.10 remote-as 5555
+ no bgp default ipv4-unicast 
+ !
+ address-family ipv4 unicast
+  neighbor 156.1.124.10 activate
+  network 24.24.24.24 mask 255.255.255.255
+!
+ 
+SW1:
+
+!
+router bgp 65100
+ neighbor 156.1.121.1 remote-as 100
+ !
+ address-family ipv4 unicast
+  neighbor 156.1.121.1 activate
+!
+
+R6:
+
+!
+router bgp 65200
+ neighbor 156.1.68.8 remote-as 800
+ !
+ address-family ipv4 unicast
+  neighbor 156.1.68.8 activate
+!
 
 
+R9:
+
+!
+router bgp 65300
+ neighbor 156.1.239.23 remote-as 300
+ !
+ address-family ipv4 unicast
+  neighbor 156.1.239.23 activate
+!
 
 
+R10:
+
+!
+router bgp 65300
+ neighbor 156.1.124.24 remote-as 400
+ !
+ address-family ipv4 unicast
+  neighbor 156.1.124.24 activate
+!
 
 
+Script:
 
+tclsh
+
+foreach i {
+1.1.1.1
+23.23.23.23
+24.24.24.24
+8.8.8.8
+} { ping $i source Loopback0 }
 
 
 ----------------------------------------------------------------------------------------------------
@@ -901,15 +1152,290 @@ SW2:
 
 ----------------------------------------------------------------------------------------------------
 
+SW3:
+
+!
+interface Loopback100
+ ip address 156.100.100.100 255.255.255.255
+!
+ip prefix-list LO100 seq 5 permit 156.100.100.100/32
+!
+route-map AS-PREPEND permit 10 
+ match ip address prefix-list LO100
+ set as-path prepend 300
+!
+route-map AS-PREPEND permit 20
+! 
+router bgp 300
+ !
+ address-family ipv4 unicast
+  network 156.100.100.100 mask 255.255.255.255
+  neighbor 156.1.239.9 route-map AS-PREPEND out
+!
+
+SW4:
+
+!
+interface Loopback100
+ ip address 156.100.100.100 255.255.255.255
+! 
+router bgp 400
+ address-family ipv4 unicast
+  network 156.100.100.100 mask 255.255.255.255
+!
+
+SW1:
+
+!
+ip prefix-list NET-156-1-0-0-16 seq 5 permit 156.1.0.0/16 le 32
+!
+route-map RED-EIGRP-TO-BGP permit 10
+ match ip address prefix-list NET-156-1-0-0-16
+!
+ip prefix-list FILTER-TO-INTERNAL-PEER seq 5 permit 156.1.0.0/16
+ip prefix-list FILTER-TO-INTERNAL-PEER seq 10 deny 156.1.0.0/16 le 32
+ip prefix-list FILTER-TO-INTERNAL-PEER seq 15 permit 0.0.0.0/0 le 32
+!
+router bgp 65100
+ address-family ipv4 unicast
+ redistribute eigrp 5 route-map RED-EIGRP-TO-BGP
+ aggregate-address 156.1.0.0 255.255.0.0
+ neighbor GROUP1 prefix-list FILTER-TO-INTERNAL-PEER out
+!
+
+***************************************************************************************************
+
+DMVPN
+
+***************************************************************************************************
+
+6.1 IPv4 over DMVPN
+
+----------------------------------------------------------------------------------------------------
+
+R5:
+
+!
+router ospf 1
+ passive-interface Gi0/1.57
+ network 156.1.57.5 0.0.0.0 area 0
+!
+
+R1:
+
+!
+vrf definition DMVPN
+ rd 78:78
+ !
+ address-family ipv4
+ exit-address-family
+!
+interface tunnel1
+ vrf forwarding DMVPN
+ ip address 156.192.17.1 255.255.255.0
+ ip nhrp map 156.192.17.7 156.1.57.7
+ ip nhrp map multicast 156.1.57.7
+ ip nhrp nhs 156.192.17.7
+ ip nhrp network-id 17 
+ ip nhrp authentication PRIVATE
+ tunnel key 17
+ tunnel mode gre multipoint
+ tunnel source Loopback0
+!
+
+R7:
+
+!
+vrf definition DMVPN
+ rd 78:78
+ !
+ address-family ipv4
+ exit-address-family
+!
+interface tunnel1
+ vrf forwarding DMVPN
+ ip address 156.192.17.7 255.255.255.0
+ ip nhrp map multicast dynamic
+ ip nhrp network-id 17 
+ ip nhrp authentication PRIVATE
+ tunnel key 17
+ tunnel mode gre multipoint
+ tunnel source Gi0/1.57
+!
+
+interface tunnel8
+ vrf forwarding DMVPN
+ ip address 156.192.78.7 255.255.255.0
+ ip nhrp map multicast dynamic
+ ip nhrp network-id 78 
+ ip nhrp authentication PRIVATE
+ tunnel key 78
+ tunnel mode gre multipoint
+ tunnel source Gi0/1.57
+!
+ip route 0.0.0.0 0.0.0.0 156.1.57.5
+!
+
+R8:
+
+!
+vrf definition DMVPN
+ rd 78:78
+ !
+ address-family ipv4
+ exit-address-family
+!
+interface tunnel8
+ vrf forwarding DMVPN
+ ip address 156.192.78.8 255.255.255.0
+ ip nhrp map 156.192.78.7 156.1.57.7
+ ip nhrp map multicast 156.1.57.7
+ ip nhrp nhs 156.192.78.7
+ ip nhrp network-id 78 
+ ip nhrp authentication PRIVATE
+ tunnel key 78
+ tunnel mode gre multipoint
+ tunnel source Loopback0
+!
+ 
+----------------------------------------------------------------------------------------------------
+
+6.2 IPsec over DMVPN
+
+----------------------------------------------------------------------------------------------------
+
+R1, R7, R8:
+
+!
+crypto isakmp policy 10
+ authentication pre-share
+ encryption aes 192 
+ hash sha256 
+ group 5
+!
+crypto isakmp key 0 DMVPN_KEY address 0.0.0.0 0.0.0.0
+!
+crypto ipsec transform-set ESP-AES-256-SHA-512 esp-aes 256 esp-sha512 
+ mode transport
+!
+crypto ipsec profile DMVPN-PROFILE
+ set transform-set ESP-AES-256-SHA-512
+!
+
+R1:
+
+!
+interface tunnel1
+ tunnel protection ipsec profile DMVPN-PROFILE
+!
+
+R8:
+
+!
+interface tunnel8
+ tunnel protection ipsec profile DMVPN-PROFILE
+!
+
+R7:
+
+!
+interface tunnel1
+ tunnel protection ipsec profile DMVPN-PROFILE
+!
+interface tunnel8
+ tunnel protection ipsec profile DMVPN-PROFILE
+!
 
 
+----------------------------------------------------------------------------------------------------
+
+6.3 OSPF over DMVPN
+
+----------------------------------------------------------------------------------------------------
+
+R1:
+
+!
+router ospf 78 vrf DMVPN
+ router-id 11.11.11.11 
+!
+interface tunnel1
+ ip ospf 78 area 0
+!
+interface Loopback78
+ vrf forwarding DMVPN
+ ip address 11.11.11.11 255.255.255.255
+ ip ospf 78 area 0
+!
+ 
+R7:
+
+!
+interface Loopback0
+ vrf forwarding DMVPN
+ ip address 7.7.7.7 255.255.255.255
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+router ospf 78 vrf DMVPN
+ router-id 7.7.7.7
+ redistribute connected subnets route-map RED-CONN
+!
+interface tunnel1
+ ip ospf 78 area 0
+!
+interface tunnel8
+ ip ospf 78 area 0
+!
+
+R8:
+
+!
+router ospf 78 vrf DMVPN
+ router-id 88.88.88.88
+!
+interface tunnel8
+ ip ospf 78 area 0
+!
+interface Loopback78
+ vrf forwarding DMVPN
+ ip address 88.88.88.88 255.255.255.255
+ ip ospf 78 area 0
+!
 
 
+Script:
 
+R1 y R8:
 
+tclsh
 
+foreach i {
+11.11.11.11
+7.7.7.7
+88.88.88.88
+} { ping vrf DMVPN $i source Loopback0 }
 
+R7:
 
+tclsh
+
+foreach i {
+11.11.11.11
+7.7.7.7
+88.88.88.88
+} { ping vrf DMVPN $i source Loopback0 }
+
+***************************************************************************************************
+
+MPLS
+
+***************************************************************************************************
+
+7.1 LDP
+
+----------------------------------------------------------------------------------------------------
 
 
 
