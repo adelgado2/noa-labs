@@ -1415,7 +1415,7 @@ foreach i {
 11.11.11.11
 7.7.7.7
 88.88.88.88
-} { ping vrf DMVPN $i source Loopback0 }
+} { ping vrf DMVPN $i source Loopback78 }
 
 R7:
 
@@ -1437,17 +1437,431 @@ MPLS
 
 ----------------------------------------------------------------------------------------------------
 
+R3:
 
+!
+mpls ldp router-id Loopback0
+mpls ldp password required
+mpls ldp neighbor 9.9.9.9 password 0 LDP_CCIE
+mpls ldp neighbor 10.10.10.10 password 0 LDP_CCIE
+!
+interface Gi0/1.39
+ mpls ip
+!
+interface Gi0/1.103
+ mpls ip
+!
+interface dialer 1
+ mpls ip
+!
 
+R9:
 
+!
+mpls ldp router-id Loopback0
+mpls ldp password required
+mpls ldp neighbor 3.3.3.3 password 0 LDP_CCIE
+!
+interface Gi0/1.39
+ mpls ip
+!
+ip access-list standard 9
+ permit host 9.9.9.9
+!
+no mpls ldp advertise-labels 
+mpls ldp advertise-labels for 9    
+!
 
+R10:
 
+!
+mpls ldp router-id Loopback0
+mpls ldp password required
+mpls ldp neighbor 3.3.3.3 password 0 LDP_CCIE
+!
+interface Gi0/1.103
+ mpls ip
+!
+no mpls ldp advertise-labels 
+!
+ip access-list standard 10
+ permit host 10.10.10.10
+!
+no mpls ldp advertise-labels 
+mpls ldp advertise-labels for 10   
+!
+int virtual-template 1
+ mpls ip
+ ip ospf cost 100
+!
 
+----------------------------------------------------------------------------------------------------
 
+7.2 PE-CE Routing
 
+----------------------------------------------------------------------------------------------------
 
+SW2:
 
+!
+vlan 200
+!
+vlan 201
+!
 
+SW1, SW2, SW3:
 
+!
+spanning-tree mst configuration
+ instance 100 vlan 124, 200, 222
+ instance 101 vlan 1, 121, 201, 239
+!
+
+R9:
+
+!
+vrf definition VPN
+ rd 9.9.9.9:1
+ !
+ address-family ipv4
+!
+interface Gi0/1.200
+ encapsulation dot1q 200
+ vrf forwarding VPN
+ ip address 156.200.239.9 255.255.255.0
+!
+router ospf 9 vrf VPN
+ router-id 99.99.99.99
+ network 156.200.239.9 0.0.0.0 area 200
+!
+
+SW3:
+
+!
+interface Vlan200
+ ip address 156.200.239.23 255.255.255.0
+ no shut
+!
+router ospf 1
+ router-id 23.23.23.23
+ network 156.200.239.23 0.0.0.0 area 200
+!
+
+R10:
+
+!
+vrf definition VPN
+ rd 10.10.10.10:1
+ !
+ address-family ipv4
+!
+interface Gi0/1.201
+ encapsulation dot1q 201
+ vrf forwarding VPN
+ ip address 156.201.124.10 255.255.255.0
+!
+router ospf 10 vrf VPN
+ router-id 100.100.100.100
+ network 156.201.124.10 0.0.0.0 area 201
+!
+
+SW4:
+
+!
+interface Vlan201
+ ip address 156.201.124.24 255.255.255.0
+ no shut
+!
+router ospf 1
+ router-id 24.24.24.24
+ network 156.201.124.24 0.0.0.0 area 201
+!
+
+----------------------------------------------------------------------------------------------------
+
+7.3 VPNv4
+
+----------------------------------------------------------------------------------------------------
+
+R3:
+
+!
+router bgp 65300
+ address-family vpnv4 
+  neighbor 9.9.9.9 activate
+  neighbor 10.10.10.10 activate
+  neighbor GROUP1 route-reflector-client
+  neighbor GROUP1 send-community extended
+!
+
+R9:
+
+!
+route-map SET-COMMUNITY permit 10
+ set extcommunity rt 200:200 
+!
+router bgp 65300
+ address-family vpnv4 
+  neighbor 3.3.3.3 activate
+  neighbor GROUP1 send-community extended
+ !
+ address-family ipv4 vrf VPN
+  redistribute ospf 9
+!
+vrf definition VPN 
+ address-family ipv4
+  route-target import 201:201
+  export map SET-COMMUNITY
+!
+router ospf 9 vrf VPN
+ redistribute bgp 65300 subnets 
+!
+
+R10:
+
+!
+route-map SET-COMMUNITY permit 10
+ set extcommunity rt 201:201
+!
+router bgp 65300
+ address-family vpnv4 
+  neighbor 3.3.3.3  activate
+  neighbor GROUP1 send-community extended
+ ! 
+ address-family ipv4 vrf VPN
+  redistribute ospf 10
+!
+vrf definition VPN 
+ address-family ipv4
+  route-target import 200:200
+  export map SET-COMMUNITY
+!
+router ospf 10 vrf VPN
+ redistribute bgp 65300 subnets 
+!
+
+***************************************************************************************************
+
+IPv6 Routing
+
+***************************************************************************************************
+
+8.1 IPv6 EIGRP
+
+----------------------------------------------------------------------------------------------------
+
+R2:
+
+!
+router eigrp CCIE
+  address-family ipv6 unicast autonomous-system 5
+  !    
+  
+R4:
+
+!
+router eigrp CCIE
+  address-family ipv6 unicast autonomous-system 5
+  !
+  af-interface Gi0/1.46
+   shut
+  af-interface Gi0/1.146
+   shut
+!
+
+SW1:
+
+!
+ipv6 unicast-routing
+!
+router eigrp CCIE
+  address-family ipv6 unicast autonomous-system 5
+  !
+  af-interface Vlan121
+   passive-interface
+  !
+!  
+
+SW2:
+
+!
+ipv6 unicast-routing
+!
+router eigrp CCIE
+  address-family ipv6 unicast autonomous-system 5
+  !
+  
+tclsh 
+
+foreach i {
+2001:2:2:2::2
+2001:21:21:21::21
+2001:22:22:22::22
+2001:156:1:121::21
+2001:156:1:221::22
+2001:156:1:222::22
+} { ping $i source lo0 }  
+  
+----------------------------------------------------------------------------------------------------
+
+8.2 IPv6 OSPFv3
+
+----------------------------------------------------------------------------------------------------
+
+R3:
+
+!
+ipv6 prefix-list AREA_52_PREFIX_FILTER seq 5 deny 2001:156:1:68::/64
+ipv6 prefix-list AREA_52_PREFIX_FILTER seq 10 permit ::/0 le 128
+!
+route-map RED-CONN-FOR-IPv6 permit 10
+ match interface Loopback0
+!
+router ospfv3 3
+ address-family ipv6 unicast 
+  router-id 3.3.3.3
+  redistribute connected route-map RED-CONN-FOR-IPv6
+  area 51 nssa default-information-originate
+  area 0 range 2001:156:1::/48
+  area 0 filter-list prefix AREA_52_PREFIX_FILTER out
+!  
+interface Gi0/1.103
+ ospfv3 3 ipv6 area 51
+!
+interface gi0/1.35
+ ospfv3 3 ipv6 area 0
+!
+
+R4:
+
+!
+route-map RED-CONN-FOR-IPv6 permit 10
+ match interface Loopback0
+!
+router ospfv3 3
+ address-family ipv6 unicast 
+  router-id 4.4.4.4
+  redistribute connected route-map RED-CONN-FOR-IPv6
+!  
+interface gi0/1.46
+ ospfv3 3 ipv6 area 0
+!  
+
+R5:
+
+!
+route-map RED-CONN-FOR-IPv6 permit 10
+ match interface Loopback0
+!
+router ospfv3 3
+ address-family ipv6 unicast 
+  router-id 5.5.5.5
+  redistribute connected route-map RED-CONN-FOR-IPv6
+!
+interface gi0/1.35
+ ospfv3 3 ipv6 area 0
+!
+interface gi0/1.56
+ ospfv3 3 ipv6 area 0
+!
+
+R6:
+
+!
+route-map RED-CONN-FOR-IPv6 permit 10
+ match interface Loopback0
+!
+router ospfv3 3
+ address-family ipv6 unicast 
+  router-id 6.6.6.6
+  redistribute connected route-map RED-CONN-FOR-IPv6
+  area 52 nssa no-summary
+!
+interface gi0/1.56
+ ospfv3 3 ipv6 area 0
+!
+interface gi0/1.46
+ ospfv3 3 ipv6 area 0
+!  
+interface gi0/1.68
+ ospfv3 3 ipv6 area 52
+!  
+
+R8:
+
+!
+route-map RED-CONN-FOR-IPv6 permit 10
+ match interface Loopback0
+!
+router ospfv3 3
+ address-family ipv6 unicast 
+  router-id 8.8.8.8
+  redistribute connected route-map RED-CONN-FOR-IPv6
+   area 52 nssa
+!  
+interface gi0/1.68
+ ospfv3 3 ipv6 area 52
+!    
+
+R10:
+
+!
+route-map RED-CONN-FOR-IPv6 permit 10
+ match interface Loopback0
+!
+router ospfv3 3
+ address-family ipv6 unicast 
+  router-id 10.10.10.10
+  redistribute connected route-map RED-CONN-FOR-IPv6
+  area 51 nssa
+!  
+interface Gi0/1.103
+ ospfv3 3 ipv6 area 51
+!
+
+----------------------------------------------------------------------------------------------------
+
+8.3 IPv6 Redistribution
+
+----------------------------------------------------------------------------------------------------
+
+R4:
+
+!
+router ospfv3 3
+ address-family ipv6 unicast 
+  redistribute eigrp 5 include-connected 
+!
+router eigrp CCIE
+ address-family ipv6 unicast autonomous-system 5
+  topology base
+   redistribute ospf 3 include-connected metric 100000 1000 255 1 1500
+!
+route-map RED-CONN-FOR-IPv6 permit 10
+ match interface Gi0/1.24
+!
+
+tclsh 
+
+foreach i {
+2001:2:2:2::2
+2001:3:3:3::3
+2001:4:4:4::4
+2001:5:5:5::5
+2001:8:8:8::8
+2001:6:6:6::6
+2001:10:10:10::10
+2001:21:21:21::21
+2001:22:22:22::22
+2001:156:1:121::21
+2001:156:1:221::22
+2001:156:1:222::22
+2001:156:1:35::5
+2001:156:1:24::2
+2001:156:1:46::4
+2001:156:1:56::5
+2001:156:1:68::8
+2001:156:1:103::10
+} { ping $i source lo0 }
 
 
