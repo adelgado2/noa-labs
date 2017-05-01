@@ -1103,29 +1103,285 @@ router bgp 65000.2525
   neighbor 128.10.254.3 advertise-map COND-NET exist-map LO-R5
 !
 
+***************************************************************************************************
+
+MPLS
+
+***************************************************************************************************
+
+6.1 Label Exchange
+
+----------------------------------------------------------------------------------------------------
+
+
+R1:
+
+!
+mpls ldp router-id Loopback0 force
+mpls ldp password required
+mpls ldp neighbor 3.3.3.3 password 0 !LDP_CCIE!
+mpls ldp neighbor 6.6.6.6 password 0 !LDP_CCIE!
+!
+router ospf 1
+ mpls ldp autoconfig
+!
+ 
+R2:
+
+!
+mpls ldp router-id Loopback0 force
+mpls ldp password required
+mpls ldp neighbor 3.3.3.3 password 0 !LDP_CCIE!
+!
+router ospf 1
+ mpls ldp autoconfig
+!
+
+R3:
+
+!
+mpls ldp router-id Loopback0 force
+mpls ldp password required
+mpls ldp neighbor 1.1.1.1 password 0 !LDP_CCIE!
+mpls ldp neighbor 2.2.2.2 password 0 !LDP_CCIE!
+mpls ldp neighbor 7.7.7.7 password 0 !LDP_CCIE!
+!
+router ospf 1
+ mpls ldp autoconfig
+!
+
+R7:
+
+!
+mpls ldp router-id Loopback0 force
+mpls ldp password required
+mpls ldp neighbor 3.3.3.3 password 0 !LDP_CCIE!
+mpls ldp neighbor 5.5.5.5 password 0 !LDP_CCIE!
+mpls ldp neighbor 6.6.6.6 password 0 !LDP_CCIE!
+!
+router ospf 1
+ mpls ldp autoconfig
+!
+interface gi0/1.123
+ mpls ip
+!
+interface gi0/1.67
+ mpls ip
+!
+
+R5:
+
+!
+mpls ldp router-id Loopback0 force
+mpls ldp password required
+mpls ldp neighbor 7.7.7.7 password 0 !LDP_CCIE!
+!
+interface Gi0/1.123
+ mpls ip
+!
+
+R6:
+
+!
+mpls ldp router-id Loopback0 force
+mpls ldp password required
+mpls ldp neighbor 1.1.1.1 password 0 !LDP_CCIE!
+mpls ldp neighbor 7.7.7.7 password 0 !LDP_CCIE!
+!
+router ospf 1
+ mpls ldp autoconfig
+!
+interface Gi0/1.67
+ mpls ip
+!
+
+----------------------------------------------------------------------------------------------------
+
+6.2 VRF Provisioning
+
+----------------------------------------------------------------------------------------------------
+
+R3:
+
+!
+vrf definition VPN_B
+ rd 200:200
+ address-family ipv4 unicast
+ address-family ipv6 unicast
+!
+interface Gi0/1.233
+ vrf forwarding VPN_B
+ ip address 128.10.233.3 255.255.255.0
+ ipv6 address 2004:128:10:233::3/64
+!
+
+R5:
+
+!
+vrf definition VPN_A 
+ rd 100:100
+ address-family ipv4 unicast 
+ address-family ipv6 unicast
+!
+interface Gi0/1.225
+ vrf forwarding VPN_A
+ ip address 128.10.225.5 255.255.255.0
+ ipv6 address 2004:128:10:225::5/64
+!
+
+R6:
+
+!
+vrf definition VPN_A 
+ rd 100:100
+ address-family ipv4 unicast 
+ address-family ipv6 unicast
+!
+interface Gi0/1.216
+ vrf forwarding VPN_A
+ ip address 128.10.216.6 255.255.255.0
+ ipv6 address 2004:128:10:216::6/64
+!
+
+SW2:
+
+!
+vrf definition VPN_A 
+ rd 100:100
+ address-family ipv4 unicast 
+ address-family ipv6 unicast
+!
+interface vlan225
+ vrf forwarding VPN_A
+ ip address 128.10.225.22 255.255.255.0
+ ipv6 address 2004:128:10:225::22/64
+!
+int Gi1/1
+ vrf forwarding VPN_A
+ ip address 128.10.221.22 255.255.255.0
+ ipv6 address 2004:128:10:221::22/64
+!
+interface Loopback0
+ vrf forwarding VPN_A
+ ip address 22.22.22.22 255.255.255.255
+ ipv6 address 2004:22:22:22::22/128
+!
+
+----------------------------------------------------------------------------------------------------
+
+6.3 PE-CE Routing
+
+----------------------------------------------------------------------------------------------------
+
+R5:
+
+!
+interface Gi0/1.225
+ ip ospf 100 area 5.6.21.22
+!
+router ospf 100
+ router-id 50.50.50.50
+! 
+
+R6:
+
+!
+interface Gi0/1.216
+ ip ospf 100 area 5.6.21.22
+!
+router ospf 100
+ router-id 60.60.60.60
+!
+
+SW1:
+
+!
+interface Loopback0
+ ip ospf 100 area 5.6.21.22
+!
+interface Vlan216
+ ip ospf 100 area 5.6.21.22
+!
+int gi1/1
+ ip ospf 100 area 5.6.21.22
+!
+router ospf 100
+ router-id 21.21.21.21
+! 
+
+SW2:
+
+!
+interface Loopback0
+ ip ospf 100 area 5.6.21.22
+!
+interface Vlan225
+ ip ospf 100 area 5.6.21.22
+!
+int gi1/1
+ ip ospf 100 area 5.6.21.22
+!
+router ospf 100 vrf VPN_A
+ router-id 22.22.22.22
+!
+
+SW3:
+
+!
+router bgp 65024
+ bgp router-id 23.23.23.23
+ no bgp default ipv4-unicast
+ neighbor 128.10.234.24 remote-as 65024
+ neighbor 128.10.233.3 remote-as 4259842525
+ address-family ipv4 unicast
+ neighbor 128.10.234.24 activate 
+ neighbor 128.10.233.3 activate
+ redistribute connected
+!
+
+SW4:
+
+!
+router bgp 65024
+ bgp router-id 24.24.24.24
+ no bgp default ipv4-unicast
+ neighbor 128.10.234.23 remote-as 65024
+ address-family ipv4 unicast
+ neighbor 128.10.234.23 activate
+ redistribute connected
+! 
+
+R3:
+
+!
+router bgp 4259842525
+ address-family ipv4 unicast vrf VPN_B
+ neighbor 128.10.233.23 remote-as 65024
+ neighbor 128.10.233.23 activate
+!
+
+----------------------------------------------------------------------------------------------------
+
+6.4 VPNv4
+
+----------------------------------------------------------------------------------------------------
 
 
 
 
+----------------------------------------------------------------------------------------------------
+
+6.5 VPN Routing Policy
+
+----------------------------------------------------------------------------------------------------
 
 
 
+----------------------------------------------------------------------------------------------------
 
+6.6 MPLS Backup Routing
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+----------------------------------------------------------------------------------------------------
 
 
 
