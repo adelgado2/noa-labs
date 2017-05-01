@@ -170,12 +170,95 @@ vtp mode client  ! OJO
 
 ----------------------------------------------------------------------------------------------------
 
+VIRL needed:
+
+SW1,SW2,SW3,SW4:
+
+!
+interface range Gi0/0 - 3
+ spanning-tree link-type point-to-point
+!
+interface range Gi1/0 - 2
+ spanning-tree link-type point-to-point
+!
+
+SW1: 
+
+!
+interface range Gi1/3
+ spanning-tree link-type point-to-point
+!
+
+SW2,SW2:
+
+!
+interface Port-channel23
+ spanning-tree link-type point-to-point
+!
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+SW1,SW2,SW3,SW4:
+
+!
+spanning-tree mode rapid-pvst 
+!
+
+SW2,SW3:
+
+!
+spanning-tree portfast edge default 
+!
+
+SW2,SW4:
+
+!
+int range Gi0/1-2
+ spanning-tree link-type shared
+!
 
 ----------------------------------------------------------------------------------------------------
 
 2.5 Spanning-Tree 
 
 ----------------------------------------------------------------------------------------------------
+
+SW1,SW2,SW3,SW4:
+
+!
+spanning-tree portfast edge bpduguard default 
+errdisable recovery cause bpduguard 
+errdisable recovery interval 30
+!
+
+SW3:
+
+!
+spanning-tree vlan 1-4094 priority 8192
+!
+int range gi0/1 - 2
+ spanning-tree guard root 
+!
+int Po23
+ spanning-tree guard root
+!
+int range gi1/1 - 2
+ spanning-tree guard root
+!
+
+SW2:
+
+!
+int gi0/1
+ spanning-tree cost 1
+!
+
+SW4:
+
+!
+int gi1/1 
+ spanning-tree cost 1
+!
 
 SW1:
 
@@ -197,6 +280,15 @@ interface range Gi1/1-2
  shut
 !
 
+SW4:
+
+!
+interface Gi1/0
+ shut
+!
+interface Gi0/3
+ shut
+!
 
 ----------------------------------------------------------------------------------------------------
 
@@ -204,12 +296,838 @@ interface range Gi1/1-2
 
 ----------------------------------------------------------------------------------------------------
 
+VIRL no acepta Po nivel 3, así que lo hacemos a nivel de interfaz solamente:
 
+SW1:
 
+!
+interface Gi1/1
+ no shut
+ no switchport
+ ip address 128.10.221.11 255.255.255.0
+ ipv6 address 2004:128:10:221::11/64
+!
 
+SW2:
+
+!
+interface Gi1/1
+ no shut
+ no switchport
+ ip address 128.10.221.22 255.255.255.0
+ ipv6 address 2004:128:10:221::22/64
+!
+
+Como toca:
+
+SW1:
+
+!
+interface Gi1/1
+ no shut
+ no switchport 
+ channel-group 12 mode desirable
+!
+interface Gi1/2
+ no shut
+ no switchport 
+ channel-group 12 mode desirable 
+!
+interface Po12
+ ip address 128.10.221.11 255.255.255.0
+ ipv6 address 2004:128:10:221::11/64
+!
+ 
+SW2:
+
+!
+interface Gi1/1
+ no shut
+ no switchport 
+ channel-group 12 mode desirable
+!
+interface Gi1/2
+ no shut
+ no switchport 
+ channel-group 12 mode desirable 
+!
+interface Po12
+ ip address 128.10.221.22 255.255.255.0
+ ipv6 address 2004:128:10:221::22/64
+!
 
 ----------------------------------------------------------------------------------------------------
 
 2.7 Layer 2 Security 
 
 ----------------------------------------------------------------------------------------------------
+
+SW1:
+
+!
+interface Gi1/3
+ switchport port-security
+ switchport port-security maximum 50 
+ switchport port-security maximum 1 vlan 233
+ switchport port-security maximum 1 vlan 234
+ switchport port-security violation restrict 
+!
+
+***************************************************************************************************
+
+DMVPN
+
+***************************************************************************************************
+
+3.1 DMVPN
+
+----------------------------------------------------------------------------------------------------
+
+R3:
+
+!
+interface Tunnel100
+ ip address 128.10.254.3 255.255.255.0
+ ip nhrp network-id 100
+ ip nhrp authentication !DMVPN!
+ ip nhrp holdtime 60
+ ip nhrp map multicast dynamic
+ tunnel source Gi0/1.100
+ tunnel key 100
+ tunnel mode gre multipoint
+ ip mtu 1400
+ ip tcp adjust-mss 1360
+!
+
+R1:
+
+!
+interface Tunnel100
+ ip address 128.10.254.1 255.255.255.0
+ ip nhrp network-id 100
+ ip nhrp authentication !DMVPN!
+ ip nhrp holdtime 60
+ ip nhrp nhs 128.10.254.3 nbma 128.10.100.3 multicast 
+ tunnel source Gi0/1.100
+ tunnel key 100
+ tunnel mode gre multipoint
+ ip mtu 1400
+ ip tcp adjust-mss 1360
+!
+
+R2:
+
+!
+interface Tunnel100
+ ip address 128.10.254.2 255.255.255.0
+ ip nhrp network-id 100
+ ip nhrp authentication !DMVPN!
+ ip nhrp holdtime 60
+ ip nhrp nhs 128.10.254.3 nbma 128.10.100.3 multicast 
+ tunnel source Gi0/1.100
+ tunnel key 100
+ tunnel mode gre multipoint
+ ip mtu 1400
+ ip tcp adjust-mss 1360
+!
+ 
+R7:
+
+!
+interface Tunnel100
+ ip address 128.10.254.7 255.255.255.0
+ ip nhrp network-id 100
+ ip nhrp authentication !DMVPN!
+ ip nhrp holdtime 60
+ ip nhrp nhs 128.10.254.3 nbma 128.10.100.3 multicast 
+ tunnel source Gi0/1.100
+ tunnel key 100
+ tunnel mode gre multipoint
+ ip mtu 1400
+ ip tcp adjust-mss 1360
+!
+
+***************************************************************************************************
+
+IGP
+
+***************************************************************************************************
+
+4.1 RIPv2
+
+----------------------------------------------------------------------------------------------------
+
+R1:
+
+!
+ip access-list standard 1 
+ permit host 9.9.9.9 
+!
+router rip 
+ version 2
+ no auto-summary
+ passive-interface default
+ no passive-interface Gi0/1.19
+ network 128.10.0.0 
+ network 1.0.0.0
+ offset-list 1 in 14 Gi0/1.19
+!
+int gi0/1.19
+ ip rip v2-broadcast 
+! 
+
+R9:
+
+!
+ip access-list standard 1 
+ permit 128.10.100.0 0.0.0.255
+!
+router rip 
+ version 2
+ passive-interface default
+ no passive-interface Gi0/1.19 
+ network 128.10.0.0 
+ network 9.0.0.0
+ offset-list 1 in 15
+ no auto-summary
+!
+int gi0/1.19
+ ip rip v2-broadcast 
+!
+
+----------------------------------------------------------------------------------------------------
+
+4.2 RIPv2 
+
+----------------------------------------------------------------------------------------------------
+
+R1:
+
+!
+router rip
+ bfd all-interfaces
+!
+interface GigabitEthernet0/1.19
+ bfd interval 250 min_rx 250 multiplier 3
+!
+
+R9:
+
+!
+router rip
+ bfd all-interfaces
+!
+interface GigabitEthernet0/1.19
+ bfd interval 250 min_rx 250 multiplier 3
+!
+
+----------------------------------------------------------------------------------------------------
+
+4.3 OSPF
+
+----------------------------------------------------------------------------------------------------
+
+R3 (Hub):
+
+!
+router ospf 1
+ router-id 3.3.3.3
+ area 1.2.3.7 authentication message-digest
+!
+interface Tunnel100
+ ip ospf 1 area 1.2.3.7 
+ ip ospf network point-to-multipoint
+ ip ospf hello-interval 10
+ ip ospf dead-interval 40
+ ip ospf message-digest-key 1 md5 0 OSPF_CCIE
+!
+
+
+R1:
+
+!
+router ospf 1
+ router-id 1.1.1.1
+ area 1.2.3.7 authentication message-digest
+!
+interface Tunnel100
+ ip ospf 1 area 1.2.3.7 
+ ip ospf message-digest-key 1 md5 0 OSPF_CCIE
+!
+
+R2:
+
+!
+router ospf 1
+ router-id 2.2.2.2
+ area 1.2.3.7 authentication message-digest
+!
+interface Tunnel100
+ ip ospf 1 area 1.2.3.7 
+ ip ospf message-digest-key 1 md5 0 OSPF_CCIE
+!
+
+R7:
+
+!
+router ospf 1
+ router-id 7.7.7.7
+ area 1.2.3.7 authentication message-digest
+!
+interface Tunnel100
+ ip ospf 1 area 1.2.3.7 
+ ip ospf message-digest-key 1 md5 0 OSPF_CCIE
+!
+
+R2:
+
+!
+interface Gi0/1.210
+ ip ospf 1 area 0.0.2.10
+ ip ospf network point-to-point
+! 
+
+R10:
+
+!
+interface Gi0/1.210
+ ip ospf 1 area 0.0.2.10
+ ip ospf network point-to-point
+! 
+router ospf 1
+ router-id 10.10.10.10
+!
+
+R1:
+
+!
+interface Gi0/1.16
+ ip ospf 1 area 0.0.1.6
+ ip ospf network point-to-point
+! 
+
+R6:
+
+!
+interface Gi0/1.16
+ ip ospf 1 area 0.0.1.6
+ ip ospf network point-to-point
+! 
+router ospf 1
+ router-id 6.6.6.6
+!
+
+----------------------------------------------------------------------------------------------------
+
+4.4 OSPF
+
+----------------------------------------------------------------------------------------------------
+
+R10:
+
+!
+interface Loopback0
+ ip ospf 1 area 0.0.2.10
+!
+
+R2:
+
+!
+interface Loopback0
+ ip ospf 1 area 0.0.0.0
+!
+
+R3:
+
+!
+interface Loopback0
+ ip ospf 1 area 0.0.0.0
+!
+
+R1,R7:
+
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+router ospf 1
+ redistribute connected subnets route-map RED-CONN metric-type 1
+!
+
+Virtual Link between R1 y R2:
+
+R1:
+
+!
+router ospf 1
+ area 1.2.3.7 virtual-link 3.3.3.3 
+ area 1.2.3.7 virtual-link 3.3.3.3 message-digest-key 1 md5 0 !BACK_BONE!
+ area 0 authentication message-digest 
+!
+ 
+R2:
+
+!
+router ospf 1
+ area 1.2.3.7 virtual-link 3.3.3.3
+ area 1.2.3.7 virtual-link 3.3.3.3 message-digest-key 1 md5 0 !BACK_BONE!
+ area 0 authentication message-digest 
+!
+
+R3:
+
+!
+router ospf 1
+ area 1.2.3.7 virtual-link 1.1.1.1
+ area 1.2.3.7 virtual-link 1.1.1.1 message-digest-key 1 md5 0 !BACK_BONE!
+ area 1.2.3.7 virtual-link 2.2.2.2 
+ area 1.2.3.7 virtual-link 2.2.2.2 message-digest-key 1 md5 0 !BACK_BONE!
+ area 0 authentication message-digest 
+!
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Script:
+
+tclsh
+
+foreach i {
+128.10.16.1
+128.10.254.1
+2.2.2.2
+128.10.254.2
+128.210.2
+3.3.3.3
+128.10.254.3
+128.10.254.7
+128.10.210.10
+10.10.10.10
+128.10.16.6
+} { ping $i } 
+
+----------------------------------------------------------------------------------------------------
+
+4.5 OSPFv3 for IPv4
+
+----------------------------------------------------------------------------------------------------
+
+R6:
+
+!
+interface loopback0
+ ospfv3 2 ipv4 area 67
+!
+interface gi0/1.67
+ ospfv3 2 ipv4 area 67
+ bfd interval 250 min_rx 250 multiplier 3
+!
+router ospfv3 2
+ router-id 63.63.63.63
+ bfd all-interfaces
+!
+ 
+R7:
+
+!
+interface gi0/1.67
+ ospfv3 2 ipv4 area 67
+ bfd interval 250 min_rx 250 multiplier 3
+!
+router ospfv3 2
+ router-id 73.73.73.73
+ bfd all-interfaces
+! 
+
+----------------------------------------------------------------------------------------------------
+
+4.6 EIGRP
+
+----------------------------------------------------------------------------------------------------
+
+R5:
+
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+router eigrp CCIE
+ address-family ipv4 unicast autonomous-system 123
+  eigrp router-id 5.5.5.5
+  network 128.10.55.0 0.0.0.255
+  network 128.10.123.0 0.0.0.255
+  neighbor 128.10.123.7 gigabitEthernet 0/1.123 
+  af-interface Gi0/1.55
+   passive-interface
+  af-interface Gi0/1.225
+   shutdown  
+  af-interface Gi0/1.123
+   summary-address 128.10.55.0/23 
+   authentication mode hmac-sha-256 0 !EIGRP_CCIE!
+  topology base
+   redistribute connected route-map RED-CONN
+!
+ 
+R7: 
+ 
+!
+router eigrp CCIE
+ address-family ipv4 unicast autonomous-system 123
+  eigrp router-id 7.7.7.7
+  network 128.10.123.0 0.0.0.255
+  neighbor 128.10.123.5 gigabitEthernet 0/1.123 
+  neighbor 128.10.123.8 gigabitEthernet 0/1.123 
+  af-interface Gi0/1.123
+   authentication mode hmac-sha-256 0 !EIGRP_CCIE!
+   no split-horizon
+  af-interface Gi0/1.100
+   shutdown  
+  af-interface Gi0/1.67
+   shutdown 
+! 
+ 
+R8: 
+ 
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+router eigrp CCIE
+ address-family ipv4 unicast autonomous-system 123
+  eigrp router-id 8.8.8.8
+  network 128.10.123.0 0.0.0.255
+  neighbor 128.10.123.7 gigabitEthernet 0/1.123 
+  af-interface Gi0/1.123
+   authentication mode hmac-sha-256 0 !EIGRP_CCIE!
+  topology base
+   redistribute connected route-map RED-CONN
+!
+ 
+----------------------------------------------------------------------------------------------------
+
+4.7 Redistribution
+
+----------------------------------------------------------------------------------------------------
+
+R1:
+
+!
+route-map RED-CONN permit 10
+ match interface Gi0/1.19   ! Añadido de lo que ya había
+!
+router rip
+ redistribute ospf 1 metric 3 
+!
+router ospf 1
+ redistribute rip subnets
+!
+
+R6:
+
+!
+router ospfv3 2
+ address-family ipv4 uni
+  redistribute ospf 1 
+!
+router ospf 1
+ redistribute ospfv3 2 subnets
+!
+
+R7:
+
+!
+ip access-list standard 10
+ permit host 5.5.5.5
+ permit host 7.7.7.7
+!
+
+!
+route-map RED-CONN-FOR-OSPFv3 permit 10
+ match interface Gi0/1.123 Loopback0 Tunnel100
+!
+
+!
+route-map RED-CONN permit 10
+ match interface Gi0/1.123 Gi0/1.67  ! Añadido de lo que ya había
+!
+route-map RED-CONN-FOR-EIGRP permit 10
+ match interface Gi0/1.67 Loopback0 Tunnel100
+!
+router eigrp CCIE
+ address-family ipv4 unicast autonomous-system 123
+  topology base
+   default-metric 10000 1000 255 1 1500  
+   redistribute ospf 1 
+   redistribute ospf 2
+   redistribute connected route-map RED-CONN-FOR-EIGRP
+!
+router ospf 1
+ redistribute eigrp 123 subnets
+ redistribute ospfv3 2 subnets
+ distance 200 255.255.255.255 0.0.0.0 10
+!
+router ospfv3 2
+ address-family ipv4 uni
+  redistribute eigrp 123
+  redistribute ospf 1
+  distance 200
+!
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Script:
+
+tclsh
+
+foreach i {
+128.10.16.1
+128.10.254.1
+2.2.2.2
+128.10.254.2
+128.210.2
+3.3.3.3
+128.10.254.3
+128.10.254.7
+128.10.210.10
+10.10.10.10
+128.10.16.6
+9.9.9.9
+128.10.19.1
+128.10.19.9
+1.1.1.1
+6.6.6.6
+7.7.7.7
+5.5.5.5
+8.8.8.8
+128.10.67.6
+128.10.67.7
+128.10.123.7
+128.10.123.8
+128.10.123.5
+} { ping $i } 
+
+***************************************************************************************************
+
+EGP
+
+***************************************************************************************************
+
+5.1 iBGP
+
+----------------------------------------------------------------------------------------------------
+
+R1:
+
+!
+interface Loopback99
+ ip address 128.10.99.1 255.255.255.255
+!
+route-map RED-LO99 permit 10
+ match int Loopback99
+!
+router bgp 65000.2525
+ bgp router-id 1.1.1.1
+ no bgp default ipv4-unicast
+ neighbor 128.10.254.3 remote-as 65000.2525
+ neighbor 128.10.254.3 update-source Tunnel100
+ !
+ address-family ipv4
+  neighbor 128.10.254.3 activate
+  redistribute connected route-map RED-LO99
+!
+
+R2:
+
+!
+interface Loopback99
+ ip address 128.10.99.2 255.255.255.255
+!
+route-map RED-LO99 permit 10
+ match int Loopback99
+!
+router bgp 65000.2525
+ bgp router-id 2.2.2.2
+ no bgp default ipv4-unicast
+ neighbor 128.10.254.3 remote-as 65000.2525
+ neighbor 128.10.254.3 update-source Tunnel100
+ !
+ address-family ipv4
+  neighbor 128.10.254.3 activate
+  redistribute connected route-map RED-LO99
+!
+
+R3:
+
+!
+interface Loopback99
+ ip address 128.10.99.3 255.255.255.255
+!
+route-map RED-LO99 permit 10
+ match int Loopback99
+!
+router bgp 65000.2525
+ bgp router-id 3.3.3.3
+ no bgp default ipv4-unicast
+ bgp listen range 128.10.254.0/24  peer-group IBGP 
+ neighbor IBGP peer-group 
+ neighbor IBGP remote-as 65000.2525 
+ neighbor IBGP update-source Tunnel100
+ neighbor 6.6.6.6 remote-as 65000.2525
+ neighbor 6.6.6.6 update-source Loopback0
+ !
+ address-family ipv4 unicast
+  neighbor IBGP activate
+  neighbor IBGP route-reflector-client
+  neighbor 6.6.6.6 activate
+  neighbor 6.6.6.6 route-reflector-client
+  redistribute connected route-map RED-LO99
+! 
+ 
+R5:
+
+!
+interface Loopback99
+ ip address 128.10.99.5 255.255.255.255
+!
+route-map RED-LO99 permit 10
+ match int Loopback99
+!
+router bgp 65000.2525
+ bgp router-id 5.5.5.5
+ no bgp default ipv4-unicast
+ neighbor 7.7.7.7 remote-as 65000.2525
+ neighbor 7.7.7.7 update-source Loopback0
+ !
+ address-family ipv4 unicast
+  neighbor 7.7.7.7 activate
+  redistribute connected route-map RED-LO99
+!  
+ 
+R6:
+
+!
+interface Loopback99
+ ip address 128.10.99.6 255.255.255.255
+!
+route-map RED-LO99 permit 10
+ match int Loopback99
+!
+router bgp 65000.2525
+ bgp router-id 6.6.6.6
+ bgp asnotation dot
+ no bgp default ipv4-unicast
+ neighbor 3.3.3.3 remote-as 65000.2525
+ neighbor 3.3.3.3 update-source Loopback0
+ !
+ address-family ipv4 unicast
+  neighbor 3.3.3.3 activate
+  redistribute connected route-map RED-LO99
+! 
+ 
+R7:
+
+!
+interface Loopback99
+ ip address 128.10.99.7 255.255.255.255
+!
+route-map RED-LO99 permit 10
+ match int Loopback99
+!
+router bgp 65000.2525
+ bgp router-id 7.7.7.7
+ no bgp default ipv4-unicast
+ neighbor 128.10.254.3 remote-as 65000.2525
+ neighbor 128.10.254.3 update-source Tunnel100
+ neighbor 5.5.5.5 remote-as 65000.2525
+ neighbor 5.5.5.5 update-source Loopback0 
+ !
+ address-family ipv4
+  neighbor 128.10.254.3 activate
+  neighbor 5.5.5.5 activate
+  neighbor 5.5.5.5 route-reflector-client  
+  redistribute connected route-map RED-LO99
+!
+
+ 
+----------------------------------------------------------------------------------------------------
+
+5.2 EBGP
+
+----------------------------------------------------------------------------------------------------
+
+R9:
+
+!
+interface Loopback99
+ ip address 128.10.99.9 255.255.255.255
+!
+route-map RED-LO99 permit 10
+ match int Loopback99 
+!
+router bgp 900
+ bgp router-id 9.9.9.9
+ no bgp default ipv4-unicast
+ neighbor 1.1.1.1 remote-as 65000.2525
+ neighbor 1.1.1.1 update-source Loopback0
+ neighbor 1.1.1.1 disable-connected-check
+ neighbor 1.1.1.1 password 0 !BGP_CCIE!
+ !
+ address-family ipv4 unicast 
+  neighbor 1.1.1.1 activate
+  redistribute connected route-map RED-LO99
+!
+  
+
+
+R1:
+
+!
+ip prefix-list Loopback-R9 seq 5 permit 128.10.99.9/32
+!
+ip prefix-list Loopback-R5 seq 5 permit 128.10.99.5/32
+!
+route-map COND-NET permit 10
+ match ip address prefix-list Loopback-R9
+!
+route-map LO-R5 permit 10
+ match ip address prefix-list Loopback-R5 
+!
+router bgp 65000.2525
+ no bgp asnotation dot
+ neighbor 9.9.9.9 remote-as 900
+ neighbor 9.9.9.9 update-source Loopback0
+ neighbor 9.9.9.9 disable-connected-check
+ neighbor 9.9.9.9 password 0 !BGP_CCIE!
+ !
+ address-family ipv4 unicast 
+  neighbor 9.9.9.9 activate
+  neighbor 128.10.254.3 advertise-map COND-NET exist-map LO-R5
+!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
