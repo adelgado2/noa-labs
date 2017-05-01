@@ -1,0 +1,215 @@
+***************************************************************************************************
+
+Troubleshooting
+
+***************************************************************************************************
+
+1.1 Faults
+
+----------------------------------------------------------------------------------------------------
+
+SW1:
+
+!
+no vlan filter vacl vlan-list 1-4094
+no vlan access-map vacl 10
+!
+
+***************************************************************************************************
+
+LAN Switching
+
+***************************************************************************************************
+
+2.1 Trunking
+
+----------------------------------------------------------------------------------------------------
+
+SW3:
+
+!
+interface range Gi0/1 - 2
+ switchport trunk encapsulation dot1q 
+ switchport mode dynamic desirable
+!
+interface range Gi1/1 - 2
+ switchport trunk encapsulation dot1q 
+ switchport mode dynamic desirable
+!
+
+SW1:
+
+!
+interface range Gi0/1 - 2
+ switchport trunk encapsulation dot1q 
+ switchport mode dynamic desirable
+!
+interface Gi1/3
+ switchport trunk encapsulation dot1q 
+ switchport mode trunk
+ switchport nonegotiate
+!
+
+SW4:
+
+!
+interface range Gi1/1 - 2
+ switchport trunk encapsulation dot1q 
+ switchport mode dynamic desirable
+!
+interface range Gi0/1 - 2
+ switchport trunk encapsulation dot1q 
+ switchport mode trunk
+!
+
+SW2:
+
+!
+interface range Gi0/1 - 2
+ switchport trunk encapsulation dot1q 
+ switchport mode trunk
+!
+
+https://supportforums.cisco.com/discussion/12476171/switch-port-modes
+
+----------------------------------------------------------------------------------------------------
+
+2.2 EtherChannel 
+
+----------------------------------------------------------------------------------------------------
+
+Nota: Pongo la config también en las interfaces físicas porque el VIRL es estúpido, no debería hacer falta.
+
+Y además como hagas default interface, no te olvides de volver a poner con el port en shut el media type rj45!! El VIRL es tonto como él sólo.
+
+!
+int gi0/0
+ shut
+! 
+
+SW3:
+
+!
+port-channel load-balance dst-ip 
+!
+interface Gi0/3
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 23 mode active 
+!
+interface Gi1/0
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 23 mode active
+!
+interface Port-channel23
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+
+SW2:
+
+!
+port-channel load-balance dst-ip 
+!
+interface Gi0/3
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 23 mode active
+!
+interface Gi1/0
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 23 mode active
+!
+interface Port-channel23
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+
+----------------------------------------------------------------------------------------------------
+
+2.3 VTP 
+
+----------------------------------------------------------------------------------------------------
+
+SW1,SW2,SW3,SW4:
+
+!
+vtp domain CCIE_VTP3
+vtp version 3
+!
+vtp password VTP3_PASS hidden
+!
+
+SW1,SW2,SW3:
+
+!
+vtp mode client
+!
+
+SW4:
+
+!
+vtp mode server
+!
+! Fuera conf t
+!
+vtp primary
+!
+conf t
+!
+vlan 216,225,233,234
+!
+vtp mode client  ! OJO
+!
+
+----------------------------------------------------------------------------------------------------
+
+2.4 Spanning-Tree 
+
+----------------------------------------------------------------------------------------------------
+
+
+----------------------------------------------------------------------------------------------------
+
+2.5 Spanning-Tree 
+
+----------------------------------------------------------------------------------------------------
+
+SW1:
+
+!
+interface Gi1/0
+ shut
+!
+interface Gi0/3
+ shut
+!
+interface range Gi1/1-2
+ shut
+!
+
+SW2:
+
+!
+interface range Gi1/1-2
+ shut
+!
+
+
+----------------------------------------------------------------------------------------------------
+
+2.6 Layer 3 EtherChannel
+
+----------------------------------------------------------------------------------------------------
+
+
+
+
+
+----------------------------------------------------------------------------------------------------
+
+2.7 Layer 2 Security 
+
+----------------------------------------------------------------------------------------------------
