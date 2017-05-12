@@ -1,0 +1,5 @@
+version 15
+line con 0
+ logging synchronous
+ no login
+ 

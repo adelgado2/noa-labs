@@ -1,0 +1,222 @@
+!
+! Last configuration change at 17:43:57 UTC Thu May 4 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R2
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+vrf definition VPN_CCIE
+ rd 65066:200
+ !
+ address-family ipv4
+  route-target export 100:100
+  route-target import 100:100
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+mpls tp
+ no router-id
+multilink bundle-name authenticated
+!
+!
+!
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$9H4L$UfimLXQ4lSPzrWHodspQL/
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.2 255.255.255.255
+ ip ospf 100 area 0
+ ipv6 address ::192:122:3:2/128
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.12
+ encapsulation dot1Q 12
+ ip address 10.0.12.2 255.255.255.252
+ ip pim sparse-mode
+ ip ospf 100 area 10
+ ipv6 address 2001:10:0:12::2/126
+ no shutdown
+!
+interface GigabitEthernet1.23
+ encapsulation dot1Q 23
+ ip address 10.0.23.1 255.255.255.252
+ ip pim sparse-mode
+ ipv6 address 2001:10:0:23::1/126
+ no shutdown
+!
+interface GigabitEthernet1.24
+ encapsulation dot1Q 24
+ ip address 10.0.24.1 255.255.255.252
+ ip pim sparse-mode
+ ip ospf network non-broadcast
+ ip ospf dead-interval 40
+ ip ospf hello-interval 10
+ ip ospf 100 area 30
+ ipv6 address 2001:10:0:24::1/126
+ no shutdown
+!
+interface GigabitEthernet1.210
+ encapsulation dot1Q 210
+ vrf forwarding VPN_CCIE
+ ip address 202.4.210.2 255.255.255.0
+ ipv6 address 2001:202:4:210::2/64
+ no shutdown
+!
+interface GigabitEthernet1.216
+ encapsulation dot1Q 216
+ ip address 202.4.216.2 255.255.255.192
+ ip pim sparse-mode
+ ip ospf 100 area 121
+ ipv6 address 2001:202:4:216::2/64
+ no shutdown
+!
+interface GigabitEthernet2
+ ip address 192.168.1.2 255.255.255.0
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+router ospf 100
+ router-id 192.122.3.2
+ area 30 virtual-link 192.122.3.4
+ area 121 nssa default-information-originate nssa-only
+ redistribute connected subnets route-map RED-CONN-TO-OSPF
+ neighbor 10.0.24.2
+ mpls ldp autoconfig
+!
+router bgp 65006
+ bgp router-id 192.122.3.2
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 192.122.3.4 remote-as 65006
+ neighbor 192.122.3.4 password md5 0 CC!E_!nE
+ neighbor 192.122.3.4 update-source Loopback0
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family vpnv4
+  neighbor 192.122.3.4 activate
+  neighbor 192.122.3.4 send-community extended
+ exit-address-family
+ !
+ address-family ipv4 vrf VPN_CCIE
+  neighbor 202.4.210.10 remote-as 65100
+  neighbor 202.4.210.10 activate
+ exit-address-family
+!
+!
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+route-map RED-CONN-TO-OSPF permit 10
+ match interface GigabitEthernet1.23
+ set metric 1000
+ set metric-type type-1
+!
+mpls ldp router-id Loopback0 force
+!
+control-plane host
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line vty 0 4
+ exec-timeout 0 0
+ privilege level 15
+ no login
+line vty 11 15
+ exec-timeout 0 0
+ login
+!
+!
+end

@@ -1,0 +1,29 @@
+!! IOS XR Configuration 5.2.0
+!! Last configuration change at Sun May  7 08:12:42 2017 by cisco
+!
+hostname XR4
+telnet vrf MGMT_DO_NOT_CHANGE ipv4 server max-servers 50
+cdp
+vrf MGMT_DO_NOT_CHANGE
+ address-family ipv4 unicast
+ !
+!
+line console
+ exec-timeout 0 0
+!
+line default
+ exec-timeout 15 0
+ transport input telnet
+!
+interface Loopback0
+ ipv4 address 24.24.24.24 255.255.255.255
+ no shutdown
+!
+!
+interface GigabitEthernet0/0/0/0
+ shutdown
+!
+interface GigabitEthernet0/0/0/1
+ shutdown
+!
+end

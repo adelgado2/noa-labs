@@ -1,0 +1,100 @@
+! tsrack99, r17, 2014-09-22 11:22:42
+do undebug all
+no logging console
+no service config
+no ip domain-lookup
+!
+version 12.4
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R17
+!
+boot-start-marker
+boot-end-marker
+!
+no logging console
+!
+no aaa new-model
+dot11 syslog
+ip cef
+!
+no ip domain lookup
+!
+multilink bundle-name authenticated
+!
+username R16 password 0 CISCO
+archive
+ log config
+  hidekeys
+!
+class-map match-all 1274
+ match access-group 145
+!
+policy-map 1285
+ class 1274
+    police 8000
+!
+interface FastEthernet0/0
+ no shutdown
+ ip address 10.17.27.17 255.255.255.0
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/1
+ no shutdown
+ no ip address
+ duplex auto
+ speed auto
+ pppoe enable group global
+ pppoe-client dial-pool-number 1
+!
+interface Dialer1
+ ip address negotiated
+ ip mtu 1492
+ encapsulation ppp
+ dialer pool 1
+ dialer idle-timeout 0
+ dialer persistent
+!
+router bgp 65222
+ no synchronization
+ bgp log-neighbor-changes
+ network 10.17.27.0 mask 255.255.255.0
+ network 172.16.101.0 mask 255.255.255.224
+ neighbor 10.17.27.27 remote-as 65100
+ neighbor 172.16.101.16 remote-as 65222
+ neighbor 172.16.101.16 next-hop-self
+ no auto-summary
+!
+ip forward-protocol nd
+!
+ip http server
+no ip http secure-server
+!
+access-list 145 permit icmp any any
+!
+tftp-server flash:c1841-adventerprisek9-mz.124-15.T17.bin
+!
+control-plane
+ service-policy input 1285
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous level 0 limit 20
+line aux 0
+line vty 0 4
+ privilege level 15
+ no login
+!
+scheduler allocate 20000 1000
+!
+service password-recovery
+!
+do show ip interface brief
+!
+!
+end

@@ -1,0 +1,290 @@
+!
+! Last configuration change at 17:40:32 UTC Sat May 6 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R4
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+mpls ldp password required for 12
+mpls ldp neighbor 192.122.3.6 password CC!E_!nE
+no mpls ldp advertise-labels
+mpls ldp advertise-labels for 10
+multilink bundle-name authenticated
+!
+!
+!
+!
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$wfh3$AazCRt8jkpiWa3xmiutoK0
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+!
+class-map match-all PIM
+ match access-group name PIM
+!
+policy-map MULTICAST-SHAPE
+ class PIM
+  police 256000
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.4 255.255.255.255
+ ip pim sparse-mode
+ ip ospf 100 area 0
+ ipv6 address ::192:122:3:4/128
+ ipv6 rip CCIE enable
+ no shutdown
+!
+interface Loopback100
+ ip address 192.122.3.100 255.255.255.255
+ ip pim sparse-mode
+ ip ospf 100 area 0
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.14
+ encapsulation dot1Q 14
+ ip address 10.0.14.2 255.255.255.252
+ ip pim sparse-mode
+ ipv6 address 2001:10:0:14::2/126
+ no shutdown
+!
+interface GigabitEthernet1.24
+ encapsulation dot1Q 24
+ ip address 10.0.24.2 255.255.255.252
+ ip pim sparse-mode
+ ip ospf network non-broadcast
+ ip ospf dead-interval 40
+ ip ospf hello-interval 10
+ ip ospf 100 area 30
+ ipv6 address 2001:10:0:24::2/126
+ no shutdown
+!
+interface GigabitEthernet1.34
+ encapsulation dot1Q 34
+ ip address 10.0.34.2 255.255.255.252
+ ip pim sparse-mode
+ ip ospf 100 area 0
+ ipv6 address 2001:10:0:34::2/126
+ ipv6 rip CCIE enable
+ no shutdown
+!
+interface GigabitEthernet1.45
+ encapsulation dot1Q 45
+ ip address 10.0.45.1 255.255.255.252
+ ip pim sparse-mode
+ ipv6 address 2001:10:0:45::1/126
+ ipv6 rip CCIE enable
+ mpls ip
+ no shutdown
+!
+interface GigabitEthernet1.46
+ encapsulation dot1Q 46
+ ip address 10.0.46.1 255.255.255.252
+ ip pim sparse-mode
+ ip rip v2-broadcast
+ ipv6 address 2001:10:0:46::1/126
+ ipv6 rip CCIE enable
+ mpls ip
+ no shutdown
+!
+interface GigabitEthernet2
+ ip address 192.168.1.4 255.255.255.0
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+router ospf 100
+ router-id 192.122.3.4
+ fast-reroute per-prefix enable prefix-priority low
+ area 30 virtual-link 192.122.3.2
+ redistribute connected subnets route-map RED-CONN-TO-OSPF
+ redistribute rip subnets route-map RED-RIP-TO-OSPF
+ neighbor 10.0.24.1
+ distribute-list route-map BLOCK_RIP_ROUTES_IN in
+ mpls ldp autoconfig
+!
+router rip
+ version 2
+ redistribute ospf 100 metric 3 route-map RED-OSPF-TO-RIP
+ passive-interface default
+ no passive-interface GigabitEthernet1.45
+ no passive-interface GigabitEthernet1.46
+ network 10.0.0.0
+ no auto-summary
+!
+router bgp 65006
+ bgp router-id 192.122.3.4
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor IBGP peer-group
+ neighbor IBGP remote-as 65006
+ neighbor IBGP password md5 0 CC!E_!nE
+ neighbor IBGP update-source Loopback0
+ neighbor ::192:122:3:6 remote-as 65006
+ neighbor ::192:122:3:6 update-source Loopback0
+ neighbor 192.122.3.2 peer-group IBGP
+ neighbor 192.122.3.7 peer-group IBGP
+ neighbor 192.122.3.8 peer-group IBGP
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family vpnv4
+  neighbor IBGP send-community extended
+  neighbor IBGP route-reflector-client
+  neighbor 192.122.3.2 activate
+  neighbor 192.122.3.7 activate
+  neighbor 192.122.3.8 activate
+ exit-address-family
+ !
+ address-family ipv6
+  neighbor ::192:122:3:6 activate
+ exit-address-family
+!
+!
+!
+ip forward-protocol nd
+no ip forward-protocol udp domain
+!
+ip pim rp-candidate Loopback100
+ip msdp peer 192.122.3.3 connect-source Loopback0
+ip msdp cache-sa-state
+ip msdp originator-id Loopback0
+no ip http server
+ip http secure-server
+!
+ip access-list extended PIM
+ permit pim any any
+!
+access-list 10 permit 192.122.3.8
+access-list 10 permit 192.122.3.2
+access-list 10 permit 192.122.3.7
+access-list 10 permit 192.122.3.6
+access-list 10 deny   any
+access-list 12 permit 192.122.3.6
+access-list 12 deny   any
+ipv6 router rip CCIE
+!
+!
+route-map RED-OSPF-TO-RIP deny 10
+ match tag 190
+!
+route-map RED-OSPF-TO-RIP permit 20
+!
+route-map RED-RIP-TO-OSPF deny 10
+ match tag 590
+!
+route-map RED-RIP-TO-OSPF permit 20
+ set tag 440
+!
+route-map BLOCK_RIP_ROUTES_IN deny 10
+ match tag 330
+!
+route-map BLOCK_RIP_ROUTES_IN permit 20
+!
+route-map RED-CONN-TO-OSPF permit 10
+ match interface GigabitEthernet1.14
+ set metric 1000
+ set metric-type type-1
+!
+route-map RED-CONN-TO-OSPF permit 20
+ match interface GigabitEthernet1.45 GigabitEthernet1.46
+ set tag 440
+!
+mpls ldp router-id Loopback0 force
+!
+!
+control-plane
+ service-policy input MULTICAST-SHAPE
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line vty 0 4
+ exec-timeout 0 0
+ no login
+line vty 11 15
+ exec-timeout 0 0
+ no login
+!
+!
+end

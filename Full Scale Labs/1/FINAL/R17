@@ -1,0 +1,180 @@
+!
+! Last configuration change at 16:38:17 UTC Sat May 6 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R17
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$ArPL$WcQ3Rb1JjpEohKcboGII5/
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+!
+!
+!
+!
+!
+!
+crypto isakmp policy 10
+ encr aes 192
+ hash sha256
+ authentication pre-share
+ group 5
+crypto isakmp key DmvPn!23 address 89.211.116.16
+crypto isakmp key DmvPn!23 address 202.4.180.0
+!
+!
+crypto ipsec transform-set TRANF esp-3des esp-sha-hmac
+ mode transport
+!
+crypto ipsec profile DMVPN-PROFILE
+ set transform-set TRANF
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.17 255.255.255.255
+ ipv6 address ::192:122:3:17/128
+ no shutdown
+!
+interface Tunnel100
+ ip address 172.100.123.17 255.255.255.0
+ no ip redirects
+ ip mtu 1400
+ ip nhrp authentication NHRPKEY
+ ip nhrp network-id 100
+ ip nhrp nhs 172.100.123.18 nbma 202.4.180.0 multicast
+ ip nhrp shortcut
+ ip tcp adjust-mss 1360
+ tunnel source GigabitEthernet1.117
+ tunnel mode gre multipoint
+ tunnel protection ipsec profile DMVPN-PROFILE
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.117
+ encapsulation dot1Q 117
+ ip address 89.211.117.17 255.255.255.128
+ ip pim sparse-mode
+ ipv6 address 2001:89:211:117::17/125
+ no shutdown
+!
+interface GigabitEthernet1.170
+ encapsulation dot1Q 170
+ ip address 172.25.170.17 255.255.255.0
+ ipv6 address 2001:172:25:170::17/64
+ no shutdown
+!
+interface GigabitEthernet2
+ ip address 192.168.1.17 255.255.255.0
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+!
+router eigrp 123
+ network 172.25.170.17 0.0.0.0
+ network 172.100.123.17 0.0.0.0
+ network 192.122.3.17 0.0.0.0
+ passive-interface Loopback0
+ eigrp router-id 17.17.17.17
+ eigrp stub connected
+!
+!
+!
+ip forward-protocol nd
+!
+no ip http server
+ip http secure-server
+ip route 0.0.0.0 0.0.0.0 89.211.117.1
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ length 0
+ stopbits 1
+line vty 0 4
+ no login
+line vty 11 98
+ no login
+!
+!
+end

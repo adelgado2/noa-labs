@@ -1,0 +1,227 @@
+!
+! Last configuration change at 17:43:59 UTC Thu May 4 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R8
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+vrf definition VPN_CCIE
+ rd 65066:800
+ !
+ address-family ipv4
+  route-target export 100:100
+  route-target import 100:100
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$G5Qe$sRxaEA1nsfl/CvdVPsY3r.
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.8 255.255.255.255
+ ipv6 address ::192:122:3:6/128
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.18
+ encapsulation dot1Q 18
+ ip address 136.5.18.8 255.255.255.0
+ ip pim sparse-mode
+ ipv6 address 2001:136:5:18::8/64
+ mpls ip
+ no shutdown
+!
+interface GigabitEthernet1.58
+ encapsulation dot1Q 58
+ ip address 136.6.58.8 255.255.255.0
+ ip pim sparse-mode
+ ipv6 address 2001:136:6:58::8/64
+ mpls ip
+ no shutdown
+!
+interface GigabitEthernet1.78
+ encapsulation dot1Q 78
+ ip address 172.30.78.8 255.255.255.224
+ ip pim sparse-mode
+ ipv6 address 2001:172:30:78::8/120
+ mpls ip
+ no shutdown
+!
+interface GigabitEthernet1.89
+ encapsulation dot1Q 89
+ vrf forwarding VPN_CCIE
+ ip address 172.30.89.8 255.255.255.224
+ ipv6 address 2001:172:30:89::8/120
+ no shutdown
+!
+interface GigabitEthernet2
+ ip address 192.168.1.8 255.255.255.0
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+!
+router eigrp CCIE
+ !
+ address-family ipv4 unicast autonomous-system 56
+  !
+  af-interface default
+   shutdown
+   authentication mode hmac-sha-256 CC!E_!nE
+  exit-af-interface
+  !
+  af-interface Loopback0
+   no shutdown
+  exit-af-interface
+  !
+  af-interface GigabitEthernet1.58
+   no shutdown
+  exit-af-interface
+  !
+  af-interface GigabitEthernet1.78
+   no shutdown
+  exit-af-interface
+  !
+  af-interface GigabitEthernet1.18
+   no shutdown
+  exit-af-interface
+  !
+  topology base
+   metric maximum-hops 10
+  exit-af-topology
+  network 136.5.0.0
+  network 136.6.0.0
+  network 172.30.0.0
+  network 192.122.3.0
+  metric weights 0 0 0 1 0 0 0
+  eigrp router-id 192.122.3.8
+ exit-address-family
+!
+router bgp 65006
+ bgp router-id 192.122.3.8
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 192.122.3.4 remote-as 65006
+ neighbor 192.122.3.4 password md5 0 CC!E_!nE
+ neighbor 192.122.3.4 update-source Loopback0
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family vpnv4
+  neighbor 192.122.3.4 activate
+  neighbor 192.122.3.4 send-community extended
+ exit-address-family
+ !
+ address-family ipv4 vrf VPN_CCIE
+  neighbor 172.30.89.9 remote-as 65100
+  neighbor 172.30.89.9 activate
+ exit-address-family
+!
+!
+!
+ip forward-protocol nd
+!
+no ip http server
+ip http secure-server
+!
+!
+mpls ldp router-id Loopback0 force
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line vty 0 4
+ no login
+!
+!
+end

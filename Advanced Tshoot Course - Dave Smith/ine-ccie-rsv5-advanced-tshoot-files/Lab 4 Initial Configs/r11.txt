@@ -1,0 +1,97 @@
+! tsrack99, r11, 2014-09-16 21:17:13
+do undebug all
+no logging console
+no service config
+no ip domain-lookup
+!
+version 12.4
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R11
+!
+boot-start-marker
+boot-end-marker
+!
+no logging console
+!
+no aaa new-model
+dot11 syslog
+ip cef
+!
+no ip domain lookup
+ip multicast-routing
+!
+multilink bundle-name authenticated
+!
+archive
+ log config
+  hidekeys
+!
+interface FastEthernet0/0
+ no shutdown
+ ip address 10.11.3.11 255.255.255.128
+ ip pim bsr-border
+ ip pim sparse-mode
+ ip nat inside
+ ip nat enable
+ ip virtual-reassembly
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/1
+ no shutdown
+ ip address 192.168.179.34 255.255.255.248
+ ip pim sparse-mode
+ ip nat outside
+ ip nat enable
+ ip virtual-reassembly
+ duplex auto
+ speed auto
+ ntp multicast client
+!
+interface Serial0/0/0
+ no shutdown
+ no ip address
+ no fair-queue
+!
+router eigrp 179
+ network 192.168.179.0
+ no auto-summary
+!
+router bgp 65179
+ no synchronization
+ bgp log-neighbor-changes
+ neighbor 10.11.3.3 remote-as 65034
+ neighbor 192.168.179.33 remote-as 65179
+ neighbor 192.168.179.33 next-hop-self
+ no auto-summary
+!
+ip forward-protocol nd
+!
+ip http server
+no ip http secure-server
+ip nat outside source static tcp 192.168.179.41 23 192.168.179.42 23 extendable
+ip nat outside source static tcp 192.168.179.42 23 192.168.179.41 23 extendable
+!
+control-plane
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous level 0 limit 20
+line aux 0
+line vty 0 4
+ privilege level 15
+ no login
+!
+scheduler allocate 20000 1000
+!
+service password-recovery
+!
+do show ip interface brief
+!
+!
+end

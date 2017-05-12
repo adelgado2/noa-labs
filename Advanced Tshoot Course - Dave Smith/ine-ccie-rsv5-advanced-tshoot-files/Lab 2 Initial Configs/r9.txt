@@ -1,0 +1,83 @@
+! tsrack99, r9, 2014-09-15 12:17:21
+do undebug all
+no logging console
+no service config
+no ip domain-lookup
+!
+version 12.4
+no service pad
+no service timestamps debug uptime
+no service timestamps log uptime
+no service password-encryption
+!
+hostname Rack1R9
+!
+boot-start-marker
+boot-end-marker
+!
+logging buffered 4096
+no logging console
+enable secret 5 $1$8LaD$lmClbj90vQlwLPOEk8aEV/
+!
+no aaa new-model
+dot11 syslog
+ip cef
+!
+no ip domain lookup
+!
+multilink bundle-name authenticated
+!
+archive
+ log config
+  hidekeys
+!
+ip tcp synwait-time 5
+!
+interface Loopback0
+ ip address 10.1.1.9 255.255.255.255
+!
+interface Loopback1
+ ip address 9.9.9.9 255.255.255.255
+!
+interface FastEthernet0/0
+ no shutdown
+ ip address 192.168.179.19 255.255.255.248
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/1
+ no shutdown
+ ip address 192.168.179.9 255.255.255.248
+ duplex auto
+ speed auto
+!
+router eigrp 179
+ network 10.0.0.0
+ network 192.168.179.0
+ no auto-summary
+ eigrp router-id 0.0.0.9
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+control-plane
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous level 0 limit 20
+line aux 0
+line vty 0 4
+ password cisco
+ login
+!
+scheduler allocate 20000 1000
+!
+service password-recovery
+!
+do show ip interface brief
+!
+!
+end

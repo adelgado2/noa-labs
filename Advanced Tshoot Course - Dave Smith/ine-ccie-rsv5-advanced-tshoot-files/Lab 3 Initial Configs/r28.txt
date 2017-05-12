@@ -1,0 +1,131 @@
+! tsrack99, r28, 2014-09-22 11:22:43
+do undebug all
+no logging console
+no service config
+no ip domain-lookup
+!
+version 12.4
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R28
+!
+boot-start-marker
+boot-end-marker
+!
+no logging console
+!
+no aaa new-model
+dot11 syslog
+!
+ip cef
+!
+no ip domain lookup
+!
+multilink bundle-name authenticated
+!
+voice-card 0
+ no dspfarm
+!
+archive
+ log config
+  hidekeys
+!
+crypto isakmp policy 10
+ encr aes
+ authentication pre-share
+ group 5
+crypto isakmp key CISCO address 0.0.0.0 0.0.0.0
+!
+crypto ipsec transform-set ESP-AES-SHA esp-aes esp-sha-hmac
+!
+crypto ipsec profile IPSEC_DMVPN
+ set transform-set ESP-AES-SHA
+!
+interface Tunnel0
+ ip address 172.17.2.28 255.255.255.240
+ no ip redirects
+ ip nhrp map 172.17.2.18 204.186.88.18
+ ip nhrp map multicast 204.186.88.18
+ ip nhrp network-id 99
+ ip nhrp nhs 172.17.2.18
+ ip ospf network point-to-multipoint
+ tunnel source Serial1/0
+ tunnel mode gre multipoint
+ tunnel key 100000
+ tunnel protection ipsec profile IPSEC_DMVPN
+!
+interface FastEthernet0/0
+ no shutdown
+ ip address 172.17.3.28 255.255.255.224
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/1
+ no shutdown
+ no ip address
+ duplex auto
+ speed auto
+!
+interface Serial1/0
+ no shutdown
+ ip address 204.186.88.28 255.255.255.0
+ encapsulation ppp
+ ip ospf 123 area 0
+ no fair-queue
+ clock rate 64000
+!
+interface Serial1/1
+ no shutdown
+ ip address 204.186.89.28 255.255.255.0
+ encapsulation ppp
+ ip ospf 123 area 0
+ clock rate 64000
+!
+interface Serial1/2
+ no shutdown
+ no ip address
+ clock rate 64000
+!
+interface Serial1/3
+ no shutdown
+ no ip address
+ clock rate 64000
+!
+router ospf 123
+ log-adjacency-changes
+!
+router ospf 65100
+ router-id 172.17.3.28
+ log-adjacency-changes
+ area 20 virtual-link 172.17.3.20
+ network 172.17.2.16 0.0.0.15 area 0
+ network 172.17.3.0 0.0.0.31 area 20
+!
+ip forward-protocol nd
+!
+ip http server
+no ip http secure-server
+!
+control-plane
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous level 0 limit 20
+line aux 0
+line vty 0 4
+ privilege level 15
+ no login
+!
+scheduler allocate 20000 1000
+!
+!
+service password-recovery
+!
+do show ip interface brief
+!
+!
+end

@@ -1,0 +1,206 @@
+!
+! Last configuration change at 16:32:29 UTC Tue May 9 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R6
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+key chain KEY
+ key 1
+   key-string CISCO
+   cryptographic-algorithm hmac-sha-512
+!
+!
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 10.255.255.6 255.255.255.255
+ ipv6 address 2001:10:255:255::6/128
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv6 area 0
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.26
+ encapsulation dot1Q 26
+ ip address 10.255.8.2 255.255.255.252
+ ipv6 enable
+ mpls ip
+ ospfv3 network point-to-point
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv6 area 0
+ bfd interval 250 min_rx 250 multiplier 3
+ no shutdown
+!
+interface GigabitEthernet1.36
+ encapsulation dot1Q 36
+ ip address 10.255.11.2 255.255.255.252
+ ipv6 enable
+ mpls ip
+ ospfv3 network point-to-point
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv6 area 0
+ bfd interval 250 min_rx 250 multiplier 3
+ no shutdown
+!
+interface GigabitEthernet1.56
+ encapsulation dot1Q 56
+ ip address 10.255.10.2 255.255.255.252
+ ipv6 enable
+ mpls ip
+ ospfv3 network point-to-point
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv6 area 0
+ bfd interval 250 min_rx 250 multiplier 3
+ no shutdown
+!
+interface GigabitEthernet1.60
+ encapsulation dot1Q 60
+ ip address 169.254.60.0 255.255.255.254
+ ipv6 address 2001:169:254:60::/127
+ no shutdown
+!
+interface GigabitEthernet2
+ no ip address
+ negotiation auto
+ shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+router ospfv3 1
+ router-id 10.255.255.6
+ prefix-suppression
+ bfd all-interfaces
+ area 0 authentication key-chain KEY
+ !
+ address-family ipv4 unicast
+  passive-interface Loopback0
+ exit-address-family
+ !
+ address-family ipv6 unicast
+  passive-interface Loopback0
+ exit-address-family
+!
+router bgp 1.20000
+ bgp asnotation dot
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 10.255.255.4 remote-as 1.20000
+ neighbor 10.255.255.4 update-source Loopback0
+ neighbor 2001:10:255:255::4 remote-as 1.20000
+ neighbor 2001:10:255:255::4 update-source Loopback0
+ neighbor 2001:169:254:60::1 remote-as 30000
+ neighbor 169.254.60.1 remote-as 30000
+ !
+ address-family ipv4
+  neighbor 10.255.255.4 activate
+  neighbor 10.255.255.4 next-hop-self
+  neighbor 169.254.60.1 activate
+ exit-address-family
+ !
+ address-family ipv6
+  neighbor 2001:10:255:255::4 activate
+  neighbor 2001:169:254:60::1 activate
+ exit-address-family
+!
+!
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+mpls ldp router-id Loopback0 force
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line vty 0 4
+ privilege level 15
+ no login
+!
+!
+end

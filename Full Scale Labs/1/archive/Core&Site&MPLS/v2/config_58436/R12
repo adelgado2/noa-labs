@@ -1,0 +1,177 @@
+!
+! Last configuration change at 19:00:42 UTC Thu May 4 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R12
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$9ENY$vc5a.2M1dA2P.3pYLIbxI1
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+!
+!
+!
+!
+!
+!
+!
+no crypto ipsec transform-set default
+!
+no crypto ipsec profile default
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.12 255.255.255.255
+ ipv6 address ::192:122:3:12/128
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.102
+ encapsulation dot1Q 102
+ ip address 172.19.102.12 255.255.255.128
+ ipv6 address 2001:172:19:102::12/64
+ bfd interval 150 min_rx 150 multiplier 3
+ no shutdown
+!
+interface GigabitEthernet1.124
+ encapsulation dot1Q 124
+ ip address 172.19.124.12 255.255.255.128
+ ipv6 address 2001:172:19:124::12/64
+ ospfv3 5 ipv4 area 5
+ no shutdown
+!
+interface GigabitEthernet2
+ ip address 192.168.1.12 255.255.255.0
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+!
+router eigrp CCIE
+ !
+ address-family ipv4 unicast autonomous-system 789
+  !
+  af-interface default
+   bfd
+  exit-af-interface
+  !
+  af-interface GigabitEthernet1.124
+   shutdown
+  exit-af-interface
+  !
+  topology base
+   default-metric 10000 1000 255 1 1500
+   redistribute ospfv3 5
+  exit-af-topology
+  network 172.19.0.0
+  network 192.122.3.0
+  eigrp router-id 192.122.3.12
+ exit-address-family
+!
+router ospfv3 5
+ router-id 192.122.3.12
+ !
+ address-family ipv4 unicast
+  summary-prefix 172.30.0.0/16
+  summary-prefix 192.122.3.8/31
+  redistribute eigrp 789
+ exit-address-family
+!
+!
+!
+ip forward-protocol nd
+!
+no ip http server
+ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line vty 0 4
+ exec-timeout 0 0
+ no login
+line vty 11 15
+ exec-timeout 0 0
+ no login
+!
+!
+end

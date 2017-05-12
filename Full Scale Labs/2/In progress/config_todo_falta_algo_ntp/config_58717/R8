@@ -1,0 +1,171 @@
+!
+! Last configuration change at 18:53:40 UTC Tue May 9 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R8
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 10.255.255.8 255.255.255.255
+ ip ospf 2 area 0
+ ipv6 address 2001:10:255:255::8/128
+ no shutdown
+!
+interface Tunnel89
+ ip unnumbered GigabitEthernet1.28
+ ip pim sparse-mode
+ tunnel source Loopback0
+ tunnel destination 10.255.255.9
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.28
+ encapsulation dot1Q 28
+ ip address 172.31.28.8 255.255.255.0
+ ip ospf 2 area 0
+ ipv6 address 2001:172:31:28::8/64
+ no shutdown
+!
+interface GigabitEthernet1.78
+ encapsulation dot1Q 78
+ ip address 172.31.78.8 255.255.255.0
+ ip ospf 2 area 0
+ ipv6 address 2001:172:31:78::8/64
+ no shutdown
+!
+interface GigabitEthernet1.228
+ encapsulation dot1Q 228
+ ip address 172.31.228.8 255.255.255.0
+ ip pim sparse-mode
+ ip ospf 2 area 0
+ no shutdown
+!
+interface GigabitEthernet2
+ no ip address
+ negotiation auto
+ shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+router ospf 2
+ router-id 10.255.255.8
+!
+!
+!
+ip forward-protocol nd
+!
+ip pim autorp listener
+ip mroute 0.0.0.0 0.0.0.0 Tunnel89
+no ip http server
+no ip http secure-server
+!
+access-list 11 permit 10.255.255.9
+access-list 11 permit 10.255.255.13
+access-list 12 permit 10.255.255.7
+access-list 12 permit 10.255.255.22
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line vty 0 4
+ no login
+line vty 11 98
+ no login
+!
+ntp authentication-key 1 md5 0525323F0A1F77 7
+ntp trusted-key 1
+ntp source Loopback0
+ntp access-group peer 11
+ntp access-group serve 12
+ntp master 3
+ntp peer 10.255.255.9
+ntp peer 10.255.255.13
+!
+end

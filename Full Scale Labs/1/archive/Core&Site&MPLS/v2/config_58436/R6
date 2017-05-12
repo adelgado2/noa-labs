@@ -1,0 +1,181 @@
+!
+! Last configuration change at 17:43:54 UTC Thu May 4 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R6
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+mpls ldp password required
+mpls ldp neighbor 192.122.3.5 password CC!E_!nE
+mpls ldp neighbor 192.122.3.3 password CC!E_!nE
+mpls ldp neighbor 192.122.3.4 password CC!E_!nE
+multilink bundle-name authenticated
+!
+!
+!
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$eF1d$RtoVvxulLL30InAq01r0F1
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.6 255.255.255.255
+ ipv6 address ::192:122:3:6/128
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.36
+ encapsulation dot1Q 36
+ ip address 10.0.36.2 255.255.255.252
+ ip pim sparse-mode
+ ipv6 address 2001:10:0:36::2/126
+ mpls ip
+ no shutdown
+!
+interface GigabitEthernet1.46
+ encapsulation dot1Q 46
+ ip address 10.0.46.2 255.255.255.252
+ ip broadcast-address 10.0.46.3
+ ip pim sparse-mode
+ ip rip v2-broadcast
+ ipv6 address 2001:10:0:46::2/126
+ mpls ip
+ no shutdown
+!
+interface GigabitEthernet1.56
+ encapsulation dot1Q 56
+ ip address 10.0.56.2 255.255.255.252
+ ip pim sparse-mode
+ ipv6 address 2001:10:0:56::2/126
+ mpls ip
+ no shutdown
+!
+interface GigabitEthernet1.60
+ encapsulation dot1Q 60
+ ip address 202.4.60.0 255.255.255.254
+ ipv6 address 2001:202:4:60::/127
+ no shutdown
+!
+interface GigabitEthernet2
+ ip address 192.168.1.6 255.255.255.0
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+router rip
+ version 2
+ redistribute connected route-map RED-CONN-TO-RIP
+ passive-interface default
+ no passive-interface GigabitEthernet1.36
+ no passive-interface GigabitEthernet1.46
+ no passive-interface GigabitEthernet1.56
+ network 10.0.0.0
+ no auto-summary
+!
+router bgp 65006
+ bgp log-neighbor-changes
+ neighbor 202.4.60.1 remote-as 65123
+!
+!
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+route-map RED-CONN-TO-RIP permit 10
+ match interface Loopback0
+ set metric 6
+!
+mpls ldp router-id Loopback0 force
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line vty 0 4
+ privilege level 15
+ no login
+!
+!
+end

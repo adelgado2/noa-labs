@@ -1,0 +1,161 @@
+
+!
+! Last configuration change at 23:01:11 UTC Thu Sep 18 2014
+!
+enable
+configure terminal
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$6cdl$cmjLSX79LVHEnbYagSKEm/
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+! 
+! 
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.1 255.255.255.255
+ ipv6 address ::192:122:3:1/128
+ no shutdown
+!
+interface GigabitEthernet1
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.12
+ encapsulation dot1Q 12
+ ip address 10.0.12.1 255.255.255.252
+ ipv6 address 2001:10:0:12::1/126
+ no shutdown
+!
+interface GigabitEthernet1.13
+ encapsulation dot1Q 13
+ ip address 10.0.13.1 255.255.255.252
+ ipv6 address 2001:10:0:13::1/126
+ no shutdown
+!
+interface GigabitEthernet1.14
+ encapsulation dot1Q 14
+ ip address 10.0.14.1 255.255.255.252
+ ipv6 address 2001:10:0:14::1/126
+ no shutdown
+!
+interface GigabitEthernet1.17
+ encapsulation dot1Q 17
+ ip address 136.5.17.1 255.255.255.0
+ ipv6 address 2001:136:5:17::1/64
+ no shutdown
+!
+interface GigabitEthernet1.18
+ encapsulation dot1Q 18
+ ip address 136.5.18.1 255.255.255.0
+ ipv6 address 2001:136:5:18::1/64
+ no shutdown
+!
+interface GigabitEthernet1.116
+ encapsulation dot1Q 116
+ ip address 89.211.116.1 255.255.255.128
+ ipv6 address 2001:89:211:116::1/125
+ no shutdown
+!
+interface GigabitEthernet1.117
+ encapsulation dot1Q 117
+ ip address 89.211.117.1 255.255.255.128
+ ipv6 address 2001:89:211:117::1/125
+ no shutdown
+!
+interface GigabitEthernet2
+ description MGMT INTERFACE - DO NOT CHANGE
+ ip address 192.168.1.1 255.255.255.0
+ negotiation auto
+ no shutdown
+!
+!
+!
+ip forward-protocol nd
+!
+no ip http server
+ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ length 0
+ stopbits 1
+line vty 0 4
+ no login
+!
+!
+end

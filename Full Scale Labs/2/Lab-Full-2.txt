@@ -1,0 +1,2003 @@
+********************************************************************************
+
+LAN Switching
+
+********************************************************************************
+
+1.1 ECH
+
+--------------------------------------------------------------------------------
+
+SW1:
+
+!
+int range Fa0/19 - 20
+ shut
+!
+int range Fa0/21 - 22
+ shut
+!
+int range Fa0/23 - 24
+ no shut
+ channel-group 12 mode active 
+!
+int Po12
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+ 
+SW2:
+
+!
+int range Fa0/23 - 24
+ no shut
+ channel-group 12 mode active 
+!
+int Po12
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+int range Fa0/21 - 22
+ no shut
+ channel-group 23 mode active
+!
+int Po23
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+int range Fa0/19 - 20
+ no shut
+ channel-group 24 mode active
+!
+int Po24
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+
+SW3:
+
+!
+int range Fa0/19 - 20
+ shut
+!
+int range Fa0/21 - 22
+ no shut
+ channel-group 23 mode active
+!
+int Po23
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+int range Fa0/23 - 24
+ no shut
+ channel-group 34 mode active
+!
+int Po34
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+
+SW4:
+
+!
+int range Fa0/21 - 22
+ shut
+!
+int range Fa0/19 - 20
+ no shut
+ channel-group 24 mode active
+!
+int Po24
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+int range Fa0/23 - 24
+ no shut
+ channel-group 34 mode active
+!
+int Po34
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+
+--------------------------------------------------------------------------------
+
+1.2 Trunking
+
+--------------------------------------------------------------------------------
+
+SW1:
+
+!
+int Fa0/1
+ no shut
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+ switchport trunk allowed vlan 227,228,1623,1723
+ spanning-tree portfast trunk
+!
+
+--------------------------------------------------------------------------------
+
+1.3 VLANs
+
+--------------------------------------------------------------------------------
+
+SW1,SW2,SW3:
+
+!
+vtp domain CCIE
+vtp version 3
+vtp mode client
+!
+
+SW4:
+
+!
+vtp domain CCIE
+vtp version 3
+vtp mode server
+!
+
+Fuera conf t:
+vtp primary
+
+!
+vlan 227
+!
+vlan 228
+!
+vlan 1623
+!
+vlan 1723
+!
+
+--------------------------------------------------------------------------------
+
+1.4 STP
+
+--------------------------------------------------------------------------------
+
+SW1,SW2,SW3:
+
+!
+spanning-tree mode mst
+!
+
+SW4:
+
+!
+spanning-tree mode mst 
+spanning-tree mst 0 root primary 
+!
+
+********************************************************************************
+
+Core Routing
+
+********************************************************************************
+
+2.1 Core Routing
+
+--------------------------------------------------------------------------------
+
+R1:
+
+!
+int Lo0
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv6 area 0
+!
+int Gi1.12
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv6 area 0
+!
+int Gi1.14
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv6 area 0
+!
+int Gi1.15
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv6 area 0
+! 
+router ospfv3 1
+ router-id 10.255.255.1
+  address-family ipv4
+   passive-interface Loopback0
+  address-family ipv6
+   passive-interface Loopback0
+!
+
+R2:
+
+!
+int Lo0
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv6 area 0
+!
+int Gi1.12
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv6 area 0
+!
+int Gi1.24
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv6 area 0
+!
+int Gi1.25
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv6 area 0
+!
+int Gi1.26
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv6 area 0
+!
+int Gi1.23
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv6 area 0
+! 
+router ospfv3 1
+ router-id 10.255.255.2
+  address-family ipv4
+   passive-interface Loopback0
+  address-family ipv6
+   passive-interface Loopback0
+!
+
+R3:
+
+!
+int Lo0
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv6 area 0
+!
+int Gi1.23
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv6 area 0
+!
+int Gi1.35
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv6 area 0
+!
+int Gi1.36
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv6 area 0
+! 
+router ospfv3 1
+ router-id 10.255.255.3
+  address-family ipv4
+   passive-interface Loopback0
+  address-family ipv6
+   passive-interface Loopback0
+!
+
+R4:
+
+!
+int Lo0
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv6 area 0
+!
+int Gi1.14
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv6 area 0
+!
+int Gi1.24
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv6 area 0
+!
+int Gi1.45
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv6 area 0
+! 
+router ospfv3 1
+ router-id 10.255.255.4
+  address-family ipv4
+   passive-interface Loopback0
+  address-family ipv6
+   passive-interface Loopback0
+!
+
+R5:
+
+!
+int Lo0
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv6 area 0
+!
+int Gi1.45
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv6 area 0
+!
+int Gi1.15
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv6 area 0
+!
+int Gi1.25
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv6 area 0
+!
+int Gi1.35
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv6 area 0
+!
+int Gi1.56
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv6 area 0
+!
+router ospfv3 1
+ router-id 10.255.255.5
+  address-family ipv4
+   passive-interface Loopback0
+  address-family ipv6
+   passive-interface Loopback0
+!
+
+R6:
+
+!
+int Lo0
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv6 area 0
+!
+int Gi1.56
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv6 area 0
+!
+int Gi1.26
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv6 area 0
+!
+int Gi1.36
+ ospfv3 1 ipv4 area 0
+ ospfv3 1 ipv6 area 0
+! 
+router ospfv3 1
+ router-id 10.255.255.6
+  address-family ipv4
+   passive-interface Loopback0
+  address-family ipv6
+   passive-interface Loopback0
+!
+
+tclsh
+
+foreach i { 
+10.255.255.1
+10.255.255.2
+10.255.255.3
+10.255.255.4
+10.255.255.5
+10.255.255.6
+} { ping $i source Loopback0 }
+
+tclsh
+
+foreach i { 
+2001:10:255:255::1
+2001:10:255:255::2
+2001:10:255:255::3
+2001:10:255:255::4
+2001:10:255:255::5
+2001:10:255:255::6
+} { ping $i source Loopback0 }
+
+--------------------------------------------------------------------------------
+
+2.2 Core Security
+
+--------------------------------------------------------------------------------
+
+R1-R6:
+
+!
+key chain KEY
+ key 1 
+  key-string 
+   key-string 0 CISCO
+   cryptographic-algorithm hmac-sha-512
+!
+router ospfv3 1
+  area 0 authentication key-chain KEY
+!
+
+--------------------------------------------------------------------------------
+
+2.3 Core Resource Optimization
+
+--------------------------------------------------------------------------------
+
+R1-R6:
+
+!
+router ospfv3 1
+ prefix-suppression
+!
+
+R1:
+
+!
+int Gi1.12
+ ospfv3 network point-to-point 
+!
+int Gi1.14
+ ospfv3 network point-to-point 
+!
+int Gi1.15
+ ospfv3 network point-to-point 
+! 
+
+R2:
+
+
+!
+int Gi1.12
+ ospfv3 network point-to-point 
+!
+int Gi1.24
+ ospfv3 network point-to-point 
+!
+int Gi1.25
+ ospfv3 network point-to-point 
+!
+int Gi1.26
+ ospfv3 network point-to-point 
+!
+int Gi1.23
+ ospfv3 network point-to-point 
+! 
+
+R3:
+
+!
+int Gi1.23
+ ospfv3 network point-to-point 
+!
+int Gi1.35
+ ospfv3 network point-to-point 
+!
+int Gi1.36
+ ospfv3 network point-to-point 
+! 
+
+R4:
+
+!
+int Gi1.14
+ ospfv3 network point-to-point 
+!
+int Gi1.24
+ ospfv3 network point-to-point 
+!
+int Gi1.45
+ ospfv3 network point-to-point 
+! 
+
+R5:
+
+!
+int Gi1.45
+ ospfv3 network point-to-point 
+!
+int Gi1.15
+ ospfv3 network point-to-point 
+!
+int Gi1.25
+ ospfv3 network point-to-point 
+!
+int Gi1.35
+ ospfv3 network point-to-point 
+!
+int Gi1.56
+ ospfv3 network point-to-point 
+!
+
+R6:
+
+!
+int Gi1.56
+ ospfv3 network point-to-point 
+!
+int Gi1.26
+ ospfv3 network point-to-point 
+!
+int Gi1.36
+ ospfv3 network point-to-point 
+! 
+
+--------------------------------------------------------------------------------
+
+2.4 Core Convergence Optimization
+
+--------------------------------------------------------------------------------
+
+R1:
+
+!
+router ospfv3 1
+ bfd all-interfaces 
+!
+int Gi1.12
+ bfd interval 250 min_rx 250 multiplier 3
+!
+int Gi1.14
+ bfd interval 250 min_rx 250 multiplier 3 
+!
+int Gi1.15
+ bfd interval 250 min_rx 250 multiplier 3
+! 
+
+R2:
+
+!
+router ospfv3 1
+ bfd all-interfaces 
+!
+int Gi1.12
+ bfd interval 250 min_rx 250 multiplier 3
+!
+int Gi1.24
+ bfd interval 250 min_rx 250 multiplier 3 
+!
+int Gi1.25
+ bfd interval 250 min_rx 250 multiplier 3
+! 
+int Gi1.26
+ bfd interval 250 min_rx 250 multiplier 3
+! 
+int Gi1.23
+ bfd interval 250 min_rx 250 multiplier 3
+! 
+
+R3:
+
+!
+router ospfv3 1
+ bfd all-interfaces 
+!
+int Gi1.23
+ bfd interval 250 min_rx 250 multiplier 3
+!
+int Gi1.35
+ bfd interval 250 min_rx 250 multiplier 3 
+!
+int Gi1.36
+ bfd interval 250 min_rx 250 multiplier 3
+! 
+
+R4:
+
+!
+router ospfv3 1
+ bfd all-interfaces 
+!
+int Gi1.14
+ bfd interval 250 min_rx 250 multiplier 3
+!
+int Gi1.24
+ bfd interval 250 min_rx 250 multiplier 3 
+!
+int Gi1.45
+ bfd interval 250 min_rx 250 multiplier 3
+! 
+
+R5:
+
+!
+router ospfv3 1
+ bfd all-interfaces 
+!
+int Gi1.45
+ bfd interval 250 min_rx 250 multiplier 3
+!
+int Gi1.15
+ bfd interval 250 min_rx 250 multiplier 3 
+!
+int Gi1.25
+ bfd interval 250 min_rx 250 multiplier 3
+! 
+int Gi1.35
+ bfd interval 250 min_rx 250 multiplier 3
+! 
+int Gi1.56
+ bfd interval 250 min_rx 250 multiplier 3
+! 
+
+R6:
+
+!
+router ospfv3 1
+ bfd all-interfaces 
+!
+int Gi1.56
+ bfd interval 250 min_rx 250 multiplier 3
+!
+int Gi1.26
+ bfd interval 250 min_rx 250 multiplier 3 
+!
+int Gi1.36
+ bfd interval 250 min_rx 250 multiplier 3
+! 
+
+********************************************************************************
+
+MPLS
+
+********************************************************************************
+
+3.1 PE to CE OSPFv2 Routing
+
+--------------------------------------------------------------------------------
+
+R1:
+
+!
+int Gi1.17
+ ip ospf 2 area 0
+!
+router ospf 2 vrf SITE_A
+ router-id 10.255.255.1
+!
+
+R2:
+
+!
+int Gi1.28
+ ip ospf 2 area 0
+!
+router ospf 2 vrf SITE_A
+ router-id 10.255.255.2
+!
+
+R4:
+
+!
+int Gi1.49
+ ip ospf 2 area 0
+!
+router ospf 2 vrf SITE_B
+ router-id 10.255.255.4
+!
+
+R5:
+
+!
+int Gi1.135
+ ip ospf 2 area 0
+!
+int Gi1.145
+ ip ospf 2 area 0
+!
+router ospf 2 vrf SITE_C 
+ router-id 10.255.255.5
+!
+
+R7:
+
+!
+int Lo0
+ ip ospf 2 area 0
+!
+int Gi1.17
+ ip ospf 2 area 0
+!
+int Gi1.78
+ ip ospf 2 area 0
+!
+int Gi1.227
+ ip ospf 2 area 0
+!
+router ospf 2
+ router-id 10.255.255.7
+!
+
+R8:
+
+!
+int Lo0
+ ip ospf 2 area 0
+!
+int Gi1.28
+ ip ospf 2 area 0
+!
+int Gi1.78
+ ip ospf 2 area 0
+!
+int Gi1.228
+ ip ospf 2 area 0
+!
+router ospf 2
+ router-id 10.255.255.8
+!
+
+SW2:
+
+!
+ip routing
+!
+int Lo0
+ ip ospf 2 area 0
+!
+int Vlan227
+ ip ospf 2 area 0
+!
+int Vlan228
+ ip ospf 2 area 0
+!
+router ospf 2
+ router-id 10.255.255.22
+!
+
+R13:
+
+!
+int Lo0
+ ip ospf 2 area 0
+!
+int Gi1.135
+ ip ospf 2 area 0
+!
+int Gi1.100
+ ip ospf 2 area 0
+!
+router ospf 2
+ router-id 10.255.255.13
+!
+
+R14:
+
+!
+int Lo0
+ ip ospf 2 area 0
+!
+int Gi1.145
+ ip ospf 2 area 0
+!
+int Gi1.100
+ ip ospf 2 area 0
+!
+router ospf 2
+ router-id 10.255.255.14
+!
+
+R9:
+
+!
+int Lo0
+ ip ospf 2 area 0
+!
+int Gi1.49
+ ip ospf 2 area 0
+!
+int Gi1.109
+ ip ospf 2 area 0
+!
+router ospf 2
+ router-id 10.255.255.9
+!
+
+R10
+
+!
+int Lo0
+ ip ospf 2 area 0
+!
+int Gi1.102
+ ip ospf 2 area 1
+!
+int Gi1.109
+ ip ospf 2 area 0
+!
+router ospf 2
+ router-id 10.255.255.10
+!
+
+R11:
+
+!
+int Lo0
+ ip ospf 2 area 0
+!
+int Gi1.102
+ ip ospf 2 area 1
+!
+int Gi1.109
+ ip ospf 2 area 0
+!
+router ospf 2
+ router-id 10.255.255.11
+!
+
+R12
+
+!
+int Lo0
+ ip ospf 2 area 1
+!
+int Gi1.102
+ ip ospf 2 area 1
+!
+router ospf 2
+ router-id 10.255.255.12
+!
+
+--------------------------------------------------------------------------------
+
+3.2 MPLS Label Distribution
+
+--------------------------------------------------------------------------------
+
+R1:
+
+!
+mpls ldp router-id Loopback0 force
+!
+int Gi1.12
+ mpls ip
+!
+int Gi1.14
+ mpls ip 
+!
+int Gi1.15
+ mpls ip
+! 
+
+R2:
+
+!
+mpls ldp router-id Loopback0 force
+!
+int Gi1.12
+ mpls ip
+!
+int Gi1.24
+ mpls ip
+!
+int Gi1.25
+ mpls ip
+! 
+int Gi1.26
+ mpls ip
+! 
+int Gi1.23
+ mpls ip
+! 
+
+R3:
+
+!
+mpls ldp router-id Loopback0 force
+!
+int Gi1.23
+ mpls ip
+!
+int Gi1.35
+ mpls ip
+!
+int Gi1.36
+ mpls ip
+! 
+
+R4:
+
+!
+mpls ldp router-id Loopback0 force
+!
+int Gi1.14
+ mpls ip
+!
+int Gi1.24
+ mpls ip 
+!
+int Gi1.45
+ mpls ip
+! 
+
+R5:
+
+!
+mpls ldp router-id Loopback0 force
+!
+int Gi1.45
+ mpls ip
+!
+int Gi1.15
+ mpls ip 
+!
+int Gi1.25
+ mpls ip
+! 
+int Gi1.35
+ mpls ip
+! 
+int Gi1.56
+ mpls ip
+! 
+
+R6:
+
+!
+mpls ldp router-id Loopback0 force
+!
+int Gi1.56
+ mpls ip
+!
+int Gi1.26
+ mpls ip
+!
+int Gi1.36
+ mpls ip
+! 
+
+--------------------------------------------------------------------------------
+
+3.3 MPLS VPNVv4 Routing
+
+--------------------------------------------------------------------------------
+
+R1:
+
+!
+vrf definition SITE_A
+ rd 1:1
+ address-family ipv4 
+  route-target import 100:100
+  route-target export 100:100
+!
+
+!
+router bgp 1.20000
+ address-family ipv4 vrf SITE_A
+  redistribute ospf 2
+!
+
+!
+router ospf 2 vrf SITE_A
+ redistribute bgp 1.20000 subnets
+!
+
+R2:
+
+!
+vrf definition SITE_A
+ rd 1:2
+ address-family ipv4 
+  route-target import 100:100
+  route-target export 100:100
+!
+
+!
+router bgp 1.20000
+ address-family ipv4 vrf SITE_A
+  redistribute ospf 2
+!
+
+!
+router ospf 2 vrf SITE_A
+ redistribute bgp 1.20000 subnets
+!
+
+R4:
+
+!
+vrf definition SITE_B
+ rd 1:4
+ address-family ipv4
+  route-target import 100:100
+  route-target export 100:100
+!
+
+!
+router bgp 1.20000
+ !
+ address-family vpnv4
+  neighbor 10.255.255.1 route-reflector-client
+  neighbor 10.255.255.2 route-reflector-client
+  neighbor 10.255.255.5 route-reflector-client
+!
+ 
+ 
+!
+
+!
+router bgp 1.20000
+ address-family ipv4  vrf SITE_B
+  redistribute ospf 2
+  maximum-paths ibgp 2
+!
+
+!
+router ospf 2 vrf SITE_B
+ redistribute bgp 1.20000 subnets
+!
+
+
+R5:
+
+!
+vrf definition SITE_C
+ rd 1:5
+ address-family ipv4 
+  route-target import 100:100
+  route-target export 100:100
+!
+
+!
+router bgp 1.20000
+ address-family ipv4 vrf SITE_C
+  redistribute ospf 2
+  maximum-paths ibgp 2
+!
+
+!
+router ospf 2 vrf SITE_C
+ redistribute bgp 1.20000 subnets
+!
+
+********************************************************************************
+
+Site Routing
+
+********************************************************************************
+
+4.1 OSPF Inter-Area Traffic Engineering
+
+--------------------------------------------------------------------------------
+
+R10:
+
+!
+router ospf 2
+ area 1 stub no-summary
+ area 1 default-cost 3
+!
+
+R11:
+
+!
+router ospf 2
+ area 1 stub no-summary
+!
+
+R12:
+
+!
+router ospf 2
+ area 1 stub 
+!
+
+--------------------------------------------------------------------------------
+
+4.2 OSPF Intra-Area Traffic Engineering
+
+--------------------------------------------------------------------------------
+
+R15:
+
+!
+interface Loopback0
+ ip ospf 2 area 0
+!
+int Gi1.100
+ ip ospf 2 area 0
+ ip ospf network point-to-multipoint
+!
+router ospf 2
+ router-id 10.255.255.15
+ neighbor 172.29.100.13 cost 2
+ neighbor 172.29.100.14 cost 4
+! 
+
+R13:
+
+!
+interface Loopback0
+ ip ospf 2 area 0
+!
+interface Gi1.135
+ ip ospf 2 area 0
+!
+interface Gi1.100
+ ip ospf network point-to-multipoint
+ ip ospf 2 area 0
+ no ip ospf cost 15
+!
+router ospf 2
+ router-id 10.255.255.13
+ neighbor 172.29.100.15 cost 15
+!
+
+R14:
+
+!
+interface Loopback0
+ ip ospf 2 area 0
+!
+interface Gi1.145
+ ip ospf 2 area 0
+!
+interface Gi1.100
+ ip ospf network point-to-multipoint
+ ip ospf 2 area 0
+!
+router ospf 2
+ router-id 10.255.255.14
+ neighbor 172.29.100.15 cost 1
+!
+
+********************************************************************************
+
+BGP
+
+********************************************************************************
+
+5.1 BGP Peering
+
+--------------------------------------------------------------------------------
+
+R2:
+
+!
+router bgp 1.20000
+ address-family ipv4
+  neighbor 10.255.255.4 next-hop-self
+!
+
+R3:
+
+!
+router bgp 1.20000
+ address-family ipv4
+  neighbor 10.255.255.4 next-hop-self
+!
+
+R6:
+
+!
+router bgp 1.20000
+ address-family ipv4
+  neighbor 10.255.255.4 next-hop-self
+!
+
+R4:
+
+!
+router bgp 1.20000
+ address-family ipv4
+  neighbor 10.255.255.2 route-reflector-client
+  neighbor 10.255.255.3 route-reflector-client
+  neighbor 10.255.255.6 route-reflector-client
+!
+
+R16:
+
+!
+router bgp 1831
+ bgp router-id 10.255.255.16
+ neighbor 169.254.160.1 remote-as 10000
+ address-family ipv4 unicast
+  network 10.255.255.16 mask 255.255.255.255
+  neighbor 169.254.160.1 activate
+!
+
+R17:
+
+!
+router bgp 1831
+ bgp router-id 10.255.255.17
+ neighbor 169.254.170.1 remote-as 10000
+ address-family ipv4 unicast
+  network 10.255.255.17 mask 255.255.255.255
+  neighbor 169.254.170.1 activate
+!
+
+R18:
+
+!
+router bgp 1832
+ bgp router-id 10.255.255.18
+ neighbor 169.254.180.1 remote-as 10000
+ neighbor 169.254.181.1 remote-as 30000
+ address-family ipv4 unicast
+  network 10.255.255.18 mask 255.255.255.255
+  neighbor 169.254.180.1 activate
+  neighbor 169.254.181.1 activate
+!
+
+R19:
+
+!
+router bgp 1833
+ bgp router-id 10.255.255.19
+ neighbor 169.254.190.1 remote-as 30000
+ address-family ipv4 unicast
+  network 10.255.255.19 mask 255.255.255.255
+  neighbor 169.254.190.1 activate
+!
+
+R20:
+
+!
+router bgp 1834
+ bgp router-id 10.255.255.20
+ neighbor 169.254.200.1 remote-as 30000
+ address-family ipv4 unicast
+  network 10.255.255.20 mask 255.255.255.255
+  neighbor 169.254.200.1 activate
+!
+
+tclsh 
+
+foreach i {
+10.255.255.16
+10.255.255.17
+10.255.255.18
+10.255.255.19
+10.255.255.20
+} { ping $i source Loopback0 }
+
+--------------------------------------------------------------------------------
+
+5.2 BGP Transit Filtering
+
+--------------------------------------------------------------------------------
+
+R18:
+
+!
+ip as-path access-list 1 permit ^$ 
+!
+route-map NO-TRANSIT-AS permit 10
+ match as-path 1
+! 
+router bgp 1832
+ address-family ipv4 unicast
+  neighbor 169.254.180.1 route-map NO-TRANSIT-AS out
+  neighbor 169.254.181.1 route-map NO-TRANSIT-AS out
+!
+
+--------------------------------------------------------------------------------
+
+5.3 BGP Traffic Engineering
+
+--------------------------------------------------------------------------------
+
+R18:
+
+!
+route-map SET-WEIGHT permit 10
+ set weight 100
+!
+route-map PREPEND-AND-NO-TRANSIT permit 10
+ match as-path 1
+ set as-path prepend 1832 1832 1832
+!
+router bgp 1832
+ address-family ipv4 unicast
+  neighbor 169.254.180.1 route-map SET-WEIGHT in
+  neighbor 169.254.180.1 route-map NO-TRANSIT-AS out
+  neighbor 169.254.181.1 route-map PREPEND-AND-NO-TRANSIT out
+!
+  
+
+********************************************************************************
+
+DMVPN
+
+********************************************************************************
+
+6.1 DMVPN 
+
+--------------------------------------------------------------------------------
+
+R16 HUB
+
+R16:
+
+!
+interface tunnel1
+ ip address 183.100.1.16 255.255.255.0
+ ip nhrp network-id 1
+ ip nhrp authentication DMVPN1
+ ip nhrp map multicast dynamic
+ tunnel source Loopback0
+ tunnel mode gre multipoint 
+ tunnel key 1 
+!
+
+R17 HUB
+
+!
+interface tunnel2
+ ip address 183.100.2.17 255.255.255.0
+ ip nhrp network-id 2
+ ip nhrp authentication DMVPN2
+ ip nhrp map multicast dynamic
+ tunnel source Loopback0
+ tunnel mode gre multipoint 
+ tunnel key 2 
+!
+
+R18:
+
+!
+interface tunnel1
+ ip address 183.100.1.18 255.255.255.0
+ ip nhrp network-id 1
+ ip nhrp authentication DMVPN1
+ ip nhrp nhs 183.100.1.16 nbma 10.255.255.16 multicast
+ tunnel source Loopback0
+ tunnel mode gre multipoint 
+ tunnel key 1  
+! 
+
+!
+interface tunnel2
+ ip address 183.100.2.18 255.255.255.0
+ ip nhrp network-id 2
+ ip nhrp authentication DMVPN2
+ ip nhrp nhs 183.100.2.17 nbma 10.255.255.17 multicast
+ tunnel source Loopback0
+ tunnel mode gre multipoint 
+ tunnel key 2 
+!
+
+R19:
+
+!
+interface tunnel1
+ ip address 183.100.1.19 255.255.255.0
+ ip nhrp network-id 1
+ ip nhrp authentication DMVPN1
+ ip nhrp nhs 183.100.1.16 nbma 10.255.255.16 multicast
+ tunnel source Loopback0
+ tunnel mode gre multipoint 
+ tunnel key 1  
+! 
+
+!
+interface tunnel2
+ ip address 183.100.2.19 255.255.255.0
+ ip nhrp network-id 2
+ ip nhrp authentication DMVPN2
+ ip nhrp nhs 183.100.2.17 nbma 10.255.255.17 multicast
+ tunnel source Loopback0
+ tunnel mode gre multipoint 
+ tunnel key 2 
+!
+
+R20:
+
+!
+interface tunnel1
+ ip address 183.100.1.20 255.255.255.0
+ ip nhrp network-id 1
+ ip nhrp authentication DMVPN1
+ ip nhrp nhs 183.100.1.16 nbma 10.255.255.16 multicast
+ tunnel source Loopback0
+ tunnel mode gre multipoint 
+ tunnel key 1  
+! 
+
+!
+interface tunnel2
+ ip address 183.100.2.20 255.255.255.0
+ ip nhrp network-id 2
+ ip nhrp authentication DMVPN2
+ ip nhrp nhs 183.100.2.17 nbma 10.255.255.17 multicast
+ tunnel source Loopback0
+ tunnel mode gre multipoint 
+ tunnel key 2
+!
+
+--------------------------------------------------------------------------------
+
+6.2 DMVPN over IPsec
+
+--------------------------------------------------------------------------------
+
+R16 - R20:
+
+!
+crypto isakmp policy 10
+ authentication pre-share
+ hash sha1
+ encryption 3des
+ group 5
+!
+crypto isakmp key 0 DMVPNPASS address 0.0.0.0 0.0.0.0
+!
+crypto ipsec transform-set ESP-AES-128-MD5 esp-aes 128 esp-md5-hmac
+ mode transport
+!
+crypto ipsec profile DMVPN-PROFILE
+ set transform-set ESP-AES-128-MD5
+!
+
+R16:
+
+!
+interface tunnel1
+ tunnel protection ipsec profile DMVPN-PROFILE shared
+!
+
+R17:
+
+!
+interface tunnel2
+ tunnel protection ipsec profile DMVPN-PROFILE shared
+!
+
+R18,R19,R20:
+
+!
+interface tunnel1
+ tunnel protection ipsec profile DMVPN-PROFILE shared
+!
+
+!
+interface tunnel2
+ tunnel protection ipsec profile DMVPN-PROFILE shared
+!
+
+--------------------------------------------------------------------------------
+
+6.3 Routing over DMVPN
+
+--------------------------------------------------------------------------------
+
+R16:
+
+!
+router eigrp SITE_W
+ address-family ipv4 unicast autonomous-system 1831
+  network 10.255.255.0 0.0.0.255
+  network 183.0.0.0 0.255.255.255
+  af-interface Tunnel1
+   no next-hop-self
+   no split-horizon
+!
+  
+R17:
+
+!
+router eigrp SITE_W
+ address-family ipv4 unicast autonomous-system 1831
+  network 10.255.255.0 0.0.0.255
+  network 183.0.0.0 0.255.255.255
+  af-interface Tunnel2
+   no next-hop-self
+   no split-horizon
+!
+int Tu2
+ delay 2000
+!
+  
+R18:
+
+!
+router eigrp SITE_W
+ address-family ipv4 unicast autonomous-system 1831
+  network 10.255.255.0 0.0.0.255
+  network 183.0.0.0 0.255.255.255
+!
+
+R19:
+
+!
+router eigrp SITE_W
+ address-family ipv4 unicast autonomous-system 1831
+  network 10.255.255.0 0.0.0.255
+  network 183.0.0.0 0.255.255.255
+!
+
+R20:
+
+!
+router eigrp SITE_W
+ address-family ipv4 unicast autonomous-system 1831
+  network 10.255.255.0 0.0.0.255
+  network 183.0.0.0 0.255.255.255
+!
+
+NOTA: En la configuración inicial en teoría están los network ya puestos!
+
+********************************************************************************
+
+Multicast
+
+********************************************************************************
+
+7.1 Multicast over GRE
+
+--------------------------------------------------------------------------------
+
+R9:
+
+!
+ip multicast-routing distributed
+!
+interface Tunnel79
+ ip unnumbered Gi1.49
+ ip pim sparse-mode
+ tunnel source Loopback0
+ tunnel destination 10.255.255.7
+!
+interface Tunnel89
+ ip unnumbered Gi1.49
+ ip pim sparse-mode
+ tunnel source Loopback0
+ tunnel destination 10.255.255.8
+!
+interface Tunnel159
+ ip unnumbered Gi1.49
+ ip pim sparse-mode
+ tunnel source Loopback0
+ tunnel destination 10.255.255.15
+!
+int Gi1.109
+ ip pim sparse-mode
+!
+
+R7:
+
+!
+ip multicast-routing distributed
+!
+interface Tunnel79
+ ip unnumbered Gi1.17
+ ip pim sparse-mode
+ tunnel source Loopback0
+ tunnel destination 10.255.255.9
+!
+int Gi1.227
+ ip pim sparse-mode
+!
+
+R8:
+
+!
+ip multicast-routing distributed
+!
+interface Tunnel89
+ ip unnumbered Gi1.28
+ ip pim sparse-mode
+ tunnel source Loopback0
+ tunnel destination 10.255.255.9
+!
+int Gi1.228
+ ip pim sparse-mode
+!
+
+R15:
+
+!
+ip multicast-routing distributed
+!
+interface Tunnel159
+ ip unnumbered Gi1.100
+ ip pim sparse-mode
+ tunnel source Loopback0
+ tunnel destination 10.255.255.9
+!
+int Gi1.100
+ ip pim sparse-mode
+!
+
+R10:
+
+!
+ip multicast-routing distributed
+!
+interface Gi1.109
+ ip pim sparse-mode
+!
+int Gi1.102
+ ip pim sparse-mode
+!
+
+R11:
+
+!
+ip multicast-routing distributed
+!
+interface Gi1.109
+ ip pim sparse-mode
+!
+int Gi1.102
+ ip pim sparse-mode
+!
+
+R12:
+
+!
+ip multicast-routing distributed
+!
+int Gi1.102
+ ip pim sparse-mode
+!
+
+R13:
+
+!
+ip multicast-routing distributed
+!
+int Gi1.100
+ ip pim sparse-mode
+!
+
+R14:
+
+!
+ip multicast-routing distributed
+!
+int Gi1.100
+ ip pim sparse-mode
+!
+
+--------------------------------------------------------------------------------
+
+7.2 Multicast RP Distribution
+
+--------------------------------------------------------------------------------
+
+R7 - R15:
+
+!
+ip pim autorp listener
+!
+
+R9:
+
+!
+interface Loopback0
+ ip pim sparse-mode
+!
+ip pim send-rp-announce Loopback 0 scope 31 interval 5
+ip pim send-rp-discovery Loopback 0 scope 31 
+!
+
+R7:
+
+!
+ip mroute 0.0.0.0 0.0.0.0 Tunnel79
+!
+
+R8:
+
+!
+ip mroute 0.0.0.0 0.0.0.0 Tu89
+!
+
+R13,R14:
+
+!
+ip mroute 0.0.0.0 0.0.0.0 172.29.100.15
+!
+
+
+R15:
+
+!
+ip mroute 0.0.0.0 0.0.0.0 Tunnel159
+!
+
+--------------------------------------------------------------------------------
+
+7.3 Multicast Traffic Engineering
+
+--------------------------------------------------------------------------------
+
+R13:
+
+!
+int Gi1.100
+ ip igmp join-group 224.1.2.3
+!
+
+R14:
+
+!
+int Gi1.100
+ ip igmp join-group 224.1.2.3
+!
+
+SW2:
+
+!
+ip multicast-routing distributed
+!
+int Vlan227
+ ip pim sparse-mode
+ ip igmp join-group 224.1.2.3
+!
+int Vlan228
+ ip pim sparse-mode
+ ip igmp join-group 224.1.2.3
+!
+
+R11:
+
+!
+interface GigabitEthernet1.102
+ ip ospf cost 2
+!
+
+********************************************************************************
+
+Security
+
+********************************************************************************
+
+8.1 Denial of Service Tracking
+
+--------------------------------------------------------------------------------
+
+R9:
+
+!
+ip access-list extended ATTACK
+ permit tcp 10.0.0.0 0.255.255.255 host 172.30.102.100 eq www
+ permit tcp 192.168.0.0 0.0.255.255 host 172.30.102.100 eq www
+ permit tcp 172.16.0.0 0.15.255.255 host 172.30.102.100 eq www
+ permit tcp any host 172.30.102.100 eq www syn log-input
+ permit ip any any 
+!
+interface Gi1.49
+ ip access-group ATTACK in
+!
+
+--------------------------------------------------------------------------------
+
+8.2 Syslog
+
+--------------------------------------------------------------------------------
+
+R9:
+
+!
+logging 172.30.102.200
+!
+service sequence
+service timestamps log datetime msec localtime
+!
+ip access-list log-update threshold 10
+!
+
+--------------------------------------------------------------------------------
+
+8.3 Traffic Filtering
+
+--------------------------------------------------------------------------------
+
+R9:
+
+!
+interface Gi1.49
+ ip verify unicast source reachable-via rx
+!
+
+********************************************************************************
+
+Services
+
+********************************************************************************
+
+9.1 NTP
+
+--------------------------------------------------------------------------------
+
+R8:
+
+!
+ntp master 3
+ntp peer 10.255.255.9
+ntp peer 10.255.255.13
+ntp source Loopback0
+!
+
+R7,SW2:
+
+!
+ntp server 10.255.255.8
+ntp source Loopback0
+!
+
+R9:
+
+!
+ntp master 3
+ntp peer 10.255.255.8
+ntp peer 10.255.255.13
+ntp source Loopback0
+!
+
+R10,R11,R12:
+
+!
+ntp server 10.255.255.9
+ntp source Loopback0
+!
+
+R13:
+
+!
+ntp master 3
+ntp peer 10.255.255.8
+ntp peer 10.255.255.9
+ntp source Loopback0
+!
+
+R14,R15:
+
+!
+ntp server 10.255.255.13
+ntp source Loopback0
+!
+
+--------------------------------------------------------------------------------
+
+9.2 NTP Security
+
+--------------------------------------------------------------------------------
+
+!!!! ME FALTA NTP AUTHENTICATE EN R8,R9,R13 !!!!
+
+
+R8:
+
+!
+ntp authenticate
+ntp authentication-key 1 md5 NTPK3Y
+ntp trusted-key 1
+!
+ip access-list standard 11
+ permit host 10.255.255.9
+ permit host 10.255.255.13
+!
+ip access-list standard 12
+ permit host 10.255.255.7
+ permit host 10.255.255.22
+!
+ntp access-group peer 11
+ntp access-group serve 12
+!
+
+R9:
+
+!
+ntp authenticate
+ntp authentication-key 1 md5 NTPK3Y
+ntp trusted-key 1
+!
+ip access-list standard 11
+ permit host 10.255.255.8
+ permit host 10.255.255.13
+!
+ip access-list standard 12
+ permit host 10.255.255.10
+ permit host 10.255.255.11
+ permit host 10.255.255.12
+!
+ntp access-group peer 11
+ntp access-group serve 12
+!
+
+R13:
+
+!
+ntp authenticate
+ntp authentication-key 1 md5 NTPK3Y
+ntp trusted-key 1
+!
+ip access-list standard 11
+ permit host 10.255.255.8
+ permit host 10.255.255.9
+!
+ip access-list standard 12
+ permit host 10.255.255.14
+ permit host 10.255.255.15
+!
+ntp access-group peer 11
+ntp access-group serve 12
+!
+
+Clientes:
+
+R7,SW2:
+
+!
+ntp authentication-key 1 md5 NTPK3Y
+ntp trusted-key 1
+ntp authenticate
+ntp server 10.255.255.8 key 1
+!
+
+R10,R11,R12:
+
+!
+ntp authentication-key 1 md5 NTPK3Y
+ntp trusted-key 1
+ntp authenticate
+ntp server 10.255.255.9 key 1
+!
+
+R14,R15:
+
+!
+ntp authentication-key 1 md5 NTPK3Y
+ntp trusted-key 1
+ntp authenticate
+ntp server 10.255.255.13 key 1
+!
+
+--------------------------------------------------------------------------------
+
+9.3 QoS
+
+--------------------------------------------------------------------------------
+
+R9:
+
+!
+policy-map SHAPE_VPN
+ class class-default
+  shape average 50000000
+!
+interface GigabitEthernet1.49
+ service-policy output SHAPE_VPN
+!
+
+
+--------------------------------------------------------------------------------
+
+9.4 Sub-Rate QoS
+
+--------------------------------------------------------------------------------
+
+R9:
+
+!
+class-map match-all VOIP
+ match dscp ef 
+!
+class-map match-all VOIP_SIGNALING
+ match dscp cs3 
+! 
+class-map match-any TRANSACTIONAL_BULK
+ match dscp af11 
+ match dscp af21
+!
+policy-map CHILD_QUEUING
+ class VOIP
+  priority 10000
+ class VOIP_SIGNALING
+  bandwidth 1000
+ class TRANSACTIONAL_BULK
+  bandwidth 30000
+  random-detect dscp-based
+ class class-default
+!
+policy-map 93
+ class class-default
+  service-policy CHILD_QUEUING
+!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

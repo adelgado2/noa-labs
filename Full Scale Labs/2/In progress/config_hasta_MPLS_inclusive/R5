@@ -1,0 +1,257 @@
+!
+! Last configuration change at 11:55:15 UTC Sun May 7 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R5
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+vrf definition SITE_C
+ rd 1:5
+ !
+ address-family ipv4
+  route-target export 100:100
+  route-target import 100:100
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+key chain KEY
+ key 1
+   key-string CISCO
+   cryptographic-algorithm hmac-sha-512
+!
+!
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 10.255.255.5 255.255.255.255
+ ipv6 address 2001:10:255:255::5/128
+ ospfv3 1 ipv6 area 0
+ ospfv3 1 ipv4 area 0
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.15
+ encapsulation dot1Q 15
+ ip address 10.255.3.2 255.255.255.252
+ ipv6 enable
+ mpls ip
+ ospfv3 network point-to-point
+ ospfv3 1 ipv6 area 0
+ ospfv3 1 ipv4 area 0
+ bfd interval 250 min_rx 250 multiplier 3
+ no shutdown
+!
+interface GigabitEthernet1.25
+ encapsulation dot1Q 25
+ ip address 10.255.5.2 255.255.255.252
+ ipv6 enable
+ mpls ip
+ ospfv3 network point-to-point
+ ospfv3 1 ipv6 area 0
+ ospfv3 1 ipv4 area 0
+ bfd interval 250 min_rx 250 multiplier 3
+ no shutdown
+!
+interface GigabitEthernet1.35
+ encapsulation dot1Q 35
+ ip address 10.255.9.2 255.255.255.252
+ ipv6 enable
+ mpls ip
+ ospfv3 network point-to-point
+ ospfv3 1 ipv6 area 0
+ ospfv3 1 ipv4 area 0
+ bfd interval 250 min_rx 250 multiplier 3
+ no shutdown
+!
+interface GigabitEthernet1.45
+ encapsulation dot1Q 45
+ ip address 10.255.6.2 255.255.255.252
+ ipv6 enable
+ mpls ip
+ ospfv3 network point-to-point
+ ospfv3 1 ipv6 area 0
+ ospfv3 1 ipv4 area 0
+ bfd interval 250 min_rx 250 multiplier 3
+ no shutdown
+!
+interface GigabitEthernet1.56
+ encapsulation dot1Q 56
+ ip address 10.255.10.1 255.255.255.252
+ ipv6 enable
+ mpls ip
+ ospfv3 network point-to-point
+ ospfv3 1 ipv6 area 0
+ ospfv3 1 ipv4 area 0
+ bfd interval 250 min_rx 250 multiplier 3
+ no shutdown
+!
+interface GigabitEthernet1.135
+ encapsulation dot1Q 135
+ vrf forwarding SITE_C
+ ip address 172.29.135.5 255.255.255.0
+ ip ospf 2 area 0
+ ipv6 address 2001:172:29:135::5/64
+ no shutdown
+!
+interface GigabitEthernet1.145
+ encapsulation dot1Q 145
+ vrf forwarding SITE_C
+ ip address 172.29.145.5 255.255.255.0
+ ip ospf 2 area 0
+ ipv6 address 2001:172:29:145::5/64
+ no shutdown
+!
+interface GigabitEthernet2
+ no ip address
+ negotiation auto
+ shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+router ospfv3 1
+ router-id 10.255.255.5
+ prefix-suppression
+ bfd all-interfaces
+ area 0 authentication key-chain KEY
+ !
+ address-family ipv4 unicast
+  passive-interface Loopback0
+ exit-address-family
+ !
+ address-family ipv6 unicast
+  passive-interface Loopback0
+ exit-address-family
+!
+router ospf 2 vrf SITE_C
+ router-id 10.255.255.5
+ redistribute bgp 1.20000 subnets
+!
+router bgp 1.20000
+ bgp asnotation dot
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 10.255.255.4 remote-as 1.20000
+ neighbor 10.255.255.4 update-source Loopback0
+ neighbor 2001:10:255:255::4 remote-as 1.20000
+ neighbor 2001:10:255:255::4 update-source Loopback0
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family vpnv4
+  neighbor 10.255.255.4 activate
+  neighbor 10.255.255.4 send-community extended
+ exit-address-family
+ !
+ address-family vpnv6
+  neighbor 10.255.255.4 activate
+  neighbor 10.255.255.4 send-community extended
+ exit-address-family
+ !
+ address-family ipv4 vrf SITE_C
+  redistribute ospf 2
+  maximum-paths ibgp 2
+ exit-address-family
+!
+!
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+mpls ldp router-id Loopback0 force
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line vty 0 4
+ no login
+!
+!
+end

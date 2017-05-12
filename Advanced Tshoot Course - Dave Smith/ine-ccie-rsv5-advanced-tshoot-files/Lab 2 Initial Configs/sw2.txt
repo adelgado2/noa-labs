@@ -1,0 +1,261 @@
+! tsrack99, sw2, 2014-09-15 12:17:21
+do undebug all
+no logging console
+no service config
+no ip domain-lookup
+vtp file vlan.dat
+! VTP interface control currently not supported
+vtp mode Transparent
+vtp version 1
+! VTP traps generation control currently not supported
+vtp domain cisco
+do show vtp status
+do show vlan brief
+!
+no vtp password
+vlan 4
+vlan 13
+vlan 24
+vlan 35
+vlan 78
+vlan 79
+vlan 90
+vlan 102
+vlan 123
+vlan 134
+vlan 136
+vlan 145
+vlan 167
+vlan 189
+vlan 201
+vlan 226
+vlan 233
+vlan 245
+vlan 267
+vlan 318
+vlan 334
+vlan 444
+vlan 456
+vlan 555
+vlan 900
+vlan 901
+vlan 902
+vlan 903
+vlan 904
+vlan 905
+vlan 906
+vlan 908
+vlan 910
+vlan 912
+vlan 914
+!
+version 12.2
+no service pad
+no service timestamps debug uptime
+no service timestamps log uptime
+no service password-encryption
+!
+hostname Rack1SW2
+!
+boot-start-marker
+boot-end-marker
+!
+no logging console
+!
+no aaa new-model
+system mtu routing 1500
+vtp domain cisco
+vtp mode transparent
+ip subnet-zero
+ip routing
+no ip domain-lookup
+!
+spanning-tree mode mst
+spanning-tree extend system-id
+!
+spanning-tree mst configuration
+ name CISCO_CCIE
+ instance 1 vlan 100-200
+ instance 2 vlan 201-999
+!
+spanning-tree mst 1 priority 28672
+!
+vlan internal allocation policy ascending
+!
+vlan 4,13,24,35,78-79,90,102,123,134,136,145,167,189,201,226,233,245,267,318
+!
+vlan 334,444,456,555,900-906,908,910,912,914
+!
+ip tcp synwait-time 5
+!
+interface Loopback0
+ ip address 10.1.1.30 255.255.255.255
+!
+interface FastEthernet0/1
+ no shutdown
+ switchport mode dynamic desirable
+ shutdown
+!
+interface FastEthernet0/2
+ no shutdown
+ switchport access vlan 24
+ switchport mode dynamic desirable
+!
+interface FastEthernet0/3
+ no shutdown
+ switchport access vlan 35
+ switchport mode dynamic desirable
+!
+interface FastEthernet0/4
+ no shutdown
+ switchport access vlan 24
+ switchport mode dynamic desirable
+!
+interface FastEthernet0/5
+ no shutdown
+ switchport access vlan 35
+ switchport mode dynamic desirable
+!
+interface FastEthernet0/6
+ no shutdown
+ switchport access vlan 226
+ switchport mode dynamic desirable
+!
+interface FastEthernet0/7
+ no shutdown
+ switchport access vlan 79
+ switchport mode dynamic desirable
+!
+interface FastEthernet0/8
+ no shutdown
+ switchport access vlan 189
+ switchport mode dynamic desirable
+!
+interface FastEthernet0/9
+ no shutdown
+ switchport access vlan 79
+ switchport mode dynamic desirable
+!
+interface FastEthernet0/10
+ no shutdown
+ switchport access vlan 189
+ switchport mode dynamic desirable
+!
+interface FastEthernet0/11
+ no shutdown
+ switchport mode dynamic desirable
+ shutdown
+!
+interface FastEthernet0/12
+ no shutdown
+ switchport mode dynamic desirable
+ shutdown
+!
+interface FastEthernet0/13
+ no shutdown
+ switchport access vlan 13
+ switchport mode dynamic desirable
+!
+interface FastEthernet0/14
+ no shutdown
+ switchport access vlan 145
+ switchport mode dynamic desirable
+!
+interface FastEthernet0/15
+ no shutdown
+ switchport mode dynamic desirable
+ shutdown
+!
+interface FastEthernet0/16
+ no shutdown
+ switchport mode dynamic desirable
+ shutdown
+!
+interface FastEthernet0/17
+ no shutdown
+ switchport mode dynamic desirable
+ shutdown
+!
+interface FastEthernet0/18
+ no shutdown
+ switchport mode dynamic desirable
+ shutdown
+!
+interface FastEthernet0/19
+ no shutdown
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface FastEthernet0/20
+ no shutdown
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface FastEthernet0/21
+ no shutdown
+ switchport mode dynamic desirable
+ shutdown
+!
+interface FastEthernet0/22
+ no shutdown
+ switchport mode dynamic desirable
+ shutdown
+!
+interface FastEthernet0/23
+ no shutdown
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface FastEthernet0/24
+ no shutdown
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface GigabitEthernet0/1
+ no shutdown
+ switchport mode dynamic desirable
+ shutdown
+!
+interface GigabitEthernet0/2
+ no shutdown
+ switchport mode dynamic desirable
+ shutdown
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan102
+ ip address 192.168.179.26 255.255.255.248
+!
+interface Vlan201
+ ip address 192.168.179.33 255.255.255.248
+!
+router eigrp 179
+ no auto-summary
+ eigrp router-id 10.1.1.12
+ network 192.168.179.0
+!
+ip classless
+ip http server
+no ip http secure-server
+!
+control-plane
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous level 0 limit 20
+line vty 0 4
+ password cisco
+ login
+line vty 5 15
+ login
+!
+!
+service password-recovery
+!
+do show ip interface brief
+!
+!
+end

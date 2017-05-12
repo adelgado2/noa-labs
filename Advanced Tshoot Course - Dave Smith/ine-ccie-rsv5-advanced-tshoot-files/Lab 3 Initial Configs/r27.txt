@@ -1,0 +1,80 @@
+! tsrack99, r27, 2014-09-22 11:22:43
+do undebug all
+no logging console
+no service config
+no ip domain-lookup
+!
+version 12.4
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R27
+!
+boot-start-marker
+boot-end-marker
+!
+no logging console
+!
+no aaa new-model
+memory-size iomem 5
+dot11 syslog
+ip cef
+!
+no ip domain lookup
+!
+multilink bundle-name authenticated
+!
+archive
+ log config
+  hidekeys
+!
+interface FastEthernet0/0
+ no shutdown
+ ip address 172.17.3.27 255.255.255.224
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/1
+ no shutdown
+ ip address 10.17.27.27 255.255.255.0
+ duplex auto
+ speed auto
+!
+router ospf 65100
+ log-adjacency-changes
+ redistribute bgp 65100 metric-type 1 subnets
+ network 172.17.3.0 0.0.0.31 area 20
+!
+router bgp 65100
+ no synchronization
+ bgp log-neighbor-changes
+ redistribute ospf 65100 match internal external 1 external 2
+ neighbor 10.17.27.17 remote-as 65222
+ no auto-summary
+!
+ip forward-protocol nd
+!
+ip http server
+no ip http secure-server
+!
+control-plane
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous level 0 limit 20
+line aux 0
+line vty 0 4
+ privilege level 15
+ no login
+!
+scheduler allocate 20000 1000
+!
+service password-recovery
+!
+do show ip interface brief
+!
+!
+end

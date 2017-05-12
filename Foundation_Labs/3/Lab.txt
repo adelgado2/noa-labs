@@ -924,10 +924,10 @@ interface Loopback99
 route-map RED-LO99 permit 10
  match int Loopback99
 !
-router bgp 65000.2525
+router bgp 6500.2525
  bgp router-id 1.1.1.1
  no bgp default ipv4-unicast
- neighbor 128.10.254.3 remote-as 65000.2525
+ neighbor 128.10.254.3 remote-as 6500.2525
  neighbor 128.10.254.3 update-source Tunnel100
  !
  address-family ipv4
@@ -944,10 +944,10 @@ interface Loopback99
 route-map RED-LO99 permit 10
  match int Loopback99
 !
-router bgp 65000.2525
+router bgp 6500.2525
  bgp router-id 2.2.2.2
  no bgp default ipv4-unicast
- neighbor 128.10.254.3 remote-as 65000.2525
+ neighbor 128.10.254.3 remote-as 6500.2525
  neighbor 128.10.254.3 update-source Tunnel100
  !
  address-family ipv4
@@ -964,14 +964,14 @@ interface Loopback99
 route-map RED-LO99 permit 10
  match int Loopback99
 !
-router bgp 65000.2525
+router bgp 6500.2525
  bgp router-id 3.3.3.3
  no bgp default ipv4-unicast
  bgp listen range 128.10.254.0/24  peer-group IBGP 
  neighbor IBGP peer-group 
- neighbor IBGP remote-as 65000.2525 
+ neighbor IBGP remote-as 6500.2525 
  neighbor IBGP update-source Tunnel100
- neighbor 6.6.6.6 remote-as 65000.2525
+ neighbor 6.6.6.6 remote-as 6500.2525
  neighbor 6.6.6.6 update-source Loopback0
  !
  address-family ipv4 unicast
@@ -991,10 +991,10 @@ interface Loopback99
 route-map RED-LO99 permit 10
  match int Loopback99
 !
-router bgp 65000.2525
+router bgp 6500.2525
  bgp router-id 5.5.5.5
  no bgp default ipv4-unicast
- neighbor 7.7.7.7 remote-as 65000.2525
+ neighbor 7.7.7.7 remote-as 6500.2525
  neighbor 7.7.7.7 update-source Loopback0
  !
  address-family ipv4 unicast
@@ -1011,11 +1011,11 @@ interface Loopback99
 route-map RED-LO99 permit 10
  match int Loopback99
 !
-router bgp 65000.2525
+router bgp 6500.2525
  bgp router-id 6.6.6.6
  bgp asnotation dot
  no bgp default ipv4-unicast
- neighbor 3.3.3.3 remote-as 65000.2525
+ neighbor 3.3.3.3 remote-as 6500.2525
  neighbor 3.3.3.3 update-source Loopback0
  !
  address-family ipv4 unicast
@@ -1032,12 +1032,12 @@ interface Loopback99
 route-map RED-LO99 permit 10
  match int Loopback99
 !
-router bgp 65000.2525
+router bgp 6500.2525
  bgp router-id 7.7.7.7
  no bgp default ipv4-unicast
- neighbor 128.10.254.3 remote-as 65000.2525
+ neighbor 128.10.254.3 remote-as 6500.2525
  neighbor 128.10.254.3 update-source Tunnel100
- neighbor 5.5.5.5 remote-as 65000.2525
+ neighbor 5.5.5.5 remote-as 6500.2525
  neighbor 5.5.5.5 update-source Loopback0 
  !
  address-family ipv4
@@ -1066,7 +1066,7 @@ route-map RED-LO99 permit 10
 router bgp 900
  bgp router-id 9.9.9.9
  no bgp default ipv4-unicast
- neighbor 1.1.1.1 remote-as 65000.2525
+ neighbor 1.1.1.1 remote-as 6500.2525
  neighbor 1.1.1.1 update-source Loopback0
  neighbor 1.1.1.1 disable-connected-check
  neighbor 1.1.1.1 password 0 !BGP_CCIE!
@@ -1091,7 +1091,7 @@ route-map COND-NET permit 10
 route-map LO-R5 permit 10
  match ip address prefix-list Loopback-R5 
 !
-router bgp 65000.2525
+router bgp 6500.2525
  no bgp asnotation dot
  neighbor 9.9.9.9 remote-as 900
  neighbor 9.9.9.9 update-source Loopback0
@@ -1332,7 +1332,7 @@ router bgp 65024
  bgp router-id 23.23.23.23
  no bgp default ipv4-unicast
  neighbor 128.10.234.24 remote-as 65024
- neighbor 128.10.233.3 remote-as 4259842525
+ neighbor 128.10.233.3 remote-as 6500.2525
  address-family ipv4 unicast
  neighbor 128.10.234.24 activate 
  neighbor 128.10.233.3 activate
@@ -1354,7 +1354,7 @@ router bgp 65024
 R3:
 
 !
-router bgp 4259842525
+router bgp 6500.2525
  address-family ipv4 unicast vrf VPN_B
  neighbor 128.10.233.23 remote-as 65024
  neighbor 128.10.233.23 activate
@@ -1366,8 +1366,56 @@ router bgp 4259842525
 
 ----------------------------------------------------------------------------------------------------
 
+R3:
 
+!
+router bgp 6500.2525
+ neighbor 8.8.8.8 remote-as 6500.2525
+ neighbor 8.8.8.8 update-source Loopback0
+ address-family vpnv4
+  neighbor 8.8.8.8 activate
+!    
 
+R6:
+
+!
+router bgp 6500.2525
+ neighbor 8.8.8.8 remote-as 6500.2525
+ neighbor 8.8.8.8 update-source Loopback0
+ address-family vpnv4
+  neighbor 8.8.8.8 activate
+!   
+
+R5:
+
+!
+router bgp 6500.2525
+ neighbor 8.8.8.8 remote-as 6500.2525
+ neighbor 8.8.8.8 update-source Loopback0
+ address-family vpnv4
+  neighbor 8.8.8.8 activate
+!   
+
+R8:
+
+!
+router bgp 6500.2525
+ bgp router-id 8.8.8.8
+ no bgp default ipv4-unicast
+ neighbor 3.3.3.3 remote-as 6500.2525
+ neighbor 3.3.3.3 update-source Loopback0
+ neighbor 5.5.5.5 remote-as 6500.2525
+ neighbor 5.5.5.5 update-source Loopback0
+ neighbor 6.6.6.6 remote-as 6500.2525
+ neighbor 6.6.6.6 update-source Loopback0 
+ address-family vpnv4
+  neighbor 3.3.3.3 activate
+  neighbor 3.3.3.3 route-reflector-client
+  neighbor 5.5.5.5 activate
+  neighbor 5.5.5.5 route-reflector-client 
+  neighbor 6.6.6.6 activate
+  neighbor 6.6.6.6 route-reflector-client
+!
 
 ----------------------------------------------------------------------------------------------------
 
@@ -1375,7 +1423,76 @@ router bgp 4259842525
 
 ----------------------------------------------------------------------------------------------------
 
+R4:
 
+!
+route-map RED-CONN permit 10
+ match interface Loopback0 Gi0/1.46
+!
+router bgp 650004
+ bgp router-id 4.4.4.4
+ no bgp default ipv4-unicast
+ neighbor 128.10.46.6 remote-as 6500.2525
+ address-family ipv4 
+  neighbor 128.10.46.6 activate
+  neighbor 128.10.46.6 default-originate
+  redistribute connected route-map RED-CONN
+!
+
+R6:
+
+!
+vrf definition SHARED
+ address-family ipv4
+  route-target import 100:100
+  route-target import 200:200
+  route-target export 300:300
+!
+vrf definition VPN_A
+ address-family ipv4
+  route-target import 100:100
+  route-target import 300:300
+  route-target export 100:100
+!
+router bgp 6500.2525
+ address-family ipv4 vrf SHARED
+  neighbor 128.10.46.4 remote-as 650004
+  neighbor 128.10.46.4 activate
+ address-family ipv4 vrf VPN_A
+  redistribute ospf 100 
+!
+router ospf 100 vrf VPN_A
+ redistribute bgp 6500.2525 subnets
+ default-information originate
+!
+
+R3:
+
+!
+vrf definition VPN_B
+ address-family ipv4
+  route-target import 200:200
+  route-target import 300:300
+  route-target export 200:200
+!
+
+R5:
+
+!
+vrf definition VPN_A
+ address-family ipv4
+  route-target import 100:100
+  route-target import 300:300
+  route-target export 100:100
+!
+router bgp 6500.2525
+  address-family ipv4 vrf VPN_A
+  redistribute ospf 100 
+!
+router ospf 100 vrf VPN_A
+ redistribute bgp 6500.2525 subnets
+ default-information originate
+!
 
 ----------------------------------------------------------------------------------------------------
 
@@ -1383,7 +1500,281 @@ router bgp 4259842525
 
 ----------------------------------------------------------------------------------------------------
 
+R6:
 
+!
+interface Loopback56 
+ vrf forwarding VPN_A
+ ip address 128.10.56.6 255.255.255.255
+!
+router bgp 6500.2525
+ address-family ipv4 vrf VPN_A
+  network 128.10.56.6 mask 255.255.255.255
+!
+router ospf 100 vrf VPN_A
+ area 5.6.21.22 sham-link 128.10.56.6 128.10.56.5 
+!
+
+R5:
+
+!
+interface Loopback56 
+ vrf forwarding VPN_A
+ ip address 128.10.56.5 255.255.255.255
+!
+router bgp 6500.2525
+ address-family ipv4 vrf VPN_A
+  network 128.10.56.5 mask 255.255.255.255
+!
+router ospf 100 vrf VPN_A
+ area 5.6.21.22 sham-link 128.10.56.5 128.10.56.6 
+!
+
+SW2:
+
+!
+int gi1/1
+ ip ospf cost 5
+!
+
+SW1:
+
+!
+int gi1/1
+ ip ospf cost 5
+!
+
+***************************************************************************************************
+
+IPv6
+
+***************************************************************************************************
+
+7.1 DMVPN Over IPv6 Transport
+
+----------------------------------------------------------------------------------------------------
+
+R1:
+
+!
+interface Tunnel200
+ ipv6 address 2004:128:10:254::1/64
+ ipv6 nhrp network-id 200
+ ipv6 nhrp authentication v6DMVPN
+ ipv6 nhrp nhs 2004:128:10:254::7 nbma 2004:128:10:100::7 multicast
+ tunnel source Gi0/1.100 
+ tunnel key 200
+ tunnel mode gre multipoint ipv6
+!
+
+R2:
+
+!
+interface Tunnel200
+ ipv6 address 2004:128:10:254::2/64
+ ipv6 nhrp network-id 200
+ ipv6 nhrp authentication v6DMVPN
+ ipv6 nhrp nhs 2004:128:10:254::7 nbma 2004:128:10:100::7 multicast
+ tunnel source Gi0/1.100 
+ tunnel key 200
+ tunnel mode gre multipoint ipv6
+!
+
+R3:
+
+!
+interface Tunnel200
+ ipv6 address 2004:128:10:254::3/64
+ ipv6 nhrp network-id 200
+ ipv6 nhrp authentication v6DMVPN
+ ipv6 nhrp nhs 2004:128:10:254::7 nbma 2004:128:10:100::7 multicast
+ tunnel source Gi0/1.100 
+ tunnel key 200
+ tunnel mode gre multipoint ipv6
+!
+
+R7:
+
+!
+interface Tunnel200
+ ipv6 address 2004:128:10:254::7/64
+ ipv6 nhrp network-id 200
+ ipv6 nhrp authentication v6DMVPN
+ ipv6 nhrp map multicast dynamic
+ tunnel source Gi0/1.100
+ tunnel key 200
+ tunnel mode gre multipoint ipv6
+!
+
+----------------------------------------------------------------------------------------------------
+
+7.2 IPv6 OSPFv3
+
+----------------------------------------------------------------------------------------------------
+
+R1:
+
+!
+ipv6 prefix-list Lo-v6-R1 seq 5 permit 2004:1:1:1::1/128
+!
+route-map RED-CONN-IPv6 permit 10
+ match ipv6 address prefix-list Lo-v6-R1 
+!
+interface tunnel200
+ ospfv3 3 ipv6 area 1.2.3.7
+ ospfv3 network broadcast
+ ospfv3 priority 0
+!
+router ospfv3 3
+ router-id 16.16.16.16
+ address-family ipv6
+  redistribute connected route-map RED-CONN-IPv6
+!
+
+R2:
+
+!
+ipv6 prefix-list Lo-v6-R1 seq 5 permit 2004:2:2:2::2/128
+!
+route-map RED-CONN-IPv6 permit 10
+ match ipv6 address prefix-list Lo-v6-R1 
+!
+interface tunnel200
+ ospfv3 3 ipv6 area 1.2.3.7
+ ospfv3 network broadcast
+ ospfv3 priority 0
+!
+router ospfv3 3
+ router-id 26.26.26.26
+ address-family ipv6
+  redistribute connected route-map RED-CONN-IPv6
+!
+
+R3:
+
+!
+ipv6 prefix-list Lo-v6-R1 seq 5 permit 2004:3:3:3::3/128
+!
+route-map RED-CONN-IPv6 permit 10
+ match ipv6 address prefix-list Lo-v6-R1 
+!
+interface tunnel200
+ ospfv3 3 ipv6 area 1.2.3.7
+ ospfv3 network broadcast
+ ospfv3 priority 0
+!
+router ospfv3 3
+ router-id 36.36.36.36
+ address-family ipv6
+  redistribute connected route-map RED-CONN-IPv6 
+!
+
+R7:
+
+!
+ipv6 prefix-list Lo-v6-R1 seq 5 permit 2004:7:7:7::7/128
+!
+route-map RED-CONN-IPv6 permit 10
+ match ipv6 address prefix-list Lo-v6-R1 
+!
+interface tunnel200
+ ospfv3 3 ipv6 area 1.2.3.7
+!
+router ospfv3 3
+ router-id 76.76.76.76
+ address-family ipv6
+  redistribute connected route-map RED-CONN-IPv6 
+!
+interface Tunnel200
+ ospfv3 network broadcast
+! 
+
+----------------------------------------------------------------------------------------------------
+
+7.3 IPv6 IPsec
+
+----------------------------------------------------------------------------------------------------
+
+R1,R2,R3,R7:
+
+!
+crypto isakmp policy 10
+ authentication pre-share 
+ encryption aes 192
+ hash sha256
+ group 5
+!
+crypto isakmp key 0 v6Ike address ipv6 ::/0
+!
+crypto ipsec transform-set AES-256-SHA-512 esp-aes 256 esp-sha512-hmac 
+ mode transport
+!
+crypto ipsec profile IPV6-IPSEC
+ set transform-set AES-256-SHA-512
+!
+interface tunnel200
+ tunnel protection ipsec profile IPV6-IPSEC  
+!
+
+----------------------------------------------------------------------------------------------------
+
+7.4 IPv6 IPsec
+
+----------------------------------------------------------------------------------------------------
+
+R1:
+
+!
+crypto isakmp policy 16
+ authentication pre-share
+ encryption 3des
+ hash sha
+ group 14
+!
+crypto isakmp key 0 v6VTI address ipv6 2004:128:10:16::6/128
+!
+crypto ipsec transform-set 3DES-MD5 esp-3des ah-md5-hmac 
+ mode tunnel
+!
+crypto ipsec profile IPV6-VTI
+ set transform-set 3DES-MD5
+!
+interface Tunnel16
+ ipv6 address 2004:128:10:1616::/64 eui-64
+ tunnel mode ipsec ipv6
+ tunnel source Gi0/1.16
+ tunnel destination 2004:128:10:16::6
+ tunnel protection ipsec profile IPV6-VTI
+!
+ipv6 route 2004:6:6:6::6/128 Tunnel 16 
+!
+
+R6:
+
+!
+crypto isakmp policy 16
+ authentication pre-share
+ encryption 3des
+ hash sha
+ group 14
+!
+crypto isakmp key 0 v6VTI address ipv6 2004:128:10:16::1/128
+!
+crypto ipsec transform-set 3DES-MD5 esp-3des ah-md5-hmac 
+ mode tunnel
+!
+crypto ipsec profile IPV6-VTI
+ set transform-set 3DES-MD5
+!
+interface Tunnel16
+ ipv6 address 2004:128:10:1616::/64 eui-64
+ tunnel mode ipsec ipv6
+ tunnel source Gi0/1.16
+ tunnel destination 2004:128:10:16::1
+ tunnel protection ipsec profile IPV6-VTI
+!
+ipv6 route 2004:1:1:1::1/128 Tunnel 16 
+!
 
 
 

@@ -1,0 +1,274 @@
+! tsrack99, sw3, 2014-09-22 11:22:43
+do undebug all
+no logging console
+no service config
+no ip domain-lookup
+vtp file vlan.dat
+! VTP interface control currently not supported
+vtp mode Transparent
+vtp version 1
+! VTP traps generation control currently not supported
+vtp domain cisco
+do show vtp status
+do show vlan brief
+!
+no vtp password
+vlan 12
+vlan 13
+vlan 14
+vlan 16
+vlan 25
+vlan 35
+vlan 44
+vlan 45
+vlan 56
+vlan 90
+vlan 113
+vlan 115
+vlan 116
+vlan 134
+vlan 318
+vlan 334
+vlan 444
+vlan 1727
+!
+version 12.2
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname SW3
+!
+boot-start-marker
+boot-end-marker
+!
+no logging console
+!
+no aaa new-model
+system mtu routing 1500
+vtp domain cisco
+vtp mode transparent
+ip subnet-zero
+ip routing
+no ip domain-lookup
+!
+ip vrf B
+ rd 65100:318
+!
+crypto pki trustpoint TP-self-signed-2459421184
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-2459421184
+ revocation-check none
+ rsakeypair TP-self-signed-2459421184
+!
+spanning-tree mode mst
+spanning-tree extend system-id
+!
+spanning-tree mst configuration
+ instance 1 vlan 1224, 1226
+!
+vlan internal allocation policy ascending
+!
+vlan 12-14,16,25,35
+!
+vlan 44
+  private-vlan isolated
+!
+vlan 45,56,90,113,115-116,134,318,334
+!
+vlan 444
+  private-vlan primary
+  private-vlan association 44
+!
+vlan 1727
+!
+interface FastEthernet0/1
+ no shutdown
+ switchport access vlan 115
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet0/2
+ no shutdown
+ switchport access vlan 116
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet0/3
+ no shutdown
+ switchport access vlan 1727
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet0/4
+ no shutdown
+ switchport access vlan 318
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet0/5
+ no shutdown
+ switchport access vlan 90
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet0/6
+ no shutdown
+ switchport access vlan 44
+ switchport trunk encapsulation dot1q
+ switchport private-vlan host-association 444 44
+ switchport mode private-vlan host
+ spanning-tree portfast
+!
+interface FastEthernet0/7
+ no shutdown
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ spanning-tree portfast trunk
+!
+interface FastEthernet0/8
+ no shutdown
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ spanning-tree portfast trunk
+!
+interface FastEthernet0/9
+ no shutdown
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ spanning-tree portfast trunk
+!
+interface FastEthernet0/10
+ no shutdown
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ spanning-tree portfast trunk
+!
+interface FastEthernet0/11
+ no shutdown
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ spanning-tree portfast trunk
+!
+interface FastEthernet0/12
+ no shutdown
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ spanning-tree portfast trunk
+!
+interface FastEthernet0/13
+ no shutdown
+ switchport access vlan 44
+ switchport private-vlan host-association 444 44
+ switchport mode private-vlan host
+ spanning-tree portfast
+!
+interface FastEthernet0/14
+ no shutdown
+ switchport access vlan 444
+ switchport private-vlan mapping 444 44
+ switchport mode private-vlan promiscuous
+ spanning-tree portfast
+!
+interface FastEthernet0/15
+ no shutdown
+ switchport mode dynamic desirable
+!
+interface FastEthernet0/16
+ no shutdown
+ switchport mode dynamic desirable
+!
+interface FastEthernet0/17
+ no shutdown
+ switchport mode dynamic desirable
+!
+interface FastEthernet0/18
+ no shutdown
+ switchport mode dynamic desirable
+!
+interface FastEthernet0/19
+ no shutdown
+ switchport mode dynamic desirable
+!
+interface FastEthernet0/20
+ no shutdown
+ switchport mode dynamic desirable
+!
+interface FastEthernet0/21
+ no shutdown
+ switchport mode dynamic desirable
+!
+interface FastEthernet0/22
+ no shutdown
+ switchport mode dynamic desirable
+!
+interface FastEthernet0/23
+ no shutdown
+ switchport mode dynamic desirable
+!
+interface FastEthernet0/24
+ no shutdown
+ switchport mode dynamic desirable
+!
+interface GigabitEthernet0/1
+ no shutdown
+ switchport mode dynamic desirable
+!
+interface GigabitEthernet0/2
+ no shutdown
+ switchport mode dynamic desirable
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan13
+ ip address 172.16.13.3 255.255.255.0
+!
+interface Vlan134
+ ip address 10.1.143.0 255.255.255.254
+!
+interface Vlan318
+ ip vrf forwarding B
+ ip address 172.17.1.3 255.255.255.0
+ ip ospf network point-to-point
+!
+router ospf 65100 vrf B
+ log-adjacency-changes
+ capability vrf-lite
+ network 172.17.1.0 0.0.0.255 area 10
+!
+router bgp 65013
+ no synchronization
+ bgp log-neighbor-changes
+ neighbor 10.1.143.1 remote-as 65111
+ neighbor 10.1.143.1 transport path-mtu-discovery
+ neighbor 172.16.13.13 remote-as 65013
+ neighbor 172.16.13.13 transport path-mtu-discovery
+ neighbor 172.16.13.13 next-hop-self
+ no auto-summary
+!
+ip classless
+ip http server
+ip http secure-server
+!
+control-plane
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous level 0 limit 20
+line vty 0 4
+ privilege level 15
+ no login
+line vty 5 15
+ login
+!
+!
+service password-recovery
+!
+do show ip interface brief
+!
+!
+end

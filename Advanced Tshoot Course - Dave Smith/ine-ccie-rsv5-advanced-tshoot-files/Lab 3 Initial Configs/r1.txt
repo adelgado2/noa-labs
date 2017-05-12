@@ -1,0 +1,116 @@
+! tsrack99, r1, 2014-09-22 11:22:42
+do undebug all
+no logging console
+no service config
+no ip domain-lookup
+!
+version 12.4
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R1
+!
+boot-start-marker
+boot-end-marker
+!
+no logging console
+!
+no aaa new-model
+dot11 syslog
+ip cef
+!
+no ip domain lookup
+ip multicast-routing
+!
+multilink bundle-name authenticated
+!
+archive
+ log config
+  hidekeys
+!
+class-map match-all default
+ match protocol tftp
+!
+policy-map system
+ class default
+   drop
+!
+interface FastEthernet0/0
+ no shutdown
+ ip address 192.168.123.1 255.255.255.240
+ ip pim sparse-mode
+ ip ospf 1 area 0
+ duplex auto
+ speed auto
+ service-policy input system
+!
+interface FastEthernet0/1
+ no shutdown
+ ip address 10.1.116.1 255.255.255.252
+ ip pim sparse-mode
+ duplex auto
+ speed auto
+!
+interface Serial0/0/0
+ no shutdown
+ no ip address
+ shutdown
+!
+router ospf 1
+ log-adjacency-changes
+ default-information originate always
+!
+router bgp 65321
+ no bgp default ipv4-unicast
+ bgp log-neighbor-changes
+ neighbor 10.1.116.2 remote-as 65222
+ !
+ address-family ipv4
+  redistribute ospf 1 route-map IGP_TO_BGP
+  neighbor 10.1.116.2 activate
+  neighbor 10.1.116.2 send-community both
+  no auto-summary
+  no synchronization
+ exit-address-family
+!
+ip forward-protocol nd
+!
+ip http server
+no ip http secure-server
+ip pim rp-address 192.168.123.1
+!
+ip access-list extended OUTSIDE_TO_INSIDE_EXCEPTIONS_ACL
+ permit icmp any any time-exceeded
+ permit icmp any any port-unreachable
+!
+ip prefix-list IGP_PREFIXES seq 5 permit 192.168.123.0/28
+ip prefix-list IGP_PREFIXES seq 10 permit 172.16.123.0/28
+ip prefix-list IGP_PREFIXES seq 15 permit 10.1.24.0/29
+ip prefix-list IGP_PREFIXES seq 20 permit 10.1.35.0/29
+!
+route-map IGP_TO_BGP permit 10
+ match ip address prefix-list IGP_PREFIXES
+ set origin igp
+ set community 4280877166
+!
+control-plane
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous level 0 limit 20
+line aux 0
+line vty 0 4
+ privilege level 15
+ no login
+!
+scheduler allocate 20000 1000
+!
+service password-recovery
+!
+do show ip interface brief
+!
+!
+end

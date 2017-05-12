@@ -1,0 +1,134 @@
+! tsrack99, r25, 2014-09-22 11:22:43
+do undebug all
+no logging console
+no service config
+no ip domain-lookup
+!
+version 12.4
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R25
+!
+boot-start-marker
+boot-end-marker
+!
+no logging console
+!
+no aaa new-model
+dot11 syslog
+ip cef
+!
+no ip domain lookup
+!
+multilink bundle-name authenticated
+mpls label protocol ldp
+!
+archive
+ log config
+  hidekeys
+!
+interface Loopback0
+ ip address 25.25.25.25 255.255.255.255
+ ip ospf network point-to-point
+ ip ospf 10 area 0
+!
+interface FastEthernet0/0
+ no shutdown
+ no ip address
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/0.25
+ encapsulation dot1Q 25
+ ip address 10.0.0.7 255.255.255.254
+ ip ospf network point-to-point
+ ip ospf 10 area 0
+ mpls ip
+!
+interface FastEthernet0/0.35
+ encapsulation dot1Q 35
+ ip address 10.0.0.5 255.255.255.254
+ ip ospf network point-to-point
+ ip ospf 10 area 0
+ mpls ip
+!
+interface FastEthernet0/0.45
+ encapsulation dot1Q 45
+ ip address 10.0.0.11 255.255.255.254
+ ip ospf network point-to-point
+ ip ospf 10 area 0
+ mpls ip
+!
+interface FastEthernet0/0.56
+ encapsulation dot1Q 56
+ ip address 10.0.0.12 255.255.255.254
+ ip ospf network point-to-point
+ ip ospf 10 area 0
+ mpls ip
+!
+interface FastEthernet0/1
+ no shutdown
+ no ip address
+ duplex auto
+ speed auto
+!
+router ospf 10
+ router-id 25.25.25.25
+ log-adjacency-changes
+!
+router bgp 10
+ no bgp default ipv4-unicast
+ bgp log-neighbor-changes
+ neighbor 22.22.22.22 remote-as 10
+ neighbor 22.22.22.22 update-source Loopback0
+ neighbor 23.23.23.23 remote-as 10
+ neighbor 23.23.23.23 update-source Loopback0
+ neighbor 24.24.24.24 remote-as 10
+ neighbor 24.24.24.24 update-source Loopback0
+ neighbor 26.26.26.26 remote-as 10
+ neighbor 26.26.26.26 update-source Loopback0
+ !
+ address-family vpnv4
+  neighbor 22.22.22.22 activate
+  neighbor 22.22.22.22 send-community extended
+  neighbor 22.22.22.22 route-reflector-client
+  neighbor 23.23.23.23 activate
+  neighbor 23.23.23.23 send-community extended
+  neighbor 23.23.23.23 route-reflector-client
+  neighbor 24.24.24.24 activate
+  neighbor 24.24.24.24 send-community extended
+  neighbor 24.24.24.24 route-reflector-client
+  neighbor 26.26.26.26 activate
+  neighbor 26.26.26.26 send-community extended
+  neighbor 26.26.26.26 route-reflector-client
+ exit-address-family
+!
+ip forward-protocol nd
+!
+ip http server
+no ip http secure-server
+!
+mpls ldp router-id Loopback0
+!
+control-plane
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous level 0 limit 20
+line aux 0
+line vty 0 4
+ privilege level 15
+ no login
+!
+scheduler allocate 20000 1000
+!
+service password-recovery
+!
+do show ip interface brief
+!
+!
+end

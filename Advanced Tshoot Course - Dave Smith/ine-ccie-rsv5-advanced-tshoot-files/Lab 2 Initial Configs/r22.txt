@@ -1,0 +1,122 @@
+! tsrack99, r22, 2014-09-15 12:17:21
+do undebug all
+no logging console
+no service config
+no ip domain-lookup
+!
+version 12.4
+no service pad
+no service timestamps debug uptime
+no service timestamps log uptime
+no service password-encryption
+!
+hostname Rack1R22
+!
+boot-start-marker
+boot-end-marker
+!
+logging buffered 4096
+no logging console
+enable secret 5 $1$8LaD$lmClbj90vQlwLPOEk8aEV/
+!
+no aaa new-model
+dot11 syslog
+ip cef
+!
+ip vrf A
+ rd 22:1
+ route-target export 22:1
+ route-target import 23:1
+ route-target import 24:1
+ route-target import 26:1
+!
+no ip domain lookup
+!
+multilink bundle-name authenticated
+!
+archive
+ log config
+  hidekeys
+!
+ip tcp synwait-time 5
+!
+interface Loopback0
+ ip address 10.1.1.22 255.255.255.255
+!
+interface FastEthernet0/0
+ no shutdown
+ no ip address
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/0.12
+ encapsulation dot1Q 900
+ ip address 10.0.0.0 255.255.255.254
+!
+interface FastEthernet0/0.25
+ encapsulation dot1Q 906
+ ip address 10.0.0.6 255.255.255.254
+!
+interface FastEthernet0/1
+ no shutdown
+ ip vrf forwarding A
+ ip address 172.16.6.254 255.255.255.0
+ duplex auto
+ speed auto
+!
+router ospf 1
+ mpls ldp autoconfig
+ router-id 10.1.1.22
+ log-adjacency-changes
+ network 0.0.0.0 255.255.255.255 area 0
+!
+router rip
+ !
+ address-family ipv4 vrf A
+  redistribute bgp 10 metric 8
+  network 172.16.0.0
+  no auto-summary
+  version 2
+ exit-address-family
+!
+router bgp 10
+ bgp router-id 10.1.1.22
+ no bgp default ipv4-unicast
+ bgp log-neighbor-changes
+ neighbor 10.1.1.24 remote-as 10
+ neighbor 10.1.1.24 update-source Loopback0
+ !
+ address-family vpnv4
+  neighbor 10.1.1.24 activate
+  neighbor 10.1.1.24 send-community extended
+ exit-address-family
+ !
+ address-family ipv4 vrf A
+  redistribute rip
+  no synchronization
+ exit-address-family
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+control-plane
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous level 0 limit 20
+line aux 0
+line vty 0 4
+ password cisco
+ login
+!
+scheduler allocate 20000 1000
+!
+service password-recovery
+!
+do show ip interface brief
+!
+!
+end

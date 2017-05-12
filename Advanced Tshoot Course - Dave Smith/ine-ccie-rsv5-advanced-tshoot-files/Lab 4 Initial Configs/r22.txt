@@ -1,0 +1,119 @@
+! tsrack99, r22, 2014-09-16 21:17:14
+do undebug all
+no logging console
+no service config
+no ip domain-lookup
+!
+version 12.4
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname R22
+!
+boot-start-marker
+boot-end-marker
+!
+no logging console
+!
+no aaa new-model
+dot11 syslog
+ip cef
+!
+ip vrf A
+ rd 10:51
+ route-target export 10:51
+ route-target import 10:51
+!
+no ip domain lookup
+!
+multilink bundle-name authenticated
+mpls label protocol ldp
+!
+archive
+ log config
+  hidekeys
+!
+interface Loopback0
+ ip address 22.22.22.22 255.255.255.255
+ ip ospf 10 area 0
+!
+interface FastEthernet0/0
+ no shutdown
+ no ip address
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/0.12
+ encapsulation dot1Q 12
+ ip address 10.0.0.0 255.255.255.254
+ ip ospf network point-to-point
+ ip ospf 10 area 0
+ mpls ip
+!
+interface FastEthernet0/0.25
+ encapsulation dot1Q 25
+ ip address 10.0.0.6 255.255.255.254
+ ip ospf network point-to-point
+ ip ospf 10 area 0
+ mpls ip
+!
+interface FastEthernet0/1
+ no shutdown
+ ip vrf forwarding A
+ ip address 172.17.51.22 255.255.255.0
+ duplex auto
+ speed auto
+!
+router ospf 10
+ router-id 22.22.22.22
+ log-adjacency-changes
+!
+router bgp 10
+ no bgp default ipv4-unicast
+ bgp log-neighbor-changes
+ neighbor 21.21.21.21 remote-as 10
+ neighbor 21.21.21.21 update-source Loopback0
+ neighbor 25.25.25.25 remote-as 10
+ neighbor 25.25.25.25 update-source Loopback0
+ !
+ address-family vpnv4
+  neighbor 21.21.21.21 activate
+  neighbor 21.21.21.21 send-community extended
+  neighbor 25.25.25.25 activate
+  neighbor 25.25.25.25 send-community extended
+ exit-address-family
+ !
+ address-family ipv4 vrf A
+  neighbor 172.17.51.20 remote-as 65100
+  neighbor 172.17.51.20 activate
+  no synchronization
+ exit-address-family
+!
+ip forward-protocol nd
+!
+ip http server
+no ip http secure-server
+!
+mpls ldp router-id Loopback0
+!
+control-plane
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ logging synchronous level 0 limit 20
+line aux 0
+line vty 0 4
+ privilege level 15
+ no login
+!
+scheduler allocate 20000 1000
+!
+service password-recovery
+!
+do show ip interface brief
+!
+!
+end
