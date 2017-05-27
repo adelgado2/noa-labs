@@ -1,0 +1,282 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 11:52:56 UTC Sat May 20 2017
+! NVRAM config last updated at 11:40:49 UTC Sat May 20 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R7
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+vrf definition VPN_CCIE
+ rd 65066:700
+ !
+ address-family ipv4
+  route-target export 100:100
+  route-target import 100:100
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+ip domain name ine.ccie.lab
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+crypto pki trustpoint TP-self-signed-800342041
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-800342041
+ revocation-check none
+ rsakeypair TP-self-signed-800342041
+!
+!
+crypto pki certificate chain TP-self-signed-800342041
+ certificate self-signed 01
+  30820229 30820192 A0030201 02020101 300D0609 2A864886 F70D0101 05050030
+  30312E30 2C060355 04031325 494F532D 53656C66 2D536967 6E65642D 43657274
+  69666963 6174652D 38303033 34323034 31301E17 0D313730 35323031 31353235
+  335A170D 32303031 30313030 30303030 5A303031 2E302C06 03550403 1325494F
+  532D5365 6C662D53 69676E65 642D4365 72746966 69636174 652D3830 30333432
+  30343130 819F300D 06092A86 4886F70D 01010105 0003818D 00308189 02818100
+  9CB45442 B318C8CD F79194D6 BA8C4849 36089720 EAE95D0E 856C9E1F 96A1083F
+  BCC0D755 7BBA82A8 CD6150D0 E451DC2F D520F0B7 707E7739 A380E753 B94C8A5E
+  C901C6E9 63B23E0E 99BC3326 943F3E61 AF40C392 87F71365 B9AF3EC8 109F6B96
+  E8DE3997 4BA4ABFA B5E4D84C CC6D3F7A 5638D04C 2E1B0666 E2691AA5 39586DB1
+  02030100 01A35330 51300F06 03551D13 0101FF04 05300301 01FF301F 0603551D
+  23041830 1680141C BD3CA753 5ADA7987 52080BF0 250210F3 051EEF30 1D060355
+  1D0E0416 04141CBD 3CA7535A DA798752 080BF025 0210F305 1EEF300D 06092A86
+  4886F70D 01010505 00038181 00642E06 5EA879FC E7F23C5A A8BE54D9 19D756D7
+  7F49F6E0 A774A9ED BFEF8182 A007FFF9 B1374FAA B2B90B93 5F7054C7 410A4E3F
+  82312B0B 8C66C475 EEDA48B2 4FA265CA C7D50972 BCD492C8 6D31944C 3F871BFC
+  75970128 3FD5F96A 4C473A67 60EF3A32 9EEE5273 B5EC06B8 8B19038B 9CFA394E
+  1604FF31 53BC05F4 DF816AFF F4
+  	quit
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$Mu9z$tjqTeS6Oo3eSGgJSedazC1
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+ip ssh port 4022 rotary 1
+ip ssh source-interface Loopback0
+ip ssh version 2
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.7 255.255.255.255
+ ipv6 address ::192:122:3:7/128
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.17
+ encapsulation dot1Q 17
+ ip address 136.5.17.7 255.255.255.0
+ ip pim sparse-mode
+ ipv6 address 2001:136:5:17::7/64
+ mpls ip
+ no shutdown
+!
+interface GigabitEthernet1.78
+ encapsulation dot1Q 78
+ ip address 172.30.78.7 255.255.255.224
+ ip pim sparse-mode
+ ipv6 address 2001:172:30:78::7/120
+ mpls ip
+ no shutdown
+!
+interface GigabitEthernet1.79
+ encapsulation dot1Q 79
+ vrf forwarding VPN_CCIE
+ ip address 172.30.79.7 255.255.255.224
+ ip pim sparse-mode
+ ipv6 address 2001:172:30:79::7/120
+ no shutdown
+!
+interface GigabitEthernet2
+ ip address 192.168.1.7 255.255.255.0
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+!
+router eigrp CCIE
+ !
+ address-family ipv4 unicast autonomous-system 56
+  !
+  af-interface default
+   shutdown
+   authentication mode hmac-sha-256 CC!E_!nE
+  exit-af-interface
+  !
+  af-interface Loopback0
+   no shutdown
+  exit-af-interface
+  !
+  af-interface GigabitEthernet1.17
+   no shutdown
+  exit-af-interface
+  !
+  af-interface GigabitEthernet1.78
+   no shutdown
+  exit-af-interface
+  !
+  topology base
+   metric maximum-hops 10
+  exit-af-topology
+  network 136.5.0.0
+  network 172.30.0.0
+  network 192.122.3.0
+  metric weights 0 0 0 1 0 0 0
+  eigrp router-id 192.122.3.7
+ exit-address-family
+!
+router bgp 65006
+ bgp router-id 192.122.3.7
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 192.122.3.4 remote-as 65006
+ neighbor 192.122.3.4 password md5 0 CC!E_!nE
+ neighbor 192.122.3.4 update-source Loopback0
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family vpnv4
+  neighbor 192.122.3.4 activate
+  neighbor 192.122.3.4 send-community extended
+ exit-address-family
+ !
+ address-family ipv4 vrf VPN_CCIE
+  neighbor 172.30.79.9 remote-as 65100
+  neighbor 172.30.79.9 activate
+  neighbor 172.30.79.9 send-community both
+  neighbor 172.30.79.9 route-map POLICY-FROM-R9 in
+ exit-address-family
+!
+!
+!
+ip forward-protocol nd
+!
+ip bgp-community new-format
+ip community-list 1 permit 65100:110
+ip community-list 2 permit 65100:90
+ip community-list 3 permit 65100:999
+no ip http server
+ip http secure-server
+!
+ip access-list extended VTY-IN
+ permit tcp any any eq 4022
+ deny   ip any any
+!
+!
+route-map POLICY-FROM-R9 permit 10
+ match community 1
+ set local-preference 110
+!
+route-map POLICY-FROM-R9 permit 20
+ match community 2
+ set local-preference 90
+!
+route-map POLICY-FROM-R9 permit 30
+ match community 3
+ set community no-advertise additive
+!
+route-map POLICY-FROM-R9 permit 40
+!
+mpls ldp router-id Loopback0 force
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line vty 0 4
+ access-class VTY-IN in vrf-also
+ login local
+ rotary 1
+ transport input ssh
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+line vty 11 98
+ no login
+!
+!
+end

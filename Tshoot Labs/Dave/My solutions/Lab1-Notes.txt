@@ -1,0 +1,318 @@
+***************************
+Ticket 1
+***************************
+
+R18:
+
+!
+int tu0
+ tunnel source Serial1/0
+!
+int Se1/0
+ ip address 204.186.88.18 255.255.255.0
+ encapsulation ppp
+!
+
+R28:
+
+!
+int Se1/0
+ ip address 204.186.88.28 255.255.255.0
+ encapsulation ppp
+!
+int Se1/1
+ ip address 204.186.89.28 255.255.255.0
+ encapsulation ppp
+!
+
+R19:
+
+!
+int tu0
+ tunnel source Serial1/1
+!
+int Se1/1
+ ip address 204.186.89.19 255.255.255.0
+ encapsulation ppp
+!
+
+Rack1SW3:
+
+!
+router ospf 10 vrf B
+ capability vrf-lite
+!
+
+Hasta aquí es problema topología, no del ticket.
+ 
+R23:
+ 
+!
+router ospf 100 vrf A
+ no area 51 virtual-link 172.17.51.3
+ area 51 virtual-link 3.3.3.13
+!
+
+Rack1R23:
+
+!
+no mpls ip propagate-ttl forwarded
+!
+
+R14:
+
+!
+no ip icmp rate-limit unreachable 
+!
+
+***************************
+Ticket 2
+***************************
+
+R2:
+
+!
+ip access-list standard 1
+ permit host 10.1.1.1
+!
+router ospf 1
+ distance 180 10.1.1.3 0.0.0.0 1
+!
+
+R3:
+
+!
+ip access-list standard 1
+ permit host 10.1.1.1
+!
+router ospf 1
+ distance 180 10.1.1.2 0.0.0.0 1
+!
+
+***************************
+Ticket 3
+***************************
+
+Rack1SW2:
+
+!
+ip routing   
+!
+
+! Dificil que esto pase ya con IOS nuevas, que lo activen, pongan EIGRP, lo quiten y NO se vaya la parte de EIGRP. Ya no pasa con los nuevos, si quitas ip routing se va todo a la porra, como toca.
+!
+
+Del ticket solo era esto, lo de abajo es de la topología.
+
+R7:
+
+!
+line vty 0 4
+ transport input telnet
+!
+
+R12:
+
+!
+int Se1/0
+ ip address 10.1.112.12 255.255.255.0
+ encapsulation ppp
+ no fair-queue
+ clock rate 128000
+ ppp chap hostname R12
+ ppp chap password 0 CISCO
+!
+int Se1/1
+ ip address 10.1.123.12 255.255.255.0
+ encapsulation ppp
+ clock rate 2000000
+ ppp reliable-link
+ ppp encrypt mppe auto
+!
+
+R13:
+
+!
+interface Serial1/1
+ ip address 10.1.123.13 255.255.255.0
+ encapsulation ppp
+!
+
+R11:
+
+!
+int Se1/0
+ ip address 10.1.112.11 255.255.255.0
+ encapsulation ppp
+!
+
+Rack1SW2:
+
+!
+int e0/0
+ ip address 192.168.179.26 255.255.255.248
+ no ip route-cache
+ no shut
+!
+int e0/1
+ ip address 192.168.179.33 255.255.255.248
+ no ip route-cache
+ no shut
+!
+
+***************************
+Ticket 4
+***************************
+
+R7:
+
+!
+key chain EIGRP
+ key 1
+  key-string CISCO
+!
+interface E0/0
+ ip authentication mode eigrp 179 md5
+ ip authentication key-chain eigrp 179 EIGRP
+!
+
+Hay otro fault que no se puede simular. Es en SWITCH1 que
+aparece en topology entre R7 y R8, pero no en esta.
+Hay storm-control activado entre R8 y R7, en la interfaz de R8 
+a switch.
+
+RackSW1:
+
+!
+interface Fa0/8
+ storm-control multicast level pps 1000
+! 
+
+***************************
+Ticket 5
+***************************
+
+R27:
+
+!
+router ospf 1
+ no passive-interface e0/1
+!
+
+R20:
+
+!
+int e0/1 
+ ip ospf cost 12
+!
+
+***************************
+Ticket 6
+***************************
+
+R19:
+
+!
+int tu0
+ ip ospf network point-to-multipoint
+!
+
+***************************
+Ticket 7
+***************************
+
+Rack1SW3:
+
+Esto es de la topología:
+!
+line vty 0 4
+ transport input telnet
+!
+
+Esto ya del ticket:
+R26:
+
+!
+int e0/0
+ ip ospf cost 12
+!
+
+R23:
+
+!
+int e0/1
+ ip ospf cost 12
+!
+
+***************************
+Ticket 8
+***************************
+
+Esto es de la topología
+Rack1SW3:
+
+!
+int e0/0
+ ip vrf forwarding A
+ ip address 172.16.13.3 255.255.255.0
+ ip ospf 100 area 0
+ no shut
+!
+
+Esto ya del ticket:
+Rack1R13:
+
+!
+router bgp 65013
+ network 3.3.3.0 mask 255.255.255.248
+!
+router ospf 1
+ redistribute connected subnets
+!
+
+***************************
+Ticket 9
+***************************
+
+Esto es de la topología
+Rack1R28:
+
+!
+event manager applet EEM_DNS
+ event timer countdown time 30
+ action 1.0 cli command "enable"
+ action 2.0 cli command "conf t"
+ action 3.0 cli command "ip domain-lookup"
+!
+
+Esto ya del ticket:
+R18:
+
+!
+ip dns server
+!
+ip host R27 10.1.1.27
+!
+
+R27:
+
+!
+route-map LOOPBACK permit 10
+ match interface Loopback0
+!
+router ospf 1
+ redistribute connected subnets route-map LOOPBACK
+!
+
+***************************
+Ticket 10
+***************************
+
+R18:
+
+!
+ip access-list extended default
+ 5 permit tcp host 19.19.19.19 host 172.17.1.3 eq telnet
+ no 10 permit tcp host 172.17.1.3 eq telnet host 19.19.19.19
+!
+

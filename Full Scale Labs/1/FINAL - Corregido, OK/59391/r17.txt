@@ -1,0 +1,213 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 11:58:25 UTC Sat May 20 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R17
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+crypto pki trustpoint TP-self-signed-2058874989
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-2058874989
+ revocation-check none
+ rsakeypair TP-self-signed-2058874989
+!
+!
+crypto pki certificate chain TP-self-signed-2058874989
+ certificate self-signed 01
+  3082022B 30820194 A0030201 02020101 300D0609 2A864886 F70D0101 05050030
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274
+  69666963 6174652D 32303538 38373439 3839301E 170D3137 30353230 31313532
+  34395A17 0D323030 31303130 30303030 305A3031 312F302D 06035504 03132649
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D32 30353838
+  37343938 3930819F 300D0609 2A864886 F70D0101 01050003 818D0030 81890281
+  8100BF15 8F0EEAB5 42125F38 1EBEE568 82BA35CE 74657BDE 86470EC3 4CB3320F
+  046140BE E63D84CD E4D2E161 B61DF1AB 00F9A973 DF05F749 2A405AA3 4B9DDCF0
+  19C4E9F2 7F6B507F 3AEEC043 9362831D 3006AD68 573383C2 1DB37496 E7BF1CCD
+  1FB65FBD F78D2D1D 92F0F5A3 C30F976C 2E74BA56 10932D8E 751FB6AB 291FC169
+  D7C10203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 301F0603
+  551D2304 18301680 147DCC3E 382F8CFA 0E3C8A51 6A6F18EE A40BEAE6 33301D06
+  03551D0E 04160414 7DCC3E38 2F8CFA0E 3C8A516A 6F18EEA4 0BEAE633 300D0609
+  2A864886 F70D0101 05050003 81810093 92C73AE0 67E9730A 74FECE6E DC4884B6
+  F3FBF868 D2A0AC74 5F209FB6 70630266 AB717AB8 96EFF7E6 C2FAE193 FEABF747
+  DA15AC44 97732C05 1420B841 912A0002 162A90B2 EB6906C9 229F3AD0 95E01EC1
+  716CA7C8 42D21044 151A6877 F967D539 3A9CC07B DA1A82BA 969606BB 8A31B6CA
+  F9BA2F67 C1B790D1 4E1115C0 53BAB8
+  	quit
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$ArPL$WcQ3Rb1JjpEohKcboGII5/
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+!
+!
+!
+!
+!
+!
+crypto isakmp policy 10
+ encr aes 192
+ hash sha256
+ authentication pre-share
+ group 5
+crypto isakmp key DmvPn!23 address 89.211.116.16
+crypto isakmp key DmvPn!23 address 202.4.180.0
+!
+!
+crypto ipsec transform-set TRANF esp-3des esp-sha-hmac
+ mode transport
+!
+crypto ipsec profile DMVPN-PROFILE
+ set transform-set TRANF
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.17 255.255.255.255
+ ipv6 address ::192:122:3:17/128
+ no shutdown
+!
+interface Tunnel100
+ ip address 172.100.123.17 255.255.255.0
+ no ip redirects
+ ip mtu 1400
+ ip nhrp authentication NHRPKEY
+ ip nhrp network-id 100
+ ip nhrp nhs 172.100.123.18 nbma 202.4.180.0 multicast
+ ip nhrp shortcut
+ ip tcp adjust-mss 1360
+ tunnel source GigabitEthernet1.117
+ tunnel mode gre multipoint
+ tunnel protection ipsec profile DMVPN-PROFILE
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.117
+ encapsulation dot1Q 117
+ ip address 89.211.117.17 255.255.255.128
+ ip pim sparse-mode
+ ipv6 address 2001:89:211:117::17/125
+ no shutdown
+!
+interface GigabitEthernet1.170
+ encapsulation dot1Q 170
+ ip address 172.25.170.17 255.255.255.0
+ ip summary-address eigrp 123 172.0.0.0 255.0.0.0
+ ipv6 address 2001:172:25:170::17/64
+ no shutdown
+!
+interface GigabitEthernet2
+ ip address 192.168.1.17 255.255.255.0
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+!
+router eigrp 123
+ network 172.25.170.17 0.0.0.0
+ network 172.100.123.17 0.0.0.0
+ network 192.122.3.17 0.0.0.0
+ passive-interface Loopback0
+ eigrp router-id 17.17.17.17
+ eigrp stub connected summary redistributed
+!
+!
+!
+ip forward-protocol nd
+!
+no ip http server
+ip http secure-server
+ip route 0.0.0.0 0.0.0.0 89.211.117.1
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ length 0
+ stopbits 1
+line vty 0 4
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+line vty 11 98
+ no login
+!
+!
+end

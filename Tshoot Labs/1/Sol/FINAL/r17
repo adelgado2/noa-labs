@@ -1,0 +1,188 @@
+!
+! Last configuration change at 08:21:03 UTC Sat May 20 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R17
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+no logging buffered
+no logging monitor
+!
+no aaa new-model
+no ip icmp rate-limit unreachable
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 122.1.1.17 255.255.255.255
+ ip pim sparse-mode
+ ip igmp join-group 227.7.7.7
+ ip ospf 22 area 0
+ ipv6 address 2001:122:1:1::17/128
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.1617
+ encapsulation dot1Q 1617
+ ip address 172.23.17.17 255.255.255.0
+ ip ospf network point-to-point
+ ip ospf 22 area 10
+ ip ospf cost 1
+ ipv6 address 2004:172:23:17::17/64
+ no shutdown
+!
+interface GigabitEthernet1.1718
+ encapsulation dot1Q 1718
+ ip address 172.23.18.17 255.255.255.0
+ ip pim sparse-mode
+ ip ospf network point-to-point
+ ip ospf 22 area 10
+ ipv6 address 2004:172:23:18::17/64
+ no shutdown
+!
+interface GigabitEthernet1.1719
+ encapsulation dot1Q 1719
+ ip address 172.23.179.17 255.255.255.0
+ ip pim sparse-mode
+ ip ospf network point-to-point
+ ip ospf 22 area 0
+ ipv6 address 2004:172:23:179::17/64
+ no shutdown
+!
+interface GigabitEthernet2
+ no ip address
+ negotiation auto
+ shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+!
+router eigrp INE_DOT_COM
+ !
+ address-family ipv6 unicast autonomous-system 925
+  !
+  af-interface default
+   authentication mode hmac-sha-256 v6PASS!
+  exit-af-interface
+  !
+  topology base
+  exit-af-topology
+ exit-address-family
+!
+router ospf 22
+ fast-reroute per-prefix enable prefix-priority low
+ area 10 virtual-link 192.168.1.16
+!
+!
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ length 0
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+line vty 11 98
+ no login
+!
+!
+end

@@ -1,0 +1,189 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 11:52:47 UTC Sat May 20 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R19
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+crypto pki trustpoint TP-self-signed-1424269876
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-1424269876
+ revocation-check none
+ rsakeypair TP-self-signed-1424269876
+!
+!
+crypto pki certificate chain TP-self-signed-1424269876
+ certificate self-signed 01
+  3082022B 30820194 A0030201 02020101 300D0609 2A864886 F70D0101 05050030
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274
+  69666963 6174652D 31343234 32363938 3736301E 170D3137 30353230 31313532
+  34375A17 0D323030 31303130 30303030 305A3031 312F302D 06035504 03132649
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D31 34323432
+  36393837 3630819F 300D0609 2A864886 F70D0101 01050003 818D0030 81890281
+  8100A8E1 26DFD287 E5197392 8732B2F1 EBF4B022 B4BFF7C2 C194F77B 301C670A
+  1FAE3267 B2ACB3E0 A4363A31 E99D256F 89F0C1EC D43841B0 78B5BAA4 EDED5A7A
+  A0C6162A 4183DAB2 14942A57 4AAE9B0C 09A47E33 CAA2301B AFE1361D 9451B699
+  1A082BE7 24CF1916 FB2D2BD0 4CCDCDBA 7FB72EB8 BA29D2F6 857C8FEC 34591547
+  49850203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 301F0603
+  551D2304 18301680 1419C6F0 AD8CBBC4 C9C6D5EC 1FA2AA19 2501FD15 32301D06
+  03551D0E 04160414 19C6F0AD 8CBBC4C9 C6D5EC1F A2AA1925 01FD1532 300D0609
+  2A864886 F70D0101 05050003 8181000A 9149FA49 D68D10A9 11A23552 F4FBE1EF
+  148FEDD0 88ACE560 C33AA1F4 EDC6C804 36E11DE3 724EF00A 5D7A8D23 9BEFE548
+  6D0F36FA 47F82169 50EF1C01 3DC31064 4CD3D2A3 B7995011 F0E5C6BB 68C80668
+  D777D16C D2546693 B03A6F8F 69F395C6 458E6FD5 1A618531 E7724843 53973128
+  4CF84087 E89AEBCA 6B153AB9 CF301F
+  	quit
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$3CFZ$arROYO/si4TTNuyW4SQ2I0
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.19 255.255.255.255
+ ipv6 address ::192:122:3:19/128
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ standby use-bia
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.181
+ encapsulation dot1Q 181
+ ip address 172.27.181.19 255.255.255.0
+ ipv6 address 2001:172:27:181::19/64
+ no shutdown
+!
+interface GigabitEthernet1.192
+ encapsulation dot1Q 192
+ ip address 172.27.192.19 255.255.255.0
+ standby version 2
+ standby 192 ip 172.27.192.254
+ standby 192 preempt
+ standby 192 authentication md5 key-string SERVER_VIP
+ ipv6 address 2001:172:27:192::19/64
+ no shutdown
+!
+interface GigabitEthernet2
+ ip address 192.168.1.19 255.255.255.0
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+!
+router eigrp 123
+ network 172.27.181.19 0.0.0.0
+ network 172.27.192.19 0.0.0.0
+ network 192.122.3.19 0.0.0.0
+ passive-interface Loopback0
+ passive-interface GigabitEthernet1.192
+ eigrp router-id 19.19.19.19
+!
+!
+!
+ip forward-protocol nd
+!
+no ip http server
+ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ length 0
+ stopbits 1
+line vty 0 4
+ exec-timeout 0 0
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+line vty 11 15
+ exec-timeout 0 0
+ no login
+!
+!
+end

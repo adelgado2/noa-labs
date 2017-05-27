@@ -1,0 +1,174 @@
+!
+! Last configuration change at 00:32:16 UTC Mon Mar 1 1993
+!
+version 15.0
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname Switch
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+system mtu routing 1500
+vtp file vlan.dat
+vtp domain cisco
+vtp mode transparent
+!
+!
+!
+!
+!
+crypto pki trustpoint TP-self-signed-1170720896
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-1170720896
+ revocation-check none
+ rsakeypair TP-self-signed-1170720896
+!
+!
+crypto pki certificate chain TP-self-signed-1170720896
+ certificate self-signed 01
+  3082022B 30820194 A0030201 02020101 300D0609 2A864886 F70D0101 05050030
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274
+  69666963 6174652D 31313730 37323038 3936301E 170D3933 30333031 30303332
+  31345A17 0D323030 31303130 30303030 305A3031 312F302D 06035504 03132649
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D31 31373037
+  32303839 3630819F 300D0609 2A864886 F70D0101 01050003 818D0030 81890281
+  810091B4 864239D5 5B85AE21 06DC1779 D9513E48 81C2D915 931F24C9 3675954F
+  670B3AA4 60253801 0A896423 9B5DA07E D2B97090 0795370A BEF6FB8F 2FDAD4BC
+  4E76AE33 A416282D 7C501ACD 9DDE44FF 8B15A6FC 22AB57CA 2699BE32 C4C456CF
+  A0E3BA7C C4FAFBB4 37D202CA 0F9CB5A0 C7ADA447 9F75EC58 98BFFCCF BA5555C7
+  18950203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 301F0603
+  551D2304 18301680 14BA4451 0B94F2E3 567F12C5 AF65C634 AF076F96 87301D06
+  03551D0E 04160414 BA44510B 94F2E356 7F12C5AF 65C634AF 076F9687 300D0609
+  2A864886 F70D0101 05050003 81810038 8E586881 B80DB508 7ED41E23 DBC34260
+  04DDD127 1408E045 45F2F5B4 A907B98A CDB28601 A1177249 6C139BD7 6584CDA9
+  9064AB9B E6102D52 D2198692 A902E5B0 11A83F09 E436875B C07B67A3 2D84834B
+  02FA2BAB EB711F03 471295A9 47D4B2CB 29244AD2 B532A215 DFB38138 2BC54363
+  3CEE8368 716CEA34 519E49E3 E21DC7
+  	quit
+!
+!
+!
+!
+!
+spanning-tree mode pvst
+spanning-tree extend system-id
+!
+vlan internal allocation policy ascending
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface FastEthernet0/1
+ no shutdown
+!
+interface FastEthernet0/2
+ no shutdown
+!
+interface FastEthernet0/3
+ no shutdown
+!
+interface FastEthernet0/4
+ no shutdown
+!
+interface FastEthernet0/5
+ no shutdown
+!
+interface FastEthernet0/6
+ no shutdown
+!
+interface FastEthernet0/7
+ no shutdown
+!
+interface FastEthernet0/8
+ no shutdown
+!
+interface FastEthernet0/9
+ no shutdown
+!
+interface FastEthernet0/10
+ no shutdown
+!
+interface FastEthernet0/11
+ no shutdown
+!
+interface FastEthernet0/12
+ no shutdown
+!
+interface FastEthernet0/13
+ no shutdown
+!
+interface FastEthernet0/14
+ no shutdown
+!
+interface FastEthernet0/15
+ no shutdown
+!
+interface FastEthernet0/16
+ no shutdown
+!
+interface FastEthernet0/17
+ no shutdown
+!
+interface FastEthernet0/18
+ no shutdown
+!
+interface FastEthernet0/19
+ no shutdown
+!
+interface FastEthernet0/20
+ no shutdown
+!
+interface FastEthernet0/21
+ no shutdown
+!
+interface FastEthernet0/22
+ no shutdown
+!
+interface FastEthernet0/23
+ no shutdown
+!
+interface FastEthernet0/24
+ no shutdown
+!
+interface GigabitEthernet0/1
+ no shutdown
+!
+interface GigabitEthernet0/2
+ no shutdown
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+ip http server
+ip http secure-server
+!
+!
+!
+!
+!
+!
+line vty 0 4
+ login
+line vty 5 15
+ login
+!
+end

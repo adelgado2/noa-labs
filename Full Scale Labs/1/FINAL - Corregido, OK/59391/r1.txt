@@ -1,0 +1,281 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 11:52:56 UTC Sat May 20 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+mpls tp
+ no router-id
+multilink bundle-name authenticated
+!
+!
+crypto pki trustpoint TP-self-signed-4098623145
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-4098623145
+ revocation-check none
+ rsakeypair TP-self-signed-4098623145
+!
+!
+crypto pki certificate chain TP-self-signed-4098623145
+ certificate self-signed 01
+  3082022B 30820194 A0030201 02020101 300D0609 2A864886 F70D0101 05050030
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274
+  69666963 6174652D 34303938 36323331 3435301E 170D3137 30353230 31313532
+  35335A17 0D323030 31303130 30303030 305A3031 312F302D 06035504 03132649
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D34 30393836
+  32333134 3530819F 300D0609 2A864886 F70D0101 01050003 818D0030 81890281
+  8100BE8A 7A77A844 F4FBF2DC 0030831E CB32F864 3AEF0029 3A1B826D 5805D2A3
+  90C17B25 0E6E79FB 1E5D2AB3 F03962F3 804BDF80 BA803803 E4D90005 4D379753
+  14FDDBB9 67AEF400 4DDD0BD2 959C1A20 F0FA007C 7F165E30 C83BF7D2 0DF4B54F
+  8638DE25 06A612B9 AED635FE B2177591 90BB20A1 88AB88E0 012DEF03 178BA378
+  B2EF0203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 301F0603
+  551D2304 18301680 1408E622 9306CD6D 54FC7670 290AF6B5 94DF3E6A A9301D06
+  03551D0E 04160414 08E62293 06CD6D54 FC767029 0AF6B594 DF3E6AA9 300D0609
+  2A864886 F70D0101 05050003 818100A9 89E3086F 90D1C68A 5DAE3AA4 31F29A79
+  145B3F09 8547DE20 ECFF8361 1566CDD1 785194DC 93AE6CAC 38998314 F7C79F29
+  CAD37409 C03FE65F E10500FA EDB97788 26B51D12 73E91C5E 4D8A811C F543BAAA
+  C8A40A3E C1871FE0 91362985 1A1DA169 090B91F7 B88286A2 F2002557 8EFBFAF8
+  2E295894 AC2656E6 5D632EE8 59C9DD
+  	quit
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$6cdl$cmjLSX79LVHEnbYagSKEm/
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.1 255.255.255.255
+ ip ospf 100 area 0
+ ipv6 address ::192:122:3:1/128
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.12
+ encapsulation dot1Q 12
+ ip address 10.0.12.1 255.255.255.252
+ ip pim sparse-mode
+ ip ospf 100 area 10
+ ipv6 address 2001:10:0:12::1/126
+ no shutdown
+!
+interface GigabitEthernet1.13
+ encapsulation dot1Q 13
+ ip address 10.0.13.1 255.255.255.252
+ ip pim sparse-mode
+ ip ospf network point-to-multipoint
+ ip ospf dead-interval 40
+ ip ospf hello-interval 10
+ ip ospf 100 area 20
+ ipv6 address 2001:10:0:13::1/126
+ no shutdown
+!
+interface GigabitEthernet1.14
+ encapsulation dot1Q 14
+ ip address 10.0.14.1 255.255.255.252
+ ip pim sparse-mode
+ ipv6 address 2001:10:0:14::1/126
+ no shutdown
+!
+interface GigabitEthernet1.17
+ encapsulation dot1Q 17
+ ip address 136.5.17.1 255.255.255.0
+ ip pim sparse-mode
+ ipv6 address 2001:136:5:17::1/64
+ mpls ip
+ no shutdown
+!
+interface GigabitEthernet1.18
+ encapsulation dot1Q 18
+ ip address 136.5.18.1 255.255.255.0
+ ip pim sparse-mode
+ ipv6 address 2001:136:5:18::1/64
+ mpls ip
+ no shutdown
+!
+interface GigabitEthernet1.116
+ encapsulation dot1Q 116
+ ip address 89.211.116.1 255.255.255.128
+ ip pim sparse-mode
+ ip ospf 100 area 121
+ ipv6 address 2001:89:211:116::1/125
+ no shutdown
+!
+interface GigabitEthernet1.117
+ encapsulation dot1Q 117
+ ip address 89.211.117.1 255.255.255.128
+ ip pim sparse-mode
+ ip ospf 100 area 117
+ ipv6 address 2001:89:211:117::1/125
+ no shutdown
+!
+interface GigabitEthernet2
+ description MGMT INTERFACE - DO NOT CHANGE
+ ip address 192.168.1.1 255.255.255.0
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+!
+router eigrp CCIE
+ !
+ address-family ipv4 unicast autonomous-system 56
+  !
+  af-interface default
+   shutdown
+   authentication mode hmac-sha-256 CC!E_!nE
+  exit-af-interface
+  !
+  af-interface GigabitEthernet1.17
+   no shutdown
+  exit-af-interface
+  !
+  af-interface GigabitEthernet1.18
+   no shutdown
+  exit-af-interface
+  !
+  topology base
+   redistribute ospf 100 metric 10000 1000 255 1 1500
+   redistribute connected route-map RED-CONN-TO-EIGRP
+  exit-af-topology
+  network 136.5.0.0
+  metric weights 0 0 0 1 0 0 0
+  eigrp router-id 192.122.3.1
+ exit-address-family
+!
+router ospf 100
+ router-id 192.122.3.1
+ fast-reroute per-prefix enable prefix-priority low
+ area 20 virtual-link 192.122.3.3
+ area 121 nssa default-information-originate nssa-only
+ redistribute connected subnets route-map RED-CONN-TO-OSPF
+ redistribute eigrp 56 subnets route-map RED-EIGRP-TO-OSPF
+ passive-interface GigabitEthernet1.117
+ mpls ldp autoconfig
+!
+!
+!
+ip forward-protocol nd
+!
+no ip http server
+ip http secure-server
+!
+!
+route-map RED-CONN-TO-EIGRP permit 10
+ match interface GigabitEthernet1.14 GigabitEthernet1.12 Loopback0 GigabitEthernet1.13 GigabitEthernet1.116 GigabitEthernet1.117
+!
+route-map RED-EIGRP-TO-OSPF permit 10
+ set tag 190
+!
+route-map RED-CONN-TO-OSPF permit 10
+ match interface GigabitEthernet1.14
+ set metric 1000
+ set metric-type type-1
+!
+route-map RED-CONN-TO-OSPF permit 20
+ match interface GigabitEthernet1.17 GigabitEthernet1.18
+ set tag 190
+!
+mpls ldp router-id Loopback0 force
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ length 0
+ stopbits 1
+line vty 0 4
+ exec-timeout 0 0
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+line vty 11 15
+ exec-timeout 0 0
+ no login
+line vty 16 98
+ no login
+!
+!
+end

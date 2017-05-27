@@ -2089,16 +2089,21 @@ R16:
 
 !
 router eigrp 123
- eigrp stub connected
+ eigrp stub connected redistributed summary
+!
+interface Gi1.160
+ ip summary-address eigrp 123 172.0.0.0 255.0.0.0
 !
 
 R17:
 
 !
 router eigrp 123 
- eigrp stub connected
+ eigrp stub connected redistributed summary
 !
-
+interface Gi1.170
+ ip summary-address eigrp 123 172.0.0.0 255.0.0.0
+!
 
 ****************************************************************************
 

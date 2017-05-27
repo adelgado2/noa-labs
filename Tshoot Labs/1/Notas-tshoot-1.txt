@@ -1,0 +1,48 @@
+sh run | i access-list|service-policy|policy-map|distribute-list|route-map
+
+
+-------------------
+
+En Ticket 9:
+
+Lo deINE + clear bgp vpnv4 * en R5 para forzar reconvergencia, 
+porque si llegan las rutas de R1 y R2 red. de EIGRP antes hay problema.
+
+-------------------
+
+En Ticket 4, mi solución se centra en R9 solo:
+
+!
+ip route 122.1.1.6 255.255.255.255 Null0 255
+!
+ip prefix-list GATEWAY seq 5 permit 122.1.1.8/32
+ip prefix-list GATEWAY seq 10 permit 122.1.1.6/32
+ip prefix-list GATEWAY seq 30 deny 122.1.1.7/32
+!
+router ospfv3 50
+ !
+ address-family ipv4 unicast
+  distribute-list gateway GATEWAY in
+!
+
+
+R9#sh ip route 122.1.1.20
+Routing entry for 122.1.1.20/32
+  Known via "ospfv3 50", distance 110, metric 1
+  Tag 101, type NSSA extern 2, forward metric 2
+  Last update from 122.1.1.8 on GigabitEthernet1.89, 00:11:33 ago
+  Routing Descriptor Blocks:
+  * 122.1.1.8, from 122.1.1.6, 00:11:33 ago, via GigabitEthernet1.89
+      Route metric is 1, traffic share count is 1
+      Route tag 101
+
+R9#sh ip route 122.1.1.6 
+Routing entry for 122.1.1.6/32
+  Known via "ospfv3 50", distance 110, metric 2, type intra area
+  Last update from 122.1.1.8 on GigabitEthernet1.89, 00:34:45 ago
+  Routing Descriptor Blocks:
+  * 122.1.1.8, from 122.1.1.6, 00:34:45 ago, via GigabitEthernet1.89
+      Route metric is 2, traffic share count is 1
+
+R9#sh ip cef exact-route 122.1.1.9 122.1.1.20 
+122.1.1.9 -> 122.1.1.20 =>IP adj out of GigabitEthernet1.89, addr 122.1.1.8

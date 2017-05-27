@@ -1,0 +1,2502 @@
+*********************************************************************************************************
+
+L2 
+
+*********************************************************************************************************
+
+1.1 EC
+
+---------------------------------------------------------------------------------------------------------
+
+SW1:
+
+!
+interface range Fa0/21 - 22
+ channel-group 14 mode desirable
+!
+int Po14
+ switchport trunk encapsulation dot1q 
+ switchport mode trunk
+!
+vlan dot1q tag native 
+!
+
+SW4:
+
+!
+interface range Fa0/21 - 22
+ channel-group 14 mode auto
+!
+int Po14
+ switchport trunk encapsulation dot1q 
+ switchport mode trunk
+!
+vlan dot1q tag native 
+!
+
+SW2:
+
+!
+interface range Fa0/21 - 22
+ channel-group 23 mode on
+!
+int Po23
+ switchport trunk encapsulation dot1q 
+ switchport mode trunk
+ switchport nonegotiate
+!
+vlan dot1q tag native 
+!
+
+SW3:
+
+!
+interface range Fa0/21 - 22
+ channel-group 23 mode on
+!
+int Po23
+ switchport trunk encapsulation dot1q 
+ switchport mode trunk
+ switchport nonegotiate
+!
+vlan dot1q tag native 
+!
+
+---------------------------------------------------------------------------------------------------------
+
+1.2 Trunking (parte arriba)
+
+---------------------------------------------------------------------------------------------------------
+
+SW1:
+
+!
+int Fa0/1
+ spanning-tree portfast trunk
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport nonegotiate
+ switchport trunk native vlan 2048
+ switchport trunk allowed vlan 1,322,1623,1624,1723,1823,1921 
+ switchport access vlan 1024
+!
+
+SW2:
+
+!
+int range Fa0/19 - 20
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+
+SW3:
+
+!
+int range Fa0/23 - 24
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+
+SW4:
+
+!
+int range Fa0/19 - 20
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+ 
+!
+int range Fa0/23 - 24
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+
+---------------------------------------------------------------------------------------------------------
+
+1.2b VTP
+
+---------------------------------------------------------------------------------------------------------
+
+SW1,SW3,SW4:
+
+!
+vtp domain RNS_VTP
+vtp version 3
+vtp file exam_q.dat
+!
+vtp password !CISCO!
+!
+vtp mode client
+!
+
+SW2:
+
+!
+vtp domain RNS_VTP
+vtp version 3
+vtp file exam_q.dat
+!
+vtp password !CISCO!
+!
+vtp mode server
+!
+
+vtp primary vlan
+
+!
+vlan 1
+vlan 322
+vlan 1623
+vlan 1624
+vlan 1723
+vlan 1823
+vlan 1921
+!
+
+---------------------------------------------------------------------------------------------------------
+
+1.3 Spanning-Tree
+
+---------------------------------------------------------------------------------------------------------
+
+SW2:
+
+!
+spanning-tree vlan 322,1624 root primary
+!
+interface Fa0/20
+ spanning-tree vlan 322 port-priority 112
+ spanning-tree vlan 1624 port-priority 112
+!
+
+SW1:
+
+!
+spanning-tree vlan 322,1624 root secondary
+!
+
+SW4:
+
+! Root without config
+
+SW3: 
+
+!
+spanning-tree vlan 1,1623,1723,1823,1924 priority 36864 
+!
+
+SW1,SW2:
+
+!
+spanning-tree vlan 1,1623,1723,1823,1924 priority 40960
+!
+
+SW1-SW4:
+
+!
+spanning-tree portfast bpdufilter default
+spanning-tree portfast default 
+!
+spanning-tree vlan 322,1624 max-age 10
+!
+
+---------------------------------------------------------------------------------------------------------
+
+1.4 L3 EC
+
+---------------------------------------------------------------------------------------------------------
+
+SW1:
+
+!
+sdmp prefer dual-ipv4-and-ipv6 default
+!
+
+And reload
+
+!
+int range Fa0/23-24
+ no switchport
+ channel-group 12 mode desirable
+!
+
+!
+interface Port-channel12
+ ip address 119.3.12.1 255.255.255.0
+ ipv6 address 2001:119:3:12::1/64
+!
+
+SW2:
+
+!
+sdmp prefer dual-ipv4-and-ipv6 default
+!
+
+And reload
+
+!
+int range Fa0/23-24
+ no switchport
+ channel-group 12 mode auto
+!
+
+!
+interface Port-channel12
+ ip address 119.3.12.2 255.255.255.0
+ ipv6 address 2001:119:3:12::2/64
+!
+ 
+---------------------------------------------------------------------------------------------------------
+
+1.5 WAN
+
+---------------------------------------------------------------------------------------------------------
+
+R6:
+
+!
+int Gi1.60
+ no ip address
+ pppoe enable   ! Mete solo pppoe enable group global
+ pppoe-client dial-pool-number 6
+!
+interface dialer 6
+ encapsulation ppp
+ ip address 169.254.60.1 255.255.255.252
+ ip mtu 1492
+ dialer pool 6
+ ppp ipcp route default
+!
+ 
+R7:
+
+!
+int Gi1.70
+ no ip address
+ pppoe enable   
+ pppoe-client dial-pool-number 7
+!
+interface dialer 7
+ encapsulation ppp
+ ip address 169.254.70.1 255.255.255.252
+ ip mtu 1492
+ dialer pool 7
+ ppp ipcp route default
+!
+
+R15:
+
+!
+int Gi1.150
+ no ip address
+ pppoe enable   
+ pppoe-client dial-pool-number 150
+!
+interface dialer 150
+ encapsulation ppp
+ ip address 169.254.150.1 255.255.255.252
+ ip mtu 1492
+ dialer pool 150
+ ppp ipcp route default
+!
+
+R16:
+
+!
+int Gi1.160
+ no ip address
+ pppoe enable   
+ pppoe-client dial-pool-number 160
+!
+interface dialer 160
+ encapsulation ppp
+ ip address 169.254.160.1 255.255.255.252
+ ip mtu 1492
+ dialer pool 160
+ ppp ipcp route default
+!
+
+R20:
+
+!
+interface Gi1.60
+ no ip address
+ pppoe enable group 6
+!
+bba-group pppoe 6 
+ virtual-template 6
+!
+int virtual-template 6
+ vrf forwarding ISP_IECAST
+ encapsulation ppp
+ ip address 169.254.60.2 255.255.255.252
+!
+
+!
+interface Gi1.70
+ no ip address
+ pppoe enable group 7
+!
+bba-group pppoe 7 
+ virtual-template 7
+!
+int virtual-template 7
+ vrf forwarding ISP_IECAST
+ encapsulation ppp
+ ip address 169.254.70.2 255.255.255.252
+!
+
+!
+interface Gi1.150
+ no ip address
+ pppoe enable group 150
+!
+bba-group pppoe 150
+ virtual-template 150
+!
+int virtual-template 150
+ vrf forwarding ISP_IECAST
+ encapsulation ppp
+ ip address 169.254.150.2 255.255.255.252
+!
+
+!
+interface Gi1.160
+ no ip address
+ pppoe enable group 160
+!
+bba-group pppoe 160
+ virtual-template 160
+!
+int virtual-template 160
+ vrf forwarding ISP_IECAST
+ encapsulation ppp
+ ip address 169.254.160.2 255.255.255.252
+!
+
+*********************************************************************************************************
+
+IGP
+
+*********************************************************************************************************
+
+2.1 EIGRP Site - Houston
+
+---------------------------------------------------------------------------------------------------------
+
+R1:
+
+!
+router eigrp HOUSTON 
+ address-family ipv4 unicast autonomous-system 5000
+  eigrp router-id 150.1.1.1
+  metric weights 0 0 0 1 0 0
+  network 119.3.0.0 0.0.0.255
+  network 150.1.1.1 255.255.255.255
+  af-interface default
+   authentication mode hmac-sha-256 0 !EIGRP_!
+!
+
+R19:
+
+!
+router eigrp HOUSTON 
+ address-family ipv4 unicast autonomous-system 5000
+  eigrp router-id 150.1.19.19
+  metric weights 0 0 0 1 0 0
+  network 119.3.0.0 0.0.0.255
+  network 119.3.192.0 0.0.0.255
+  network 150.1.19.19 0.0.0.0
+  af-interface default
+   authentication mode hmac-sha-256 0 !EIGRP_!
+!
+
+R3:
+
+!
+router eigrp HOUSTON 
+ address-family ipv4 unicast autonomous-system 5000
+  eigrp router-id 150.1.3.3
+  metric weights 0 0 0 1 0 0
+  network 119.3.0.0 0.0.0.255
+  network 119.3.223.0 0.0.0.255
+  network 150.1.3.3 0.0.0.0  
+  af-interface default
+   authentication mode hmac-sha-256 0 !EIGRP_!
+!
+
+SW1:
+
+!
+ip routing
+!
+router eigrp HOUSTON 
+ address-family ipv4 unicast autonomous-system 5000
+  eigrp router-id 150.1.21.21
+  metric weights 0 0 0 1 0 0
+  network 119.3.192.0 0.0.0.255
+  network 150.1.21.21 0.0.0.0
+  network 119.3.12.0 0.0.0.255
+  af-interface default
+   authentication mode hmac-sha-256 0 !EIGRP_!
+  af-interface Port-channel12
+!
+
+SW2:
+
+!
+ip prefix-list SW1_Lo0 seq 5 permit 150.1.21.21/32
+!
+route-map EIGRP_IN permit 10
+ match ip address prefix-list SW1_Lo0
+ set metric 200000 +2012 255 1 1500
+!
+route-map EIGRP_IN permit 100
+!
+
+!
+ip routing
+!
+router eigrp HOUSTON 
+ address-family ipv4 unicast autonomous-system 5000
+  eigrp router-id 150.1.22.22
+  metric weights 0 0 0 1 0 0
+  network 119.3.223.0 0.0.0.255
+  network 150.1.22.22 0.0.0.0
+  network 119.3.12.0 0.0.0.255
+  af-interface default
+   authentication mode hmac-sha-256 0 !EIGRP_!
+  topology base
+   distribute-list route-map EIGRP_IN in Port-channel12
+!
+
+---------------------------------------------------------------------------------------------------------
+
+2.2 EIGRP Site - Reno
+
+---------------------------------------------------------------------------------------------------------
+
+R6:
+
+!
+route-map SET-TAG permit 10
+ match route-type internal
+ set tag 10.9.6.7
+route-map SET-TAG permit 20 
+!
+route-map RED-CONN-TO-EIGRP permit 10
+ match interface Loopback0
+!
+router eigrp RENO
+ address-family ipv4 unicast autonomous-system 6000
+  eigrp router-id 150.1.6.6
+  network 192.0.0.0 0.0.255.255
+  af-interface Gi1.60
+   shutdown
+  topology base
+   redistribute connected route-map RED-CONN-TO-EIGRP  
+   distribute-list route-map SET-TAG out 
+!
+route-tag notation dotted-decimal 
+!
+
+R7:
+
+!
+route-map SET-TAG permit 10
+ match route-type internal
+ set tag 10.9.6.7
+route-map SET-TAG permit 20  
+!
+route-map RED-CONN-TO-EIGRP permit 10
+ match interface Loopback0
+!
+router eigrp RENO
+ address-family ipv4 unicast autonomous-system 6000
+  eigrp router-id 150.1.7.7
+  network 192.0.0.0 0.0.255.255
+  af-interface Gi1.70
+   shutdown
+  topology base
+    redistribute connected route-map RED-CONN-TO-EIGRP  
+	distribute-list route-map SET-TAG out
+!
+route-tag notation dotted-decimal 
+!
+
+R9:
+
+!
+route-map SET-TAG permit 10
+ match route-type internal
+ set tag 10.9.6.7
+route-map SET-TAG permit 20  
+!
+router eigrp RENO
+ address-family ipv4 unicast autonomous-system 6000
+  eigrp router-id 150.1.9.9
+  network 192.0.0.0 0.0.255.255
+  network 150.1.9.9 0.0.0.0
+  af-interface Gi1.59
+   shutdown
+  topology base
+   distribute-list route-map SET-TAG out
+!
+route-tag notation dotted-decimal 
+!
+
+R10:
+
+!
+route-map SET-TAG permit 10
+ match route-type internal
+ set tag 10.9.6.7
+route-map SET-TAG permit 20  
+!
+router eigrp RENO
+ address-family ipv4 unicast autonomous-system 6000
+  eigrp router-id 150.1.10.10
+  network 192.0.0.0 0.0.255.255
+  network 150.1.10.10 0.0.0.0  
+  af-interface Gi1.105
+   shutdown
+  topology base
+   distribute-list route-map SET-TAG out
+!
+route-tag notation dotted-decimal 
+!
+
+---------------------------------------------------------------------------------------------------------
+
+2.3 OSPF HQ
+
+---------------------------------------------------------------------------------------------------------
+
+R4:
+
+!
+route-map RED-CONN-TO-OSPF permit 10
+ match interface Loopback0
+ set metric-type type-1 
+ set metric 1000
+!
+interface Gi1.412
+ ip ospf 1 area 1000
+!
+interface Gi1.411
+ ip ospf 1 area 1000
+!
+router ospf 1
+ router-id 150.1.4.4
+ redistribute connected subnets route-map RED-CONN-TO-OSPF
+ area 1000 nssa
+!
+
+R11:
+
+!
+interface Loopback0
+ ip ospf 1 area 1000
+!
+interface Gi1.1113
+ ip ospf 1 area 0
+!
+interface Gi1.1114
+ ip ospf 1 area 0
+!
+interface Gi1.411
+ ip ospf 1 area 1000
+!
+router ospf 1
+ router-id 150.1.11.11
+ area 1000 nssa 
+!
+
+
+R12:
+
+!
+route-map RED-CONN-TO-OSPF permit 10
+ match interface Loopback0
+ set metric-type type-1 
+ set metric 1000
+!
+interface Gi1.412
+ ip ospf 1 area 1000
+!
+interface Gi1.1214
+ ip ospf 1 area 1000
+!
+router ospf 1
+ router-id 150.1.12.12
+ redistribute connected subnets route-map RED-CONN-TO-OSPF
+ area 1000 nssa
+!
+
+R14:
+
+!
+interface Loopback0
+ ip ospf 1 area 1000
+!
+interface Gi1.1114
+ ip ospf 1 area 0
+!
+interface Gi1.1415
+ ip ospf 1 area 0
+!
+interface Gi1.1214
+ ip ospf 1 area 1000
+!
+router ospf 1
+ router-id 150.1.14.14
+ area 1000 nssa
+!
+
+R13:
+
+!
+interface Loopback0
+ ip ospf 1 area 2000
+!
+interface Gi1.1113
+ ip ospf 1 area 0
+!
+interface Gi1.1315
+ ip ospf 1 area 0
+!
+router ospf 1
+ router-id 150.1.13.13
+!
+
+R15:
+
+!
+interface Loopback0
+ ip ospf 1 area 2000
+!
+interface Gi1.1315
+ ip ospf 1 area 0
+!
+interface Gi1.1415
+ ip ospf 1 area 0
+!
+router ospf 1
+ router-id 150.1.15.15
+!
+
+---------------------------------------------------------------------------------------------------------
+
+2.4 OSPF HQ - Part 2
+
+---------------------------------------------------------------------------------------------------------
+
+- Primero hecho arriba (area 1000 nssa)
+
+R11,R13,R14,R15:
+
+!
+router ospf 1
+ auto-cost reference-bandwidth 100000 
+!
+
+R4,R12:
+
+!
+router ospf 1
+ max-lsa 200 80 
+!
+ 
+R14:
+
+!
+interface Gi1.1114
+ ip ospf network point-to-point
+ ip ospf multi-area 1000
+!
+
+R11:
+
+!
+interface Gi1.1114
+ ip ospf network point-to-point
+ ip ospf multi-area 1000
+!
+
+*********************************************************************************************************
+
+BGP
+
+*********************************************************************************************************
+
+3.1 ISP EBGP
+
+---------------------------------------------------------------------------------------------------------
+
+R1: (Houston)
+
+!
+router bgp 2000
+ bgp router-id 150.1.1.1
+ no bgp default ipv4-unicast
+ template peer-session EBGP-ISP-30
+  remote-as 30000
+ template peer-session EBGP-ISP-INE
+  remote-as 40000
+ template peer-policy TO-ISPS
+  send-community both
+ neighbor 10.10.1.20 inherit peer-session EBGP-ISP-30
+ neighbor 11.11.1.20 inherit peer-session EBGP-ISP-INE
+ !
+ address-family ipv4
+  neighbor 10.10.1.20 activate
+  neighbor 11.11.1.20 activate
+  neighbor 10.10.1.20 inherit peer-policy TO-ISPS
+  neighbor 11.11.1.20 inherit peer-policy TO-ISPS
+!
+ 
+R4: (HQ)
+
+!
+router bgp 1000
+ bgp router-id 150.1.4.4
+ no bgp default ipv4-unicast
+ template peer-session EBGP-ISP-30
+  remote-as 30000
+ template peer-session EBGP-ISP-INE
+  remote-as 40000
+ template peer-policy TO-ISPS
+  send-community both
+ neighbor 40.40.1.20 inherit peer-session EBGP-ISP-30
+ neighbor 41.41.1.20 inherit peer-session EBGP-ISP-INE
+ !
+ address-family ipv4
+  neighbor 40.40.1.20 activate
+  neighbor 41.41.1.20 activate 
+  neighbor 40.40.1.20 inherit peer-policy TO-ISPS
+  neighbor 41.41.1.20 inherit peer-policy TO-ISPS
+!
+ 
+
+R5: (Sacramento)
+
+!
+router bgp 3000
+ bgp router-id 150.1.5.5
+ no bgp default ipv4-unicast
+ template peer-session EBGP-ISP-30
+  remote-as 30000
+ template peer-session EBGP-ISP-INE
+  remote-as 40000
+ template peer-policy TO-ISPS
+  send-community both
+ neighbor 50.50.1.20 inherit peer-session EBGP-ISP-30
+ neighbor 51.51.1.20 inherit peer-session EBGP-ISP-INE
+ !
+ address-family ipv4
+  neighbor 50.50.1.20 activate
+  neighbor 51.51.1.20 activate  
+  neighbor 50.50.1.20 inherit peer-policy TO-ISPS
+  neighbor 51.51.1.20 inherit peer-policy TO-ISPS
+!
+ 
+---------------------------------------------------------------------------------------------------------
+
+3.2 ISP EBGP
+
+---------------------------------------------------------------------------------------------------------
+
+R1:
+
+!
+ip as-path access-list 1 permit _$
+!
+router bgp 2000
+ template peer-policy TO-ISPS
+  filter-list 1 out
+! 
+
+R4:
+
+!
+ip as-path access-list 1 permit _$
+!
+router bgp 1000
+ template peer-policy TO-ISPS
+  filter-list 1 out
+ bgp bestpath as-path multipath-relax
+ !  
+ address-family ipv4
+  maximum-paths 2
+!  
+
+R5:
+
+!
+ip as-path access-list 1 permit _$
+ip as-path access-list 1 permit _65600$
+!
+router bgp 3000
+ template peer-policy TO-ISPS
+  filter-list 1 out
+! 
+
+---------------------------------------------------------------------------------------------------------
+
+3.3 ISP EBGP
+
+---------------------------------------------------------------------------------------------------------
+
+R1:
+
+!
+ip prefix-list PREFIX-119-3-0-0-24 seq 5 permit 119.3.0.0/24
+!
+route-map RED-EIGRP-TO-BGP permit 10
+ match ip address prefix-list PREFIX-119-3-0-0-24
+!
+router bgp 2000
+ address-family ipv4 unicast
+  redistribute eigrp 5000 route-map RED-EIGRP-TO-BGP
+  auto-summary
+!
+
+R4:
+
+!
+ip bgp-community new-format
+!
+ip prefix-list PREFIX seq 5 permit 10.254.255.0/24
+!
+route-map SET-COMM permit 10
+ match ip address prefix-list PREFIX
+ set community 3000:90 4000:120
+route-map SET-COMM permit 20 
+!
+router bgp 1000
+ address-family ipv4 unicast
+  network 10.254.255.0 mask 255.255.255.254
+  aggregate-address 10.254.255.0 255.255.255.0 summary-only
+  template peer-policy TO-ISPS
+   route-map SET-COMM out
+!
+  
+R5:
+
+!
+ip bgp-community new-format
+!  
+
+---------------------------------------------------------------------------------------------------------
+
+3.4 SITE BGP
+
+---------------------------------------------------------------------------------------------------------
+
+R6:
+
+!
+interface Loopback1
+ ip address 150.2.6.6 255.255.255.255
+!
+router bgp 65600
+ bgp router-id 150.1.6.6
+ no bgp default ipv4-unicast
+ bgp cluster-id 6.6.6.6
+ neighbor 150.1.9.9 remote-as 65600
+ neighbor 150.1.9.9 update-source Loopback0
+ neighbor 150.1.10.10 remote-as 65600
+ neighbor 150.1.10.10 update-source Loopback0
+ neighbor 150.1.7.7 remote-as 65600
+ neighbor 150.1.7.7 update-source Loopback0
+ address-family ipv4
+  neighbor 150.1.9.9 activate
+  neighbor 150.1.10.10 activate
+  neighbor 150.1.7.7 activate
+  network 150.2.6.6 mask 255.255.255.255
+  neighbor 150.1.9.9 route-reflector-client
+  neighbor 150.1.10.10 route-reflector-client  
+!
+
+R7:
+
+!
+interface Loopback1
+ ip address 150.2.7.7 255.255.255.255
+!
+router bgp 65600
+ bgp router-id 150.1.7.7
+ no bgp default ipv4-unicast
+ bgp cluster-id 6.6.6.6
+ neighbor 150.1.9.9 remote-as 65600
+ neighbor 150.1.9.9 update-source Loopback0
+ neighbor 150.1.10.10 remote-as 65600
+ neighbor 150.1.10.10 update-source Loopback0
+ neighbor 150.1.6.6 remote-as 65600
+ neighbor 150.1.6.6 update-source Loopback0 
+ address-family ipv4
+  neighbor 150.1.9.9 activate
+  neighbor 150.1.10.10 activate
+  neighbor 150.1.6.6 activate
+  network 150.2.7.7 mask 255.255.255.255
+  neighbor 150.1.9.9 route-reflector-client
+  neighbor 150.1.10.10 route-reflector-client  
+!
+
+R9:
+
+!
+interface Loopback1
+ ip address 150.2.9.9 255.255.255.255
+!
+router bgp 65600
+ bgp router-id 150.1.9.9
+ no bgp default ipv4-unicast
+ neighbor 150.1.6.6 remote-as 65600
+ neighbor 150.1.6.6 update-source Loopback0
+ neighbor 150.1.7.7 remote-as 65600
+ neighbor 150.1.7.7 update-source Loopback0
+ address-family ipv4
+  neighbor 150.1.6.6 activate
+  neighbor 150.1.7.7 activate
+  network 150.2.9.9 mask 255.255.255.255
+!
+
+R10:
+
+!
+interface Loopback1
+ ip address 150.2.10.10 255.255.255.255
+!
+router bgp 65600
+ bgp router-id 150.1.10.10
+ no bgp default ipv4-unicast
+ neighbor 150.1.6.6 remote-as 65600
+ neighbor 150.1.6.6 update-source Loopback0
+ neighbor 150.1.7.7 remote-as 65600
+ neighbor 150.1.7.7 update-source Loopback0
+ address-family ipv4
+  neighbor 150.1.6.6 activate
+  neighbor 150.1.7.7 activate
+  network 150.2.10.10 mask 255.255.255.255
+!
+
+tclsh
+
+foreach i { 
+150.2.6.6
+150.2.7.7
+150.2.9.9
+150.2.10.10
+} { ping $i source Loopback1 }
+
+---------------------------------------------------------------------------------------------------------
+
+3.5 SITE BGP
+
+---------------------------------------------------------------------------------------------------------
+
+R5:
+
+!
+ip as-path access-list 30 permit ^30000$
+ip as-path access-list 40 permit ^40000$ 
+!
+route-map NO-ADVERTISE permit 10
+ match as-path 30 40
+ set community no-advertise 
+route-map NO-ADVERTISE permit 20 
+!
+router bgp 3000
+ neighbor 192.0.59.9 remote-as 65600
+ neighbor 192.0.105.10 remote-as 65600
+ address-family ipv4
+  neighbor 192.0.59.9 activate
+  neighbor 192.0.105.10 activate
+  neighbor 192.0.59.9 route-map NO-ADVERTISE out
+  neighbor 192.0.59.9 send-community both
+  neighbor 192.0.105.10 route-map NO-ADVERTISE out
+  neighbor 192.0.105.10 send-community both
+  network 150.1.5.5 mask 255.255.255.255
+!
+
+R9:
+
+!
+router bgp 65600
+ neighbor 192.0.59.5 remote-as 3000
+ address-family ipv4
+  neighbor 192.0.59.5 activate
+  neighbor 150.1.6.6 next-hop-self
+  neighbor 150.1.7.7 next-hop-self
+!
+
+R10:
+
+!
+router bgp 65600
+ neighbor 192.0.105.5 remote-as 3000
+ address-family ipv4
+  neighbor 192.0.105.5 activate
+  neighbor 150.1.6.6 next-hop-self
+  neighbor 150.1.7.7 next-hop-self  
+!
+
+From R6,R7,R9,R10:
+
+tclsh
+
+foreach i { 
+150.1.5.5
+} { ping $i source Loopback1 }
+
+----
+
+R1:
+
+!
+ip as-path access-list 16 permit _65600$
+!
+route-map RED-BGP-TO-EIGRP permit 10
+ match as-path 16
+!
+router eigrp HOUSTON
+ !
+ address-family ipv4 unicast autonomous-system 5000
+  !
+  topology base
+   redistribute bgp 2000 route-map RED-BGP-TO-EIGRP metric 10000 1000 255 1 1500
+!
+ 
+*********************************************************************************************************
+
+DMVPN
+
+*********************************************************************************************************
+
+4.1 Overlay
+
+---------------------------------------------------------------------------------------------------------
+
+R6: (Hub)
+
+!
+interface Tunnel2
+ ip address 172.32.1.6 255.255.255.0
+ ip nhrp network-id 2
+ ip nhrp authentication CCIE
+ ip nhrp map multicast dynamic 
+ ip nhrp nhs 172.32.1.7 nbma 169.254.70.1 multicast 
+ ip mtu 1400
+ ip tcp adjust-mss 1360 
+ tunnel key 2
+ tunnel source dialer6
+ tunnel mode gre multipoint
+!
+
+R7: (Hub)
+
+!
+interface Tunnel2
+ ip address 172.32.1.7 255.255.255.0
+ ip nhrp network-id 2
+ ip nhrp authentication CCIE
+ ip nhrp map multicast dynamic 
+ ip nhrp nhs 172.32.1.6 nbma 169.254.60.1 multicast
+ ip mtu 1400
+ ip tcp adjust-mss 1360
+ tunnel key 2
+ tunnel source dialer7
+ tunnel mode gre multipoint
+!
+
+R15:
+
+!
+interface Tunnel2
+ ip address 172.32.1.15 255.255.255.0
+ ip nhrp network-id 2
+ ip nhrp authentication CCIE
+ ip nhrp nhs 172.32.1.6 nbma 169.254.60.1 multicast
+ ip nhrp nhs 172.32.1.7 nbma 169.254.70.1 multicast
+ ip mtu 1400
+ ip tcp adjust-mss 1360 
+ tunnel key 2
+ tunnel source dialer150
+ tunnel mode gre multipoint
+!
+
+R16:
+
+!
+interface Tunnel2
+ ip address 172.32.1.16 255.255.255.0
+ ip nhrp network-id 2
+ ip nhrp authentication CCIE
+ ip nhrp nhs 172.32.1.6 nbma 169.254.60.1 multicast
+ ip nhrp nhs 172.32.1.7 nbma 169.254.70.1 multicast
+ ip mtu 1400
+ ip tcp adjust-mss 1360 
+ tunnel key 2
+ tunnel source dialer160
+ tunnel mode gre multipoint
+!
+
+R6:
+
+!
+crypto isakmp policy 10
+ authentication pre-share 
+ encryption aes 192
+ hash sha256
+ group 5
+!
+crypto isakmp key 0 !KEY! address 169.254.70.1
+crypto isakmp key 0 !KEY! address 169.254.150.1
+crypto isakmp key 0 !KEY! address 169.254.160.1
+!
+crypto ipsec transform-set ESP-3DES-SHA esp-3des esp-sha-hmac 
+ mode transport
+!
+crypto ipsec profile DMVPN-PROFILE 
+ set transform-set ESP-3DES-SHA
+!
+int tunnel2
+ tunnel protection ipsec profile DMVPN-PROFILE
+!
+
+R7:
+
+!
+crypto isakmp policy 10
+ authentication pre-share
+ encryption aes 192
+ hash sha256
+ group 5
+!
+crypto isakmp key 0 !KEY! address 169.254.60.1
+crypto isakmp key 0 !KEY! address 169.254.150.1
+crypto isakmp key 0 !KEY! address 169.254.160.1
+!
+crypto ipsec transform-set ESP-3DES-SHA esp-3des esp-sha-hmac 
+ mode transport
+!
+crypto ipsec profile DMVPN-PROFILE 
+ set transform-set ESP-3DES-SHA
+!
+int tunnel2
+ tunnel protection ipsec profile DMVPN-PROFILE
+!
+
+R15:
+
+!
+crypto isakmp policy 10
+ authentication pre-share
+ encryption aes 192
+ hash sha256
+ group 5
+!
+crypto isakmp key 0 !KEY! address 169.254.70.1
+crypto isakmp key 0 !KEY! address 169.254.60.1
+crypto isakmp key 0 !KEY! address 169.254.160.1
+!
+crypto ipsec transform-set ESP-3DES-SHA esp-3des esp-sha-hmac 
+ mode transport
+!
+crypto ipsec profile DMVPN-PROFILE 
+ set transform-set ESP-3DES-SHA
+!
+int tunnel2
+ tunnel protection ipsec profile DMVPN-PROFILE
+!
+
+R16:
+
+!
+crypto isakmp policy 10
+ authentication pre-share
+ encryption aes 192
+ hash sha256
+ group 5
+!
+crypto isakmp key 0 !KEY! address 169.254.70.1
+crypto isakmp key 0 !KEY! address 169.254.60.1
+crypto isakmp key 0 !KEY! address 169.254.150.1
+!
+crypto ipsec transform-set ESP-3DES-SHA esp-3des esp-sha-hmac 
+ mode transport
+!
+crypto ipsec profile DMVPN-PROFILE 
+ set transform-set ESP-3DES-SHA
+!
+int tunnel2
+ tunnel protection ipsec profile DMVPN-PROFILE
+!
+
+---------------------------------------------------------------------------------------------------------
+
+4.3 OSPFv2
+
+---------------------------------------------------------------------------------------------------------
+
+R6:
+
+!
+interface Loopback2
+ ip address 66.66.66.66 255.255.255.255
+ ip ospf 1 area 2000
+!
+interface tunnel2 
+ ip ospf 1 area 2000
+ ip ospf network non-broadcast
+ ip ospf priority 100
+ ip ospf hello-interval 10
+ ip ospf dead-interval 40
+!
+router ospf 1
+ router-id 150.1.6.6
+ neighbor 172.32.1.15
+ neighbor 172.32.1.16
+ neighbor 172.32.1.7
+!
+ 
+R7:
+
+!
+interface Loopback2
+ ip address 77.77.77.77 255.255.255.255
+ ip ospf 1 area 2000
+!
+interface tunnel 2
+ ip ospf 1 area 2000
+ ip ospf network non-broadcast 
+ ip ospf priority 50 
+ ip ospf hello-interval 10
+ ip ospf dead-interval 40 
+!
+router ospf 1
+ router-id 150.1.7.7
+ neighbor 172.32.1.15
+ neighbor 172.32.1.16
+ neighbor 172.32.1.6 
+!
+
+R15:
+
+!
+int tunnel2
+ ip ospf 1 area 2000
+ ip ospf network non-broadcast 
+ ip ospf priority 0
+ ip ospf hello-interval 10
+ ip ospf dead-interval 40 
+!
+router ospf 1
+ router-id 150.1.15.15
+ neighbor 172.32.1.6
+ neighbor 172.32.1.7
+!
+
+R16:
+
+!
+int Loopback0 
+ ip ospf 1 area 2000
+!
+int tunnel2
+ ip ospf 1 area 2000
+ ip ospf network non-broadcast 
+ ip ospf priority 0
+ ip ospf hello-interval 10
+ ip ospf dead-interval 40 
+!
+router ospf 1
+ router-id 150.1.16.16
+ neighbor 172.32.1.6
+ neighbor 172.32.1.7
+!
+ 
+HQ routers:
+ 
+tclsh
+
+foreach i { 
+150.1.4.4
+150.1.12.12
+150.1.13.13
+150.1.11.11
+150.1.14.14
+150.1.15.15
+150.1.16.16
+} { ping $i source Loopback0 } 
+
+DMVPN Routers:
+
+tclsh
+
+foreach i { 
+77.77.77.77
+66.66.66.66
+} { ping $i source Loopback0 } 
+
+*********************************************************************************************************
+
+MPLS
+
+*********************************************************************************************************
+
+5.1 Label distro
+
+---------------------------------------------------------------------------------------------------------
+
+R4:
+
+!
+mpls ldp router-id Loopback0 force
+no mpls ldp logging neighbor-changes
+!
+router ospf 1
+ mpls ldp autoconfig
+!
+
+R11:
+
+!
+mpls ldp router-id Loopback0 force
+no mpls ldp logging neighbor-changes
+!
+router ospf 1
+ mpls ldp autoconfig
+!
+
+R12:
+
+!
+mpls ldp router-id Loopback0 force
+no mpls ldp logging neighbor-changes
+!
+router ospf 1
+ mpls ldp autoconfig
+!
+
+R13:
+
+!
+mpls ldp router-id Loopback0 force
+no mpls ldp logging neighbor-changes
+!
+router ospf 1
+ mpls ldp autoconfig
+!
+
+R14:
+
+!
+mpls ldp router-id Loopback0 force
+no mpls ldp logging neighbor-changes
+!
+router ospf 1
+ mpls ldp autoconfig
+!
+
+R15:
+
+!
+ip access-list standard 20
+ permit host 66.66.66.66
+ permit host 77.77.77.77
+!
+mpls ldp router-id Loopback0 force
+no mpls ldp logging neighbor-changes
+mpls ldp password required for 20
+mpls ldp neighbor 66.66.66.66 password 0 !CISCO! 
+mpls ldp neighbor 77.77.77.77 password 0 !CISCO! 
+!
+router ospf 1
+ mpls ldp autoconfig
+!
+
+R16:
+
+!
+mpls ldp router-id Loopback0 force
+no mpls ldp logging neighbor-changes
+!
+router ospf 1
+ mpls ldp autoconfig
+!
+
+R6:
+
+!
+ip access-list standard 20
+ permit host 150.1.15.15
+!
+mpls ldp router-id Loopback2 force
+no mpls ldp logging neighbor-changes
+mpls ldp password required for 20
+mpls ldp neighbor 150.1.15.15 password 0 !CISCO! 
+!
+router ospf 1
+ mpls ldp autoconfig
+!
+
+R7:
+
+!
+ip access-list standard 20
+ permit host 150.1.15.15
+!
+mpls ldp router-id Loopback2 force
+no mpls ldp logging neighbor-changes
+mpls ldp password required for 20
+mpls ldp neighbor 150.1.15.15 password 0 !CISCO! 
+!
+router ospf 1
+ mpls ldp autoconfig
+!
+
+---------------------------------------------------------------------------------------------------------
+
+5.2 VPNv4 Core
+
+---------------------------------------------------------------------------------------------------------
+
+R6:
+
+!
+router bgp 65600
+ template peer-session IBGP
+  remote-as 65600
+  update-source Loopback2
+ template peer-policy IBGP
+  route-reflector-client 
+ neighbor 150.1.12.12 inherit peer-session IBGP
+ neighbor 150.1.15.15 inherit peer-session IBGP
+ neighbor 150.1.16.16 inherit peer-session IBGP
+ !
+ address-family vpnv4
+  neighbor 150.1.12.12 activate
+  neighbor 150.1.12.12 inherit peer-policy IBGP
+  neighbor 150.1.15.15 activate
+  neighbor 150.1.15.15 inherit peer-policy IBGP
+  neighbor 150.1.16.16 activate
+  neighbor 150.1.16.16 inherit peer-policy IBGP
+!
+
+R7:
+
+!
+router bgp 65600
+ template peer-session IBGP
+  remote-as 65600
+  update-source Loopback2
+ template peer-policy IBGP
+  route-reflector-client 
+ neighbor 150.1.12.12 inherit peer-session IBGP
+ neighbor 150.1.15.15 inherit peer-session IBGP
+ neighbor 150.1.16.16 inherit peer-session IBGP
+ !
+ address-family vpnv4
+  neighbor 150.1.12.12 activate
+  neighbor 150.1.12.12 inherit peer-policy IBGP
+  neighbor 150.1.15.15 activate
+  neighbor 150.1.15.15 inherit peer-policy IBGP
+  neighbor 150.1.16.16 activate
+  neighbor 150.1.16.16 inherit peer-policy IBGP
+!
+
+R12:
+
+!
+router bgp 65600
+ bgp router-id 150.1.12.12
+ no bgp default ipv4-unicast
+ neighbor 66.66.66.66 remote-as 65600
+ neighbor 66.66.66.66 update-source Loopback0
+ neighbor 77.77.77.77 remote-as 65600
+ neighbor 77.77.77.77 update-source Loopback0 
+ address-family vpnv4
+  neighbor 66.66.66.66 activate
+  neighbor 77.77.77.77 activate
+!
+
+R15:
+
+!
+router bgp 65600
+ bgp router-id 150.1.15.15
+ no bgp default ipv4-unicast
+ neighbor 66.66.66.66 remote-as 65600
+ neighbor 66.66.66.66 update-source Loopback0
+ neighbor 77.77.77.77 remote-as 65600
+ neighbor 77.77.77.77 update-source Loopback0 
+ address-family vpnv4
+  neighbor 66.66.66.66 activate
+  neighbor 77.77.77.77 activate
+!
+
+R16:
+
+!
+router bgp 65600
+ bgp router-id 150.1.16.16
+ no bgp default ipv4-unicast
+ neighbor 66.66.66.66 remote-as 65600
+ neighbor 66.66.66.66 update-source Loopback0
+ neighbor 77.77.77.77 remote-as 65600
+ neighbor 77.77.77.77 update-source Loopback0 
+ address-family vpnv4
+  neighbor 66.66.66.66 activate
+  neighbor 77.77.77.77 activate
+!
+
+---------------------------------------------------------------------------------------------------------
+
+5.3 PE/CE - OSPFv2
+
+---------------------------------------------------------------------------------------------------------
+
+R2:
+
+!
+interface Loopback0 
+ ip ospf 2 area 0
+!
+interface Gi1.215
+ ip ospf 2 area 1
+!
+interface Gi1.200
+ ip ospf 2 area 1
+!
+router ospf 2
+ router-id 150.1.2.2
+ passive-interface Gi1.200
+ area 1 virtual-link 15.15.15.15 
+!
+
+R8:
+
+!
+interface Loopback0 
+ ip ospf 2 area 0
+!
+interface Gi1.815
+ ip ospf 2 area 1
+!
+interface Gi1.800
+ ip ospf 2 area 1
+!
+router ospf 2
+ router-id 150.1.8.8
+ passive-interface Gi1.800
+ area 1 virtual-link 15.15.15.15 
+!
+
+R15:
+
+!
+interface Gi1.815
+ ip ospf 2 area 1
+!
+interface Gi1.215
+ ip ospf 2 area 1
+!
+router ospf 2 vrf RED
+ router-id 15.15.15.15
+ area 1 virtual-link 150.1.2.2
+ area 1 virtual-link 150.1.8.8
+!
+
+SW4:
+
+!
+ip routing
+!
+interface Loopback0
+ ip ospf 2 area 3
+!
+interface Vlan1624
+ ip ospf 2 area 3
+!
+router ospf 2
+ router-id 150.1.14.14
+!
+
+R16:
+
+!
+interface Gi1.1624
+ ip ospf 2 area 3
+!
+router ospf 2 vrf RED
+ router-id 16.16.16.16
+!
+ 
+---------------------------------------------------------------------------------------------------------
+
+5.4 PE/CE - EIGRP and BGP
+
+---------------------------------------------------------------------------------------------------------
+
+R16:
+
+!
+router eigrp 7000
+ address-family ipv4 vrf BLUE autonomous-system 7000
+ router-id 16.16.16.16
+ network 172.31.236.16 0.0.0.0
+!
+
+SW3:
+
+!
+ip routing
+!
+route-map RED-CONN-TO-EIGRP
+ match interface Loopback0
+!
+router eigrp 7000 
+ router-id 150.1.23.23
+ network 172.31.236.23 0.0.0.0
+ network 192.168.0.0 0.0.255.255
+ redistribute connected route-map RED-CONN-TO-EIGRP
+!
+
+R17:
+
+!
+route-map RED-CONN-TO-EIGRP
+ match interface Loopback0
+!
+router eigrp 7000 
+ router-id 150.1.17.17
+ network 192.168.0.0 0.0.255.255
+ redistribute connected route-map RED-CONN-TO-EIGRP 
+!
+
+R18:
+
+!
+route-map RED-CONN-TO-EIGRP
+ match interface Loopback0
+!
+router eigrp 7000 
+ router-id 150.1.18.18
+ network 192.168.0.0 0.0.255.255
+ redistribute connected route-map RED-CONN-TO-EIGRP 
+!
+
+R12:
+
+!
+int Gi1.912
+ no shut
+!
+router eigrp 6000
+ address-family ipv4 vrf RENO autonomous-system 6000
+ router-id 12.12.12.12
+ network 172.31.129.12 0.0.0.0
+!
+
+R9:
+
+!
+int Gi1.912
+ no shut
+!
+router eigrp RENO
+ address-family ipv4 unicast autonomous-system 6000
+ network 172.31.129.9 0.0.0.0
+!
+
+R15:
+
+!
+router bgp 65600
+ address-family ipv4 vrf HOUSTON
+  neighbor 119.3.153.3 remote-as 2000
+  neighbor 119.3.153.3 activate
+!
+  
+
+R3:
+
+!
+router bgp 2000
+ bgp router-id 150.1.3.3
+ no bgp default ipv4-unicast
+ neighbor 119.3.153.15 remote-as 65600
+ address-family ipv4
+  neighbor 119.3.153.15 activate
+!
+
+---------------------------------------------------------------------------------------------------------
+
+5.5 VPNv4 BGP - Edge
+
+---------------------------------------------------------------------------------------------------------
+
+R15:
+
+!
+vrf definition RED
+ address-family ipv4
+  route-target import 100:100
+  route-target export 100:100
+!
+router bgp 65600
+ address-family ipv4 vrf RED
+  redistribute ospf 2 
+!
+router ospf 2 vrf RED
+ redistribute bgp 65600 subnets
+! 
+
+R16:
+
+!
+vrf definition RED
+ address-family ipv4
+  route-target import 100:100
+  route-target export 100:100
+!
+router bgp 65600
+ address-family ipv4 vrf RED
+  redistribute ospf 2 
+!
+router ospf 2 vrf RED
+ redistribute bgp 65600 subnets
+! 
+
+R6,R7:
+
+!
+router bgp 65600
+ template peer-policy IBGP
+  next-hop-self all
+!  
+
+R15:
+
+!
+vrf definition HOUSTON
+ !
+ address-family ipv4
+  route-target import 200:200
+  route-target export 200:200
+ exit-address-family
+!
+
+
+R12:
+
+!
+vrf definition RENO
+ !
+ address-family ipv4
+  route-target import 200:200
+  route-target export 200:200
+ exit-address-family
+!
+router bgp 65600
+ address-family ipv4 vrf RENO
+  redistribute eigrp 6000
+!
+router eigrp 6000
+ address-family ipv4 vrf RENO autonomous-system 6000
+  redistribute bgp 65600 metric 10000 1000 255 1 1500
+!
+
+R16:
+
+!
+vrf definition BLUE
+ !
+ address-family ipv4
+  route-target import 200:200
+  route-target export 200:200
+ exit-address-family
+!
+router bgp 65600
+ address-family ipv4 vrf BLUE
+  redistribute eigrp 7000
+!
+router eigrp 7000
+ address-family ipv4 vrf BLUE autonomous-system 7000
+  redistribute bgp 65600 metric 10000 1000 255 1 1500
+!
+
+R3:
+
+!
+router eigrp HOUSTON
+ !
+ address-family ipv4 unicast autonomous-system 5000
+  topology base
+   redistribute bgp 2000 metric 1000000 100 255 1 1500
+!
+ip prefix-list TO-DENY seq 5 permit 150.2.9.9/32
+ip prefix-list TO-DENY seq 10 permit 150.2.10.10/32
+!
+route-map RED-EIGRP-TO-BGP deny 10
+ match ip address prefix-list TO-DENY 
+route-map RED-EIGRP-TO-BGP permit 20 
+!
+router bgp 2000
+ redistribute eigrp 5000 route-map RED-EIGRP-TO-BGP
+!
+
+*********************************************************************************************************
+
+Multicast
+
+*********************************************************************************************************
+
+6.1 Multicast
+
+---------------------------------------------------------------------------------------------------------
+
+R1:
+
+!
+ip multicast-routing distributed
+!
+interface Tunnel1
+ ip address 100.10.50.1 255.255.255.0
+ tunnel source Gi1.10
+ tunnel destination 50.50.1.1
+ ip pim sparse-mode
+!
+interface Tunnel2
+ ip address 100.11.51.1 255.255.255.0
+ tunnel source Gi1.11
+ tunnel destination 51.51.1.1
+ ip pim sparse-mode
+!
+int Gi1.1319
+ ip pim sparse-mode
+!
+
+R19:
+
+!
+ip multicast-routing distributed
+!
+int Gi1.1319
+ ip pim sparse-mode
+!
+int Gi1.1921
+ ip pim sparse-mode
+!
+
+R3:
+
+!
+ip multicast-routing distributed
+!
+int Gi1.1319
+ ip pim sparse-mode
+!
+int Gi1.322
+ ip pim sparse-mode
+!
+
+SW1:
+
+!
+ip multicast-routing distributed
+!
+interface Vlan1921
+ ip pim sparse-mode
+!
+interface Port-channel12
+ ip pim sparse-mode
+!
+
+SW2:
+
+!
+ip multicast-routing distributed
+!
+interface Vlan322
+ ip pim sparse-mode
+!
+interface Port-channel12
+ ip pim sparse-mode
+!
+
+R5:
+
+!
+ip multicast-routing distributed
+!
+interface Tunnel1
+ ip address 100.10.50.5 255.255.255.0
+ tunnel source Gi1.50
+ tunnel destination 10.10.1.1
+ ip pim sparse-mode
+!
+interface Tunnel2
+ ip address 100.11.51.5 255.255.255.0
+ tunnel source Gi1.51
+ tunnel destination 11.11.1.1
+ ip pim sparse-mode
+!
+interface Gi1.59
+ ip pim sparse-mode
+!
+interface Gi1.105
+ ip pim sparse-mode
+!
+ 
+R9:
+
+!
+ip multicast-routing distributed
+!
+interface Gi1.59
+ ip pim sparse-mode
+!
+int Gi1.69
+ ip pim sparse-mode
+!
+
+R10:
+
+!
+ip multicast-routing distributed
+!
+int Gi1.105
+ ip pim sparse-mode
+!
+int gi1.106
+ ip pim sparse-mode
+!
+int Gi1.107
+ ip pim sparse-mode
+!
+
+R6:
+
+!
+ip multicast-routing distributed
+!
+int Gi1.69
+ ip pim sparse-mode
+!
+int Gi1.106
+ ip pim sparse-mode
+!
+int Gi1.67
+ ip pim sparse-mode
+!
+
+R7:
+
+!
+ip multicast-routing distributed
+!
+int Gi1.107
+ ip pim sparse-mode
+!
+int Gi1.67
+ ip pim sparse-mode
+!
+
+---------------------------------------------------------------------------------------------------------
+
+6.2 Multicast
+
+---------------------------------------------------------------------------------------------------------
+
+R10:
+
+!
+interface Loopback1
+ ip pim sparse-mode
+!
+ip access-list standard 10
+ permit host 230.10.10.10
+!
+ip pim bsr-candidate Loopback1
+ip pim rp-candidate Loopback1 group-list 10 interval 5
+!
+
+R6:
+
+!
+interface Loopback1
+ ip pim sparse-mode
+ ip igmp join-group 230.10.10.10
+!
+
+R7:
+
+!
+interface Loopback1
+ ip pim sparse-mode
+ ip igmp join-group 230.10.10.10
+!
+
+R1:
+
+!
+ip route 51.51.51.51 255.255.255.255 Tunnel1 210
+ip route 51.51.51.51 255.255.255.255 Tunnel2 215
+!
+
+!
+ip mroute 192.0.0.0 255.255.0.0 51.51.51.51 
+ip mroute 150.2.10.10 255.255.255.255 51.51.51.51
+!
+
+R5:
+
+!
+ip route 51.51.51.51 255.255.255.255 Tunnel1 210
+ip route 51.51.51.51 255.255.255.255 Tunnel2 215
+!
+
+!
+ip mroute 119.3.0.0 255.255.0.0 51.51.51.51
+!
+
+R9:
+
+!
+ip mroute 192.0.0.0 255.255.0.0 192.0.59.5
+!
+
+R10:
+
+!
+ip mroute 192.0.0.0 255.255.0.00 192.0.105.5 
+!
+
+*********************************************************************************************************
+
+IPv6
+
+*********************************************************************************************************
+
+7.1 OSPFv3 Site Routing
+
+---------------------------------------------------------------------------------------------------------
+
+R2:
+
+!
+ipv6 unicast-routing
+!
+interface Loopback0
+ ospfv3 3 ipv6 area 1 
+!
+interface Gi1.215
+ ospfv3 3 ipv6 area 1 
+!
+interface Gi1.200
+ ospfv3 3 ipv6 area 1
+!
+router ospfv3 3 
+ router-id 150.1.2.2
+  address-family ipv6 unicast
+!
+int Gi1.200
+ ipv6 nd router-preference High
+!
+
+R8:
+
+!
+ipv6 unicast-routing
+!
+interface Loopback0
+ ospfv3 3 ipv6 area 1 
+!
+interface Gi1.815
+ ospfv3 3 ipv6 area 1 
+!
+interface Gi1.800
+ ospfv3 3 ipv6 area 1
+!
+router ospfv3 3 
+ router-id 150.1.8.8
+  address-family ipv6 unicast
+!
+int Gi1.800
+ ipv6 nd router-preference High
+!
+
+R15:
+
+!
+ipv6 unicast-routing
+!
+interface Gi1.215
+ ospfv3 3 ipv6 area 1 
+!
+interface Gi1.815
+ ospfv3 3 ipv6 area 1 
+!
+router ospfv3 3
+ router-id 28.28.28.28
+  address-family ipv6 vrf RED
+!
+
+R20: (servers)  
+
+ routing-context vrf SERVER1 
+ 
+!
+ipv6 unicast-routing
+!
+int Gi1.800
+ ipv6 address autoconfig default
+! 
+
+ routing-context vrf SERVER2 
+ 
+!
+ipv6 unicast-routing 
+!
+ int Gi1.200
+  ipv6 address autoconfig 
+!
+
+---------------------------------------------------------------------------------------------------------
+
+7.2 IPv6 Site Routing
+
+---------------------------------------------------------------------------------------------------------
+
+R1:
+
+!
+ipv6 unicast-routing
+!
+route-map CORRECT_NH_OUT permit 10
+ set ipv6 next-hop 2001:10:10:1::1
+route-map CORRECT_NH_IN permit 10
+ set ipv6 next-hop 2001:10:10:1::20
+!
+router bgp 2000
+ no bgp default ipv6-nexthop
+ address-family ipv6 unicast
+  neighbor 10.10.1.20 activate
+  neighbor 10.10.1.20 route-map CORRECT_NH_OUT out
+  neighbor 10.10.1.20 route-map CORRECT_NH_IN in
+!
+
+R4:
+
+!
+ipv6 unicast-routing
+!   
+route-map CORRECT_NH_OUT permit 10
+ set ipv6 next-hop 2001:40:40:1::1
+!
+route-map CORRECT_NH_IN permit 10
+ set ipv6 next-hop 2001:40:40:1::20
+!
+router bgp 1000
+ no bgp default ipv6-nexthop
+ address-family ipv6 unicast
+  neighbor 40.40.1.20 activate
+  neighbor 40.40.1.20 route-map CORRECT_NH_OUT out
+  neighbor 40.40.1.20 route-map CORRECT_NH_IN in
+!
+
+R1:
+
+!
+ipv6 unicast-routing
+!
+router eigrp HOUSTON
+ address-family ipv6 unicast autonomous-system 5000
+  af-interface Gi1.10
+   shutdown
+  af-interface Gi1.11
+   shutdown
+!
+
+R19:
+
+!
+ipv6 unicast-routing
+!
+router eigrp HOUSTON
+ address-family ipv6 unicast autonomous-system 5000
+!
+
+R3:
+
+!
+ipv6 unicast-routing
+!
+router eigrp HOUSTON
+ address-family ipv6 unicast autonomous-system 5000
+!
+
+R4:
+
+!
+interface Loopback0 
+ ospfv3 2 ipv6 area 1
+!
+interface Gi1.411
+ ospfv3 2 ipv6 area 0
+!
+interface Gi1.412
+ ospfv3 2 ipv6 area 0
+!
+
+R11:
+
+!
+ipv6 unicast-routing
+!
+interface Loopback0 
+ ospfv3 2 ipv6 area 1
+!
+interface Gi1.411
+ ospfv3 2 ipv6 area 0
+!
+interface Gi1.1114
+ ospfv3 2 ipv6 area 0
+!
+
+R12:
+
+!
+ipv6 unicast-routing
+!
+ipv6 prefix-list Loopback seq 5 permit 2001::12/128
+!
+route-map RED-CONNECTED-IPV6 permit 10
+ match ipv6 address prefix-list Loopback
+!
+interface Gi1.1214
+ ospfv3 2 ipv6 area 0
+!
+interface Gi1.412
+ ospfv3 2 ipv6 area 0
+!
+router ospfv3 2
+ router-id 12.12.12.12
+ address-family ipv6 unicast
+  redistribute connected route-map RED-CONNECTED-IPV6
+!
+
+R14:
+
+!
+ipv6 unicast-routing
+!
+ipv6 prefix-list Loopback seq 5 permit 2001::14/128
+!
+route-map RED-CONNECTED-IPV6 permit 10
+ match ipv6 address prefix-list Loopback
+!
+interface Gi1.1214
+ ospfv3 2 ipv6 area 0
+!
+interface Gi1.1114
+ ospfv3 2 ipv6 area 0
+!
+router ospfv3 2
+ router-id 14.14.14.14
+ address-family ipv6 unicast 
+ redistribute connected route-map RED-CONNECTED-IPV6
+!
+
+R4:
+
+!
+router bgp 1000
+ address-family ipv6
+  redistribute ospf 2 match internal external 1 external 2 include-connected
+!
+router ospfv3 2 
+ address-family ipv6 unicast
+  redistribute bgp 1000 
+!
+
+R1:
+
+!
+router bgp 2000
+ address-family ipv6
+  redistribute eigrp 5000 include-connected
+!
+router eigrp HOUSTON
+ address-family ipv6 unicast autonomous-system 5000
+  topology base
+   redistribute bgp 2000 metric 10000 1000 255 1 1500
+!
+
+tclsh
+
+foreach i { 
+2001::1
+2001::3
+2001::19
+2001::4
+2001::12
+2001::11
+2001::14
+} { ping $i source Loopback0 }
+
+FALTA UNA REDISTRIBUCIÓN DE BGP A EIGRP que no se copió bien.
+
+*********************************************************************************************************
+
+Security
+
+*********************************************************************************************************
+
+8.1 AAA
+
+---------------------------------------------------------------------------------------------------------
+
+R17:
+
+!
+aaa new-model
+!
+username CCIE password 0 PaSs
+!
+aaa authentication login CONSOLE none
+aaa authentication login VTY group TAC_SERV local-case
+!
+aaa group server tacacs+ TAC_SERV
+ server name SERVER1
+!
+tacacs server SERVER1
+ address ipv4 192.0.106.100
+ timeout 3
+ key TACPASS
+!
+ip tacacs source-interface Loopback0
+!
+line con 0
+ login authentIcation CONSOLE
+!
+line vty 0 98
+ login authentication VTY 
+!
+
+*********************************************************************************************************
+
+Services
+
+*********************************************************************************************************
+
+9.1 Automated QoS
+
+---------------------------------------------------------------------------------------------------------
+
+R4:
+
+!
+ip access-list extended UDP-1
+ permit udp any any eq 1000 2000
+!
+ip access-list extended UDP-2
+ permit udp any any eq 3000 4000
+!
+
+!
+class-map match-all UDP-1
+ match access-group name UDP-1
+!
+class-map match-all UDP-2
+ match access-group name UDP-2
+!
+class-map match-any HTTP-HTTPS
+ match protocol http
+ match protocol secure-http
+!
+class-map match-any MGMT
+ match protocol icmp
+ match protocol ping
+ match protocol ssh
+ match protocol snmp
+!
+class-map match-all EF
+ match dscp ef
+!
+class-map match-all CS1
+ match dscp cs1
+!
+class-map match-all CS3
+ match dscp cs3
+!
+class-map match-all AF41
+ match dscp af41
+!
+
+!
+policy-map MARKING
+ class UDP-1
+  set dscp af41
+ class UDP-2
+  set dscp ef
+ class HTTP-HTTPS
+  set dscp cs1
+ class MGMT
+  set dscp cs3
+!
+interface Gi1.411
+ service-policy input MARKING
+!
+interface Gi1.412
+ service-policy input MARKING
+!
+
+!
+policy-map CHILD-MAP
+ class EF
+  priority percent 10
+ class AF41
+  bandwidth remaining percent 30
+ class CS1
+  bandwidth remaining percent 40
+ class CS3
+  bandwidth remaining percent 5
+ class class-default 
+  bandwidth remaining percent 25 
+!
+
+!
+policy-map LEVEL-30
+ class class-default
+  shape average 100000000
+   service-policy CHILD-MAP
+!
+
+!
+policy-map INE
+ class class-default
+  shape average 150000000
+   service-policy CHILD-MAP
+!
+
+!
+interface Gi1.40
+ service-policy output LEVEL-30 
+!
+interface Gi1.41
+ service-policy output INE 
+!
+
+KRON a secas no vale!!! Porque no permite que entre a conf t. De ahí que sea necesario el EEM.
+
+
+
+
+
+
+
+

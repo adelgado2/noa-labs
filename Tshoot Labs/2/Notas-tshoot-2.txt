@@ -1,0 +1,179 @@
+*****************************************************
+
+Ticket 1
+
+*****************************************************
+
+R19:
+
+!
+interface Tunnel0
+ ip nhrp group Europe
+!
+
+R1:
+
+!
+int tu0
+ ip nhrp map group Europe service-policy output Europe_parent
+!
+
+*****************************************************
+
+Ticket 2
+
+*****************************************************
+
+R7:
+
+!
+ip access-list standard 80
+ permit 180.10.153.0
+!
+router bgp 65004
+ address-family ipv4
+  distance 100 0.0.0.0 255.255.255.255 80
+!
+
+R1:
+
+!
+ip prefix-list server-subnets seq 15 permit 180.10.153.0/26
+!
+
+R2:
+
+!
+ip prefix-list server-subnets seq 15 permit 180.10.153.0/26
+!
+
+*****************************************************
+
+Ticket 3
+
+*****************************************************
+
+R11:
+
+!
+router bgp 65001
+ address-family ipv4 vrf Colo-Site
+  neighbor 180.10.119.0 as-override 
+!
+
+R9:
+
+!
+ip as-path access-list 1 permit _65001$
+!
+
+R17:
+
+!
+ip route vrf Colo-Site 180.10.200.100 255.255.255.255 Null0 250
+!
+
+*****************************************************
+
+Ticket 4
+
+*****************************************************
+
+R5:
+
+!
+ip prefix-list rip-subs seq 10 permit 180.10.100.100/32
+!
+
+R4:
+
+!
+area 34 nssa translate type7 always
+!
+
+
+*****************************************************
+
+Ticket 5
+
+*****************************************************
+
+R5:
+
+!
+ip prefix-list rip-subs seq 10 permit 180.10.100.100/32  
+!
+interface Loopback0
+ no ip ospf 2 area 34
+ ip ospf 1 area 34
+!
+
+R5 no pone de FA las otras interfaces que hay en OSPF por el prefix-suppression!
+
+R4:
+
+!
+router ospf 1
+ area 34 nssa translate type7 suppress-fa 
+!
+
+
+*****************************************************
+
+Ticket 6
+
+*****************************************************
+
+
+*****************************************************
+
+Ticket 7
+
+*****************************************************
+
+R5:
+
+!
+router ospfv3 1
+ address-family ipv6 unicast 
+  no area 34 stub
+  area 34 nssa
+!
+
+R16:
+
+!
+router bgp 6618605
+ address-family ipv6
+  neighbor 2001:172:16:1::1 route-reflector-client
+!
+
+R1:
+
+!
+router bgp 6618605
+ address-family ipv6
+  no network 2001:192:168:10::1/128
+  network 2001:192:168:1::1/128   
+!
+
+*****************************************************
+
+Ticket 8
+
+*****************************************************
+
+
+
+*****************************************************
+
+Ticket 9
+
+*****************************************************
+
+
+*****************************************************
+
+Ticket 10
+
+*****************************************************

@@ -1,0 +1,152 @@
+!
+! Last configuration change at 11:33:38 UTC Sat May 20 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R14
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 10.255.255.14 255.255.255.255
+ ip ospf 2 area 0
+ ipv6 address 2001:10:255:255::14/128
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.100
+ encapsulation dot1Q 100
+ ip address 172.29.100.14 255.255.255.0
+ ip pim sparse-mode
+ ip igmp join-group 224.1.2.3
+ ip ospf network point-to-multipoint
+ ip ospf 2 area 0
+ ipv6 address 2001:172:29:100::14/64
+ no shutdown
+!
+interface GigabitEthernet1.145
+ encapsulation dot1Q 145
+ ip address 172.29.145.14 255.255.255.0
+ ip ospf 2 area 0
+ ipv6 address 2001:172:29:145::14/64
+ no shutdown
+!
+interface GigabitEthernet2
+ no ip address
+ negotiation auto
+ shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+router ospf 2
+ router-id 10.255.255.14
+ neighbor 172.29.100.15 cost 1
+!
+!
+!
+ip forward-protocol nd
+!
+ip pim autorp listener
+ip mroute 0.0.0.0 0.0.0.0 172.29.100.15
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line vty 0 4
+ no login
+!
+ntp authentication-key 1 md5 032A6F3B2D5C18 7
+ntp authenticate
+ntp trusted-key 1
+ntp source Loopback0
+ntp server 10.255.255.13 key 1
+!
+end
