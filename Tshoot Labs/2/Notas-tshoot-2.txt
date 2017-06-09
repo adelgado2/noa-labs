@@ -24,6 +24,10 @@ Ticket 2
 
 *****************************************************
 
+Lo he resuelto de otra forma, este ticket me da el mismo resultado.
+Revisar al final si esta solución puede impactar en otro ticket. 
+Discusión en foros, algunos han hecho igual que yo.
+
 R7:
 
 !
@@ -52,6 +56,8 @@ ip prefix-list server-subnets seq 15 permit 180.10.153.0/26
 Ticket 3
 
 *****************************************************
+
+Lo he hecho diferente, pero creo que está bien.
 
 R11:
 
@@ -82,25 +88,6 @@ Ticket 4
 R5:
 
 !
-ip prefix-list rip-subs seq 10 permit 180.10.100.100/32
-!
-
-R4:
-
-!
-area 34 nssa translate type7 always
-!
-
-
-*****************************************************
-
-Ticket 5
-
-*****************************************************
-
-R5:
-
-!
 ip prefix-list rip-subs seq 10 permit 180.10.100.100/32  
 !
 interface Loopback0
@@ -117,6 +104,50 @@ router ospf 1
  area 34 nssa translate type7 suppress-fa 
 !
 
+Otra opción:
+
+R5:
+
+!
+ip prefix-list rip-subs seq 10 permit 180.10.100.100/32  
+!
+router ospf 1
+ no prefix prefix-suppression
+!
+
+Loopback0 de R5 la dejamos en ip ospf 2 area 34
+
+Entonces FA es 180.10.45.5, que es alcanzable por R2.
+
+No hace falta añadir nada en R4.
+
+*****************************************************
+
+Ticket 5
+
+*****************************************************
+
+R13:
+
+!
+router eigrp ABC_COMPANY
+ !
+ address-family ipv4 unicast autonomous-system 56
+  !
+  neighbor 180.10.139.19 GigabitEthernet1.1319
+!
+
+
+R15:
+
+!
+router eigrp ABC_COMPANY
+ !
+ address-family ipv4 unicast autonomous-system 56
+  !
+  network 192.168.100.15 0.0.0.0
+  eigrp router-id 15.15.15.15
+!
 
 *****************************************************
 
@@ -124,6 +155,26 @@ Ticket 6
 
 *****************************************************
 
+Forma INE:
+R10:
+
+!
+int GigabitEthernet1.610 
+ ip nat inside
+!
+no ip nat inside source static 44.2.5.5 30.9.0.1
+ip nat inside source static 44.2.5.5 44.6.6.6
+!
+
+R12:
+
+!
+no crypto isakmp key CORP_KEY address 44.2.5.5
+crypto isakmp key CORP_KEY address 44.6.6.6 
+!
+
+R2 tb necesitaría lo de arriba, pero no es necesario
+para resolver el ticket.
 
 *****************************************************
 
@@ -163,7 +214,32 @@ Ticket 8
 
 *****************************************************
 
+La clave aquí es que para R14 hay dos áreas, area 55 y area 51.
+Entonces en la ospf database del proceso 51 se vé que hay Type 5 External para las redes 30.x.x.x y también hay Type 7 nssa-external para estas mismas redes (una vez que hemos quitado el 'no redistribution' en R14 del area 51 nssa command). Pero como este router es a la vez entonces NSSA ASBR y NSSA ABR el P bit is not set by default in Cisco, y por eso se vé que no acepta la traducción de Type 7 a Type 5 en LSAs nsas-external. Y además en estas situaciones la FA es 0.0.0.0.
 
+https://supportforums.cisco.com/discussion/11698856/ospf-nssa-forwarding-address-0000-value
+
+http://www.cisco.com/c/en/us/support/docs/ip/open-shortest-path-first-ospf/6208-nssa.html
+
+https://ieoc.com/discussion/32222/ccie-rs-wb5-ts2-ticket-8
+
+Cargándonos esta segunda área 55 de la loopback1 (porque no está 
+conectada al área 0 ni aparece en diagrama) cambian las condiciones.
+
+Probar a quitar el área 55 de la loopback sin meter la loopback en area 51, a ver si coge de FA la interfaz. Correcto, coge de FA en este caso la primera interfaz en ospf. La cuestión es que no haya una segunda área en Loopback1, da igual si está luego o no en proceso 51 ya que ambas FA (Loopback1, interfaz) son alcanzadas desde R4.
+
+R14:
+
+!
+router ospf 51 vrf HQ
+ no area 51 nssa no-redistribution 
+!
+Para dejarlo como area 51 nssa
+!
+int Lo1
+ no ip ospf 51 area 55
+ ip ospf 51 area 51
+!
 
 *****************************************************
 
@@ -171,9 +247,70 @@ Ticket 9
 
 *****************************************************
 
+R1:
+
+!
+no ipv6 prefix-list permit-out seq 10 permit 2001:172:16:1::4/127
+ipv6 prefix-list permit-out seq 10 permit 2001:172:16:1::4/128
+!
+router eigrp ABC_COMPANY
+ address-family ipv6 unicast autonomous-system 56
+  topology base
+   redistribute ospf 1 route-map permit-out metric 10000 100 255 1 1500
+  exit-af-topology
+!
+
+R20:
+
+!
+crypto isakmp policy 10                
+ encr aes
+!                                             
+crypto ipsec transform-set CORP_TRANS esp-aes esp-sha-hmac    
+!
+
+Lo siguiente lo añado porque sino me hace Load Balance por dos caminos y no me sale exacto el trace.
+R1:
+
+!
+int Gi1.12
+ ospfv3 1 cost 2
+!
+
+Paso por alto que aparezcan los AS en el trace porque al INE tb le sale.
 
 *****************************************************
 
 Ticket 10
 
 *****************************************************
+
+R16:
+
+!
+ip access-list extended default
+ no 10 
+ deny pim any any
+!
+
+R1:
+
+!
+int Lo0
+ ip pim sparse-mode
+!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

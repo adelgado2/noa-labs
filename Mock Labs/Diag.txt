@@ -1,0 +1,9 @@
+Case 1
+
+Ticket 1.1 F
+Ticket 1.2 D
+
+Case 2
+
+Ticket 2.1 R3 	show bgp ipv4 unicast
+Ticket 2.2 R3 	Configure a weight of 40000 towards the PE

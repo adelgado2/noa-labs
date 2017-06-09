@@ -1,0 +1,104 @@
+Ticket 1
+
+R1:
+
+!
+int Gi1.116
+ no ipv6 dhcp server ipv6-dchp-pool
+ ipv6 dhcp server ipv6-dhcp-pool
+!
+
+R16:
+
+!
+int Gi1.160
+ shut
+ no shut
+!
+
+Ticket 2
+
+R20:
+
+!
+int Gi1.192
+ standby 192 ip 172.27.192.254
+ standby 192 priority 160
+ standby use-bia
+!
+
+R19:
+
+!
+int Gi1.192
+ standby use-bia
+!
+
+R18:
+
+!
+ip access-list extended default 
+ no 10
+ 10 deny icmp 172.27.182.0 0.0.0.255 host 192.122.3.18 echo
+!
+
+Ticket 3
+
+R16:
+
+!
+router ospf 100
+ max-lsa 1000
+!
+
+R6:
+
+!
+router rip
+ redistribute bgp 65006 route-map BGP_INTO_RIP_REDISTRIBUTION metric 1
+!
+router bgp 65006
+ address-family ipv4
+  network 202.4.216.0 mask 255.255.255.192
+!
+
+R18:
+
+!
+crypto isakmp key DmvPn!23 address 202.4.216.16
+!
+
+Ticket 4:
+
+R2:
+
+!
+router ospf 100
+ mpls ldp autoconfig 
+!
+int Lo0
+ ip address 192.122.3.2 255.255.255.255
+!
+
+R1:
+
+!
+router ospf 100
+ no summary-address 192.122.3.7 255.255.255.255 not-advertise 
+!
+
+Ticket 5:
+
+R6:
+
+Tengo que deshacer lo que he hecho porque no he respetado los routing protocol boundaries!
+
+
+
+
+
+
+
+
+  
+ 
