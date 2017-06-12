@@ -87,18 +87,67 @@ router ospf 100
  no summary-address 192.122.3.7 255.255.255.255 not-advertise 
 !
 
+!El comando anterior solo quita el not-advertise.
+
 Ticket 5:
+
+!Al principio yo había redistribuido en R6 de BGP a RIP y me ha funcionado, pero no se sabe si lo aceptarían:
+!ipv6 router rip CCIE
+!redistribute bgp 65006
 
 R6:
 
-Tengo que deshacer lo que he hecho porque no he respetado los routing protocol boundaries!
+interface Tunnel64
+ tunnel source 2001:10:0:36::2
+ tunnel destination 2001:10:0:36::1
+ 
+route-map ipv6-policy permit 10
+ no set ipv6 next-hop ::192:122:3:66
+ set ipv6 next-hop ::192:122:3:6
+
+do clear bgp ipv6 unicast * soft
+
+R3:
+
+interface Tunnel64
+ tunnel source 2001:10:0:36::1
+ tunnel destination 2001:10:0:36::2
+
+!Sin cambiar el route-map en R6 me funciona porque hay rib failure y gana la ruta de RIP, no la que recibe BGP.
+
+Ticket 6
+
+R15:
+interface GigabitEthernet1.134
+ ip ospf network broadcast
 
 
+R13:
+interface GigabitEthernet1.113
+ no ip pim bsr-border
+!
+route-map default1 deny 10
 
+Ticket 7
 
+R12(config)#ip access-list extended range
+R12(config-ext-nacl)#no 10 
+R12(config-ext-nacl)#no 20
+R12(config-ext-nacl)#10 permit udp any any eq 3784
+R12(config-ext-nacl)#20 permit udp any any eq 3785
 
+R11:
 
+router eigrp INE_CCIE
+ address-family ipv4 unicast autonomous-system 789
+  af-interface GigabitEthernet1.102
+   bfd
 
+Ticket 8
 
-  
+Borrar en R4:
+
+router ospf 200
+ redistribute ospf 100 subnets
+   
  
