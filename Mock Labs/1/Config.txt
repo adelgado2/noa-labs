@@ -180,7 +180,12 @@ tacacs server SERVER
  address ipv4 172.23.17.100
  key T4CPLUS
 !
-aaa authentication ppp default group tacacs+ local 
+!
+aaa group server tacacs+ AAA_GROUP
+ server name SERVER
+!
+no aaa authentication ppp default group tacacs+ local 
+aaa authentication ppp default group AAA_GROUP local 
 !
 username R20 privilege 15 password 0 PPP_CH@P!
 !

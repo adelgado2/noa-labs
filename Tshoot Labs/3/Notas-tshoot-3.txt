@@ -145,9 +145,45 @@ router eigrp INE_CCIE
 
 Ticket 8
 
-Borrar en R4:
+R4:
 
-router ospf 200
- redistribute ospf 100 subnets
-   
+route-map CONNECTED_INTO_OSPF permit 20
+ no match interface Loopback1
+
+route-map CONNECTED_INTO_OSPF permit 10
+ match interface Loopback1 
  
+R7:
+
+R7(config)#ip access-list extended acl
+R7(config-ext-nacl)#5 deny ip any host 4.4.4.4
+
+Otra opción para el route-map más "safe" es cambiar el next-hop!
+
+route-map rm permit 10
+ no set interface Null0
+ set ip next-hop 136.5.17.1
+
+Ticket 9
+
+R1:
+router ospf 100
+ compatible rfc1587                                            
+ 
+Ticket 10
+
+Falta por planchar:
+
+R1:
+interface Virtual-Template117
+ ppp ipcp mask 255.255.255.128
+
+R17:
+interface Dialer117
+ ip mtu 1492
+!
+router ospf 100
+no passive-interface Dialer117
+
+
+
