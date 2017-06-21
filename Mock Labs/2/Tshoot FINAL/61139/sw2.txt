@@ -1,0 +1,258 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 01:37:31 UTC Mon Mar 1 1993
+!
+version 15.0
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname SW2
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no logging console
+no logging monitor
+!
+no aaa new-model
+system mtu routing 1500
+vtp file vlan.dat
+vtp domain INE
+vtp mode transparent
+ip routing
+no ip domain-lookup
+!
+ip vrf A
+!
+!
+!
+ip multicast-routing distributed
+!
+!
+crypto pki trustpoint TP-self-signed-2399939072
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-2399939072
+ revocation-check none
+ rsakeypair TP-self-signed-2399939072
+!
+!
+crypto pki certificate chain TP-self-signed-2399939072
+ certificate self-signed 01
+  3082022B 30820194 A0030201 02020101 300D0609 2A864886 F70D0101 05050030
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274
+  69666963 6174652D 32333939 39333930 3732301E 170D3933 30333031 30303130
+  31315A17 0D323030 31303130 30303030 305A3031 312F302D 06035504 03132649
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D32 33393939
+  33393037 3230819F 300D0609 2A864886 F70D0101 01050003 818D0030 81890281
+  8100C5EB 6B48854D E267EF4F F0CE0929 395A45BF 76EAF61D C4BB109E FCF1CDB8
+  9F8BE0FD 3107DBC3 8B774A82 22729BD5 3C4FC017 05F5871E F2724A81 DBF70E6E
+  F7CA0CDD D1B80F82 A83BD764 DEC4C29D 2C935102 BD5B5D1B B2EC68DA 6767A4D3
+  B14D6B30 D4D58B47 3EF151FC 3AEC044E 66D69707 1C29D311 707B5604 B0F38FD8
+  B98D0203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 301F0603
+  551D2304 18301680 14CBF9B1 0A4B7D09 3A056112 5FEC0B3D 4CBD7F69 58301D06
+  03551D0E 04160414 CBF9B10A 4B7D093A 0561125F EC0B3D4C BD7F6958 300D0609
+  2A864886 F70D0101 05050003 818100B6 CCD91985 EA6FA766 E72C8CFE 88CC3C10
+  C8134655 9D86ABD5 22EC4041 C9248F7D AEA8814D EBA52790 69388BDA 9BB84165
+  4C253570 289ABE0C 1932925F 4E0F4B95 4D19CE0A EDB3E1C6 30F3AA19 5D1F823C
+  E30266B5 27E5A24B 5F82FB71 30477F33 FE25ADCC A8642CA1 1D4E87E9 549E43AF
+  024F84F3 40C96E03 3EDDE7D2 A37D14
+  	quit
+!
+!
+!
+!
+!
+!
+spanning-tree mode mst
+spanning-tree extend system-id
+spanning-tree vlan 1723 priority 0
+!
+vlan internal allocation policy ascending
+!
+vlan 227-228
+!
+vlan 999
+ name CCIE_VLAN
+!
+vlan 1623,1723
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip vrf forwarding A
+ ip address 10.255.255.22 255.255.255.255
+ ip ospf 2 area 0
+ no shutdown
+!
+interface Port-channel12
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no shutdown
+!
+interface Port-channel23
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no shutdown
+!
+interface Port-channel24
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no shutdown
+!
+interface FastEthernet0/1
+ shutdown
+!
+interface FastEthernet0/2
+ shutdown
+!
+interface FastEthernet0/3
+ shutdown
+!
+interface FastEthernet0/4
+ shutdown
+!
+interface FastEthernet0/5
+ shutdown
+!
+interface FastEthernet0/6
+ shutdown
+!
+interface FastEthernet0/7
+ shutdown
+!
+interface FastEthernet0/8
+ shutdown
+!
+interface FastEthernet0/9
+ shutdown
+!
+interface FastEthernet0/10
+ shutdown
+!
+interface FastEthernet0/11
+ shutdown
+!
+interface FastEthernet0/12
+ shutdown
+!
+interface FastEthernet0/13
+ shutdown
+!
+interface FastEthernet0/14
+ shutdown
+!
+interface FastEthernet0/15
+ shutdown
+!
+interface FastEthernet0/16
+ shutdown
+!
+interface FastEthernet0/17
+ shutdown
+!
+interface FastEthernet0/18
+ shutdown
+!
+interface FastEthernet0/19
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 24 mode active
+ no shutdown
+!
+interface FastEthernet0/20
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 24 mode active
+ no shutdown
+!
+interface FastEthernet0/21
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 23 mode active
+ no shutdown
+!
+interface FastEthernet0/22
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 23 mode active
+ no shutdown
+!
+interface FastEthernet0/23
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 12 mode active
+ no shutdown
+!
+interface FastEthernet0/24
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 12 mode active
+ no shutdown
+!
+interface GigabitEthernet0/1
+ no shutdown
+!
+interface GigabitEthernet0/2
+ no shutdown
+!
+interface Vlan1
+ no ip address
+ no shutdown
+!
+interface Vlan227
+ ip vrf forwarding A
+ ip address 172.31.227.22 255.255.255.0
+ ip pim sparse-mode
+ ip igmp join-group 224.1.2.3
+ ip ospf 1 area 0
+ no shutdown
+!
+interface Vlan228
+ ip vrf forwarding A
+ ip address 172.31.228.22 255.255.255.0
+ ip pim sparse-mode
+ ip igmp join-group 224.1.2.3
+ ip ospf 1 area 0
+ no shutdown
+!
+router ospf 2 vrf A
+ redistribute ospf 1
+!
+router ospf 1 vrf A
+ capability vrf-lite
+ redistribute ospf 2 subnets
+!
+ip http server
+ip http secure-server
+!
+!
+!
+!
+!
+!
+line vty 0 4
+ no login
+line vty 5 15
+ login
+!
+ntp authentication-key 123 md5 132B2322205F3D 7
+ntp authenticate
+ntp trusted-key 123
+ntp source Loopback0
+ntp server 10.255.255.8 key 123
+end

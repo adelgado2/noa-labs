@@ -1,0 +1,255 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 10:24:17 UTC Mon Jun 19 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R5
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+no logging buffered
+no logging console
+no logging monitor
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+mpls ldp neighbor 192.122.3.6 password CC!E_!nE
+multilink bundle-name authenticated
+!
+!
+crypto pki trustpoint TP-self-signed-1985277595
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-1985277595
+ revocation-check none
+ rsakeypair TP-self-signed-1985277595
+!
+!
+crypto pki certificate chain TP-self-signed-1985277595
+ certificate self-signed 01
+  3082022B 30820194 A0030201 02020101 300D0609 2A864886 F70D0101 05050030
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274
+  69666963 6174652D 31393835 32373735 3935301E 170D3137 30363139 31303234
+  31345A17 0D323030 31303130 30303030 305A3031 312F302D 06035504 03132649
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D31 39383532
+  37373539 3530819F 300D0609 2A864886 F70D0101 01050003 818D0030 81890281
+  81009B70 299E1C2D 73C12928 BD425BF0 50F47229 8C11F8D5 42B2382B 399E1D0C
+  9F290209 B2D9D754 A096D10E 67CD5551 5D698870 E8380326 E9856C9F 07D05864
+  6457AA25 C8F83863 F198AAD3 D97334B8 4AAA6F91 A2A4A797 A4D7EF76 B9A533FF
+  0F8AFDF7 2E476E6D 37A60211 2B32B020 1A8C2419 046D4224 0E8C3102 2C12F614
+  15370203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 301F0603
+  551D2304 18301680 148E0571 42759648 68C2C449 9DBD63F0 A150DFF5 E7301D06
+  03551D0E 04160414 8E057142 75964868 C2C4499D BD63F0A1 50DFF5E7 300D0609
+  2A864886 F70D0101 05050003 8181004C 8A34652D E454B454 6A0A2F68 01E88387
+  84E35374 38FFD942 03560F56 76A6A91B 6FB4A1CE DFF7F538 A2562D76 E0F4765D
+  8E4CD578 D4A90773 5969BA4B F8A0B01B C1BA2C4C 45E92CF9 2F93FCE8 A9195CC2
+  1F1F553F CB4F3A59 09F42E29 747911D1 20CC9040 DF63437A E0642F79 5C786B52
+  F9AC4D79 3BD0B3D3 200E12F6 64C6AD
+  	quit
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$4d3Y$blN1ys3MQhPaEc2E9DVx0/
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.5 255.255.255.255
+ ipv6 address ::192:122:3:5/128
+ ipv6 rip CCIE enable
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.35
+ encapsulation dot1Q 35
+ ip address 10.0.35.2 255.255.255.252
+ ip pim sparse-mode
+ ipv6 address 2001:10:0:35::2/126
+ ipv6 rip CCIE enable
+ ipv6 traffic-filter test in
+ mpls ip
+ no shutdown
+!
+interface GigabitEthernet1.45
+ encapsulation dot1Q 45
+ ip address 10.0.45.2 255.255.255.252
+ ip pim sparse-mode
+ ipv6 address 2001:10:0:45::2/126
+ ipv6 rip CCIE enable
+ mpls ip
+ no shutdown
+!
+interface GigabitEthernet1.56
+ encapsulation dot1Q 56
+ ip address 10.0.56.1 255.255.255.252
+ ip pim sparse-mode
+ ipv6 address 2001:10:0:56::1/126
+ ipv6 rip CCIE enable
+ mpls ip
+ no shutdown
+!
+interface GigabitEthernet1.58
+ encapsulation dot1Q 58
+ ip address 136.6.58.5 255.255.255.0
+ ip pim sparse-mode
+ ipv6 address 2001:136:6:58::5/64
+ no shutdown
+!
+interface GigabitEthernet2
+ ip address 192.168.1.5 255.255.255.0
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+!
+router eigrp INE_CCIE
+ !
+ address-family ipv4 unicast autonomous-system 56
+  !
+  af-interface default
+   authentication mode hmac-sha-256 CC!E_!nE
+  exit-af-interface
+  !
+  topology base
+   redistribute rip metric 1000000 100 255 1 1500
+  exit-af-topology
+  network 136.6.58.0 0.0.0.255
+  metric weights 0 0 0 1 0 0 0
+ exit-address-family
+!
+router rip
+ version 2
+ redistribute eigrp 56 metric 1 route-map EIGRP_INTO_RIP_REDISTRIBUTION
+ passive-interface default
+ no passive-interface GigabitEthernet1.35
+ no passive-interface GigabitEthernet1.45
+ no passive-interface GigabitEthernet1.56
+ network 10.0.0.0
+ network 192.122.3.0
+ no auto-summary
+!
+router bgp 65006
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor ::192:122:3:6 remote-as 65006
+ neighbor ::192:122:3:6 update-source Loopback0
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+  neighbor ::192:122:3:6 activate
+ exit-address-family
+!
+!
+!
+ip forward-protocol nd
+!
+no ip http server
+ip http secure-server
+!
+ipv6 route ::192:122:3:66/128 Null0
+ipv6 router rip CCIE
+ timers 10 30 30 40
+!
+!
+route-map EIGRP_INTO_RIP_REDISTRIBUTION permit 10
+ set tag 590
+!
+mpls ldp router-id Loopback0 force
+!
+!
+ipv6 access-list test
+ deny tcp any eq bgp any
+ deny tcp any any eq bgp
+ permit ipv6 any any
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ password cisco
+ logging synchronous
+ login
+ stopbits 1
+line vty 0 4
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

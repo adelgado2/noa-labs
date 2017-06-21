@@ -1,0 +1,183 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 14:39:37 UTC Sun Jun 11 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R18
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 122.1.1.18 255.255.255.255
+ ip pim sparse-mode
+ ip ospf 2 area 10
+ ipv6 address 2001:122:1:1::18/128
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ speed 1000
+ no negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.1618
+ encapsulation dot1Q 1618
+ ip address 172.23.16.18 255.255.255.0
+ ip pim sparse-mode
+ ip ospf 2 area 10
+ ipv6 address 2004:172:23:16::18/64
+ no shutdown
+!
+interface GigabitEthernet1.1718
+ encapsulation dot1Q 1718
+ ip address 172.23.18.18 255.255.255.0
+ ip pim sparse-mode
+ ip ospf 2 area 10
+ ipv6 address 2004:172:23:18::18/64
+ no shutdown
+!
+interface GigabitEthernet1.1820
+ encapsulation dot1Q 1820
+ ip address 172.23.20.18 255.255.255.0
+ ip pim sparse-mode
+ ip ospf 3 area 20
+ ipv6 address 2004:172:23:20::18/64
+ no shutdown
+!
+interface GigabitEthernet1.1821
+ encapsulation dot1Q 1821
+ ip address 172.23.218.18 255.255.255.0
+ ip pim sparse-mode
+ ip ospf 3 area 40
+ ipv6 address 2004:172:23:218::18/64
+ no shutdown
+!
+interface GigabitEthernet2
+ no ip address
+ speed 1000
+ no negotiation auto
+ shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+router ospf 2
+ redistribute ospf 3 subnets
+!
+router ospf 3
+ router-id 18.18.18.18
+ redistribute ospf 2 subnets
+!
+!
+!
+ip forward-protocol nd
+!
+ip pim rp-address 122.1.1.18
+ip msdp peer 172.23.18.17 connect-source GigabitEthernet1.1718
+ip msdp cache-sa-state
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ length 0
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

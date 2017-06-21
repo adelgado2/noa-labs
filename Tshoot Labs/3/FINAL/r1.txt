@@ -1,0 +1,287 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 10:29:37 UTC Mon Jun 19 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+no logging buffered
+no logging console
+no logging monitor
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+ipv6 dhcp pool ipv6-dhcp-pool
+ prefix-delegation pool ipv6-pool
+!
+ipv6 dhcp pool ipv6-pool
+!
+no ipv6 dhcp server join all-dhcp-servers
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+crypto pki trustpoint TP-self-signed-4098623145
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-4098623145
+ revocation-check none
+ rsakeypair TP-self-signed-4098623145
+!
+!
+crypto pki certificate chain TP-self-signed-4098623145
+ certificate self-signed 01
+  3082022B 30820194 A0030201 02020101 300D0609 2A864886 F70D0101 05050030
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274
+  69666963 6174652D 34303938 36323331 3435301E 170D3137 30363139 31303234
+  31365A17 0D323030 31303130 30303030 305A3031 312F302D 06035504 03132649
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D34 30393836
+  32333134 3530819F 300D0609 2A864886 F70D0101 01050003 818D0030 81890281
+  8100BE8A 7A77A844 F4FBF2DC 0030831E CB32F864 3AEF0029 3A1B826D 5805D2A3
+  90C17B25 0E6E79FB 1E5D2AB3 F03962F3 804BDF80 BA803803 E4D90005 4D379753
+  14FDDBB9 67AEF400 4DDD0BD2 959C1A20 F0FA007C 7F165E30 C83BF7D2 0DF4B54F
+  8638DE25 06A612B9 AED635FE B2177591 90BB20A1 88AB88E0 012DEF03 178BA378
+  B2EF0203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 301F0603
+  551D2304 18301680 1408E622 9306CD6D 54FC7670 290AF6B5 94DF3E6A A9301D06
+  03551D0E 04160414 08E62293 06CD6D54 FC767029 0AF6B594 DF3E6AA9 300D0609
+  2A864886 F70D0101 05050003 8181002E 197F7B1B BA9DF31B FBC5BFB3 BEFD34F3
+  049CB8DA 6EF41E8E 584D0132 1C3D12ED 71DFE04F 745128A2 5A9CA7BE 8CCE3BBF
+  3CDC163E DFA4178A 6BE63B61 6B5C352D 7E183E36 AC2349D6 0C3EB073 C612262B
+  7A80C268 D1F53479 289D68E1 B43E6D7D F6380C73 B68181E1 FECA5193 FCA20882
+  1D0A1B3C 95B4A3B7 53A31CAB BEED7E
+  	quit
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$6cdl$cmjLSX79LVHEnbYagSKEm/
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+bba-group pppoe r1-r17
+ virtual-template 117
+!
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.1 255.255.255.255
+ ip ospf 100 area 0
+ ipv6 address ::192:122:3:1/128
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.12
+ encapsulation dot1Q 12
+ ip address 10.0.12.1 255.255.255.252
+ ip pim sparse-mode
+ ip ospf 100 area 10
+ ipv6 address 2001:10:0:12::1/126
+ no shutdown
+!
+interface GigabitEthernet1.13
+ encapsulation dot1Q 13
+ ip address 10.0.13.1 255.255.255.252
+ ip pim sparse-mode
+ ip ospf network point-to-multipoint
+ ip ospf hello-interval 10
+ ip ospf 100 area 20
+ ipv6 address 2001:10:0:13::1/126
+ no shutdown
+!
+interface GigabitEthernet1.14
+ encapsulation dot1Q 14
+ ip address 10.0.14.1 255.255.255.252
+ ip pim sparse-mode
+ ipv6 address 2001:10:0:14::1/126
+ no shutdown
+!
+interface GigabitEthernet1.17
+ encapsulation dot1Q 17
+ ip address 136.5.17.1 255.255.255.0
+ ip pim sparse-mode
+ ipv6 address 2001:136:5:17::1/64
+ mpls ip
+ no shutdown
+!
+interface GigabitEthernet1.18
+ encapsulation dot1Q 18
+ ip address 136.5.18.1 255.255.255.0
+ ip pim sparse-mode
+ ipv6 address 2001:136:5:18::1/64
+ mpls ip
+ no shutdown
+!
+interface GigabitEthernet1.116
+ encapsulation dot1Q 116
+ ip address 89.211.116.1 255.255.255.128
+ ip pim sparse-mode
+ ip ospf 100 area 121
+ ipv6 address 2001:89:211:116::1/125
+ ipv6 dhcp server ipv6-dhcp-pool
+ no shutdown
+!
+interface GigabitEthernet1.117
+ encapsulation dot1Q 117
+ ipv6 address 2001:89:211:117::1/125
+ pppoe enable group r1-r17
+ no shutdown
+!
+interface GigabitEthernet2
+ description MGMT INTERFACE - DO NOT CHANGE
+ ip address 192.168.1.1 255.255.255.0
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+interface Virtual-Template117
+ ip address 89.211.117.1 255.255.255.128
+ ip pim sparse-mode
+ ip ospf 100 area 117
+ no peer neighbor-route
+ peer default ip address pool r1-r17-pool
+ ppp ipcp mask 255.255.255.128
+ no shutdown
+!
+!
+router eigrp INE_CCIE
+ !
+ address-family ipv4 unicast autonomous-system 56
+  !
+  af-interface default
+   authentication mode hmac-sha-256 CC!E_!nE
+  exit-af-interface
+  !
+  topology base
+   redistribute ospf 100 metric 1000000 100 255 1 1500
+  exit-af-topology
+  network 136.5.17.0 0.0.0.255
+  network 136.5.18.0 0.0.0.255
+  metric weights 0 0 0 1 0 0 0
+ exit-address-family
+!
+router ospf 100
+ router-id 192.122.3.1
+ compatible rfc1587
+ fast-reroute per-prefix enable prefix-priority low
+ area 20 virtual-link 192.122.3.3
+ area 121 nssa default-information-originate
+ summary-address 192.122.3.7 255.255.255.255
+ summary-address 192.122.3.8 255.255.255.255 not-advertise
+ redistribute connected subnets route-map CONNECTED_INTO_OSPF
+ redistribute eigrp 56 subnets route-map EIGRP_INTO_OSPF_REDISTRIBUTION
+ passive-interface GigabitEthernet1.117
+ mpls ldp autoconfig
+!
+!
+!
+ip local pool r1-r17-pool 89.211.117.17
+ip forward-protocol nd
+!
+no ip http server
+ip http secure-server
+!
+ipv6 local pool ipv6-pool 2001:172:23:160::/64 64
+!
+route-map EIGRP_INTO_OSPF_REDISTRIBUTION permit 10
+ set tag 190
+!
+route-map CONNECTED_INTO_OSPF permit 10
+ match interface GigabitEthernet1.14
+ set metric 1000
+ set metric-type type-1
+!
+route-map CONNECTED_INTO_OSPF permit 20
+ match interface GigabitEthernet1.17 GigabitEthernet1.18
+ set tag 190
+!
+mpls ldp router-id Loopback0 force
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ password cisco
+ logging synchronous
+ login
+ length 0
+ stopbits 1
+line vty 0 4
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

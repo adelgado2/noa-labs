@@ -1,0 +1,254 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 00:05:59 UTC Mon Mar 1 1993
+!
+version 15.0
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname SW3
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no logging console
+no logging monitor
+!
+no aaa new-model
+system mtu routing 1500
+vtp file vlan.dat
+vtp domain INE
+vtp mode transparent
+ip routing
+no ip domain-lookup
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+crypto pki trustpoint TP-self-signed-2718919936
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-2718919936
+ revocation-check none
+ rsakeypair TP-self-signed-2718919936
+!
+!
+crypto pki certificate chain TP-self-signed-2718919936
+ certificate self-signed 01
+  3082022B 30820194 A0030201 02020101 300D0609 2A864886 F70D0101 05050030
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274
+  69666963 6174652D 32373138 39313939 3336301E 170D3933 30333031 30303030
+  35375A17 0D323030 31303130 30303030 305A3031 312F302D 06035504 03132649
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D32 37313839
+  31393933 3630819F 300D0609 2A864886 F70D0101 01050003 818D0030 81890281
+  81009D5A 5AEB47CE E75A8B3A C7F36A59 C2039AD6 761A467E 0C8B19D7 770A8240
+  F41B3124 EBC3A9E5 6AE66E97 5680BE52 E30FCC24 E35CE9D1 77013434 DE84BEFE
+  ED959225 C0BC0F90 D0BBA262 053EC27D FCA5E7D6 EEBE4A2E E9933B13 84BB9C1D
+  08C16FFD FBC9D9BB 72BBEB83 D923DF50 D39ECEAA 82DF15AA D0A48BD9 063BB1F5
+  97450203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 301F0603
+  551D2304 18301680 1426E82E F15F3A75 E229DF6C 7235EB0C 14FFD721 4E301D06
+  03551D0E 04160414 26E82EF1 5F3A75E2 29DF6C72 35EB0C14 FFD7214E 300D0609
+  2A864886 F70D0101 05050003 81810003 F767AA9B 9D2127DE A47A1534 25E0A831
+  8F15C4A8 0B0E8F02 F6987CB9 538D5E12 8D3F1D2B 290B4AC8 8B476086 55D6CDAB
+  3E18BD5D E37A2E59 02079066 2683074E 0A567CE4 18686668 EF1A7531 A71CFFFB
+  7DED1AED 7720BCAB F8538941 976604E9 0D86B8A7 8806C673 A368A8CF 4E4BD004
+  25322532 C2FF457E C9DE28AB 981B1C
+  	quit
+!
+!
+!
+!
+!
+!
+mac access-list extended mac
+ permit any any 0x86DD 0x0
+!
+spanning-tree mode mst
+spanning-tree extend system-id
+spanning-tree mst 0 priority 0
+!
+!
+vlan access-map 1723 10
+ match mac address mac
+ action forward
+vlan access-map 1723 20
+ action forward
+!
+vlan filter 1723 vlan-list 1723
+vlan internal allocation policy ascending
+!
+vlan 227-228
+!
+vlan 999
+ name CCIE_VLAN
+!
+vlan 1623,1723
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 10.255.255.23 255.255.255.255
+ no shutdown
+!
+interface Port-channel23
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no shutdown
+!
+interface Port-channel34
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no shutdown
+!
+interface FastEthernet0/1
+ shutdown
+!
+interface FastEthernet0/2
+ shutdown
+!
+interface FastEthernet0/3
+ shutdown
+!
+interface FastEthernet0/4
+ shutdown
+!
+interface FastEthernet0/5
+ shutdown
+!
+interface FastEthernet0/6
+ shutdown
+!
+interface FastEthernet0/7
+ shutdown
+!
+interface FastEthernet0/8
+ shutdown
+!
+interface FastEthernet0/9
+ shutdown
+!
+interface FastEthernet0/10
+ shutdown
+!
+interface FastEthernet0/11
+ shutdown
+!
+interface FastEthernet0/12
+ shutdown
+!
+interface FastEthernet0/13
+ shutdown
+!
+interface FastEthernet0/14
+ shutdown
+!
+interface FastEthernet0/15
+ shutdown
+!
+interface FastEthernet0/16
+ shutdown
+!
+interface FastEthernet0/17
+ shutdown
+!
+interface FastEthernet0/18
+ shutdown
+!
+interface FastEthernet0/19
+ no shutdown
+!
+interface FastEthernet0/20
+ no shutdown
+!
+interface FastEthernet0/21
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 23 mode active
+ no shutdown
+!
+interface FastEthernet0/22
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 23 mode active
+ no shutdown
+!
+interface FastEthernet0/23
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 34 mode active
+ no shutdown
+!
+interface FastEthernet0/24
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 34 mode active
+ no shutdown
+!
+interface GigabitEthernet0/1
+ no shutdown
+!
+interface GigabitEthernet0/2
+ no shutdown
+!
+interface Vlan1
+ no ip address
+ no shutdown
+!
+interface Vlan1623
+ ip address 183.16.23.23 255.255.255.0
+ ipv6 address 2001:183:16:23::23/64
+ no shutdown
+!
+interface Vlan1723
+ ip address 183.17.23.23 255.255.255.0
+ ipv6 address 2001:183:17:23::23/64
+ no shutdown
+!
+!
+router eigrp SITE_W
+ !
+ address-family ipv4 unicast autonomous-system 1831
+  !
+  topology base
+  exit-af-topology
+  network 10.255.255.0 0.0.0.255
+  network 183.0.0.0 0.255.255.255
+ exit-address-family
+ !
+ address-family ipv6 unicast autonomous-system 1831
+  !
+  topology base
+  exit-af-topology
+ exit-address-family
+!
+ip http server
+ip http secure-server
+!
+!
+!
+!
+!
+!
+!
+line vty 0 4
+ no login
+line vty 5 15
+ login
+!
+end

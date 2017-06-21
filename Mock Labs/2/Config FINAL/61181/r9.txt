@@ -1,0 +1,169 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 06:41:27 UTC Wed Jun 21 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R9
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+enable secret 5 $1$40AM$cJQR3ObtRvwZD6/Ov.edN.
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description Coorporate Loopback
+ ip address 172.16.1.9 255.255.255.255
+ ipv6 address 2001:172:16:1::9/128
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.911
+ encapsulation dot1Q 911
+ ip address 180.10.119.0 255.255.255.254
+ ipv6 address 2001:180:10:119::/127
+ bfd interval 999 min_rx 999 multiplier 3
+ no shutdown
+!
+interface GigabitEthernet1.917
+ encapsulation dot1Q 917
+ ip address 180.10.179.0 255.255.255.254
+ ipv6 address 2001:180:10:179::/127
+ bfd interval 999 min_rx 999 multiplier 3
+ no shutdown
+!
+interface GigabitEthernet2
+ no ip address
+ negotiation auto
+ shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+router bgp 65003
+ bgp router-id 172.16.1.9
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 180.10.119.1 remote-as 65001
+ neighbor 180.10.119.1 fall-over bfd
+ neighbor 180.10.179.1 remote-as 65000
+ neighbor 180.10.179.1 fall-over bfd
+ !
+ address-family ipv4
+  network 172.16.1.9 mask 255.255.255.255
+  neighbor 180.10.119.1 activate
+  neighbor 180.10.119.1 send-community both
+  neighbor 180.10.179.1 activate
+  neighbor 180.10.179.1 send-community
+ exit-address-family
+!
+!
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

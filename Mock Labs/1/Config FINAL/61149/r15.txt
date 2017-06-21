@@ -1,0 +1,162 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 16:05:37 UTC Tue Jun 20 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R15
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+archive
+ log config
+  logging enable
+  logging size 500
+  notify syslog contenttype plaintext
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 122.1.1.15 255.255.255.255
+ ipv6 address 2001:122:1:1::15/128
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ speed 1000
+ no negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.115
+ encapsulation dot1Q 115
+ ip address 10.245.1.3 255.255.255.254
+ ipv6 address 2001:10:245:1::3/127
+ no shutdown
+!
+interface GigabitEthernet1.1015
+ encapsulation dot1Q 1015
+ ip address 10.245.2.9 255.255.255.254
+ ipv6 address 2001:10:245:2::9/127
+ no shutdown
+!
+interface GigabitEthernet2
+ no ip address
+ speed 1000
+ no negotiation auto
+ shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+router rip
+ version 2
+ network 10.0.0.0
+ network 122.0.0.0
+ default-information originate
+ no auto-summary
+!
+!
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

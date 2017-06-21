@@ -1,0 +1,206 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 16:05:40 UTC Tue Jun 20 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R19
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+!
+aaa new-model
+!
+!
+aaa group server tacacs+ AAA_GROUP
+ server name SERVER
+!
+aaa authentication login default none
+aaa authentication ppp default group AAA_GROUP local
+!
+!
+!
+!
+!
+aaa session-id common
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+!
+flow record RECORD
+ match routing next-hop address ipv4
+ match routing next-hop address ipv6
+ match transport source-port
+ match interface input
+ collect flow direction
+ collect pfr one-way-delay sum
+!
+!
+flow monitor MONITOR
+ record RECORD
+!
+multilink bundle-name authenticated
+!
+!
+!
+spanning-tree extend system-id
+!
+username R20 privilege 15 password 0 PPP_CH@P!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+bba-group pppoe CCIE
+ virtual-template 1
+!
+!
+interface Loopback0
+ ip address 122.1.1.19 255.255.255.255
+ ip pim sparse-mode
+ ip ospf 3 area 0
+ ipv6 address FE80::19 link-local
+ ipv6 address 2001:122:1:1::19/128
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ speed 1000
+ no negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.1719
+ encapsulation dot1Q 1719
+ ip address 172.23.179.19 255.255.255.0
+ ip pim sparse-mode
+ ip ospf 3 area 0
+ ipv6 address 2004:172:23:179::19/64
+ no shutdown
+!
+interface GigabitEthernet1.1920
+ encapsulation dot1Q 1920
+ ipv6 address FE80::19 link-local
+ ipv6 address 2004:172:23:19::19/64
+ pppoe enable group CCIE
+ no shutdown
+!
+interface GigabitEthernet1.1922
+ encapsulation dot1Q 1922
+ ip address 172.23.229.19 255.255.255.0
+ ip pim sparse-mode
+ ip ospf 3 area 40
+ ipv6 address 2004:172:23:229::19/64
+ no shutdown
+!
+interface GigabitEthernet2
+ no ip address
+ negotiation auto
+ shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+interface Virtual-Template1
+ ip address 172.23.19.19 255.255.255.0
+ ip pim sparse-mode
+ ip ospf 3 area 0
+ ppp authentication chap
+ no shutdown
+!
+router ospf 3
+ router-id 122.1.1.19
+!
+!
+!
+ip forward-protocol nd
+!
+ip pim rp-address 122.1.1.17
+no ip http server
+no ip http secure-server
+!
+!
+!
+tacacs server SERVER
+ address ipv4 172.23.17.100
+ key T4CPLUS
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ length 0
+ stopbits 1
+line vty 0
+ privilege level 15
+line vty 1
+ length 0
+line vty 2 4
+ privilege level 15
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ rotary 1
+!
+!
+end

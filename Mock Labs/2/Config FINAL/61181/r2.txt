@@ -1,0 +1,263 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 06:41:35 UTC Wed Jun 21 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R2
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+enable secret 5 $1$IzzF$grGL6GFJq77x.K6YB6u0t/
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+crypto isakmp policy 10
+ encr aes
+ authentication pre-share
+ group 14
+crypto isakmp key SK_HU address 0.0.0.0
+!
+!
+crypto ipsec transform-set 3DES-SHA esp-3des esp-sha-hmac
+ mode transport
+!
+crypto ipsec profile DMVPN-PROFILE
+ set transform-set 3DES-SHA
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description Coorporate Loopback
+ ip address 172.16.1.2 255.255.255.255
+ ip ospf 1 area 0
+ ipv6 address 2001:172:16:1::2/128
+ ospfv3 2 ipv6 area 0
+ no shutdown
+!
+interface Loopback2
+ description IPv6 Loopback
+ no ip address
+ ipv6 address 2001:192:168:1::2/128
+ no shutdown
+!
+interface Tunnel0
+ ip address 180.10.254.2 255.255.255.0
+ no ip redirects
+ ip mtu 1300
+ ip nhrp authentication NHRP_
+ ip nhrp map multicast dynamic
+ ip nhrp network-id 10
+ ip nhrp redirect
+ ip tcp adjust-mss 1260
+ tunnel source GigabitEthernet1.210
+ tunnel mode gre multipoint
+ tunnel key 10
+ tunnel protection ipsec profile DMVPN-PROFILE
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.12
+ encapsulation dot1Q 12
+ ip address 180.10.12.2 255.255.255.0
+ ip pim sparse-mode
+ ip ospf network point-to-point
+ ip ospf 1 area 0
+ ipv6 address 2001:180:10:12::2/64
+ ipv6 mtu 1500
+ ipv6 traffic-filter ACL in
+ ospfv3 2 ipv6 area 0
+ no shutdown
+!
+interface GigabitEthernet1.24
+ encapsulation dot1Q 24
+ ip address 180.10.24.2 255.255.255.0
+ ip pim sparse-mode
+ ip ospf network point-to-point
+ ip ospf 1 area 0
+ ipv6 address 2001:180:10:24::2/64
+ ospfv3 2 ipv6 area 0
+ no shutdown
+!
+interface GigabitEthernet1.210
+ encapsulation dot1Q 210
+ ip address 44.2.5.3 255.255.255.254
+ ipv6 address 2001:44:2:5::3/127
+ no shutdown
+!
+interface GigabitEthernet1.216
+ encapsulation dot1Q 216
+ ip address 180.10.216.2 255.255.255.0
+ ip pim sparse-mode
+ ip ospf 1 area 20
+ ipv6 address 2001:180:10:216::2/64
+ no shutdown
+!
+interface GigabitEthernet2
+ no ip address
+ negotiation auto
+ shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+!
+router eigrp HQ
+ !
+ address-family ipv4 unicast autonomous-system 56
+  !
+  af-interface Tunnel0
+   no split-horizon
+   summary-address 0.0.0.0 0.0.0.0 leak-map LEAK-MAP
+  exit-af-interface
+  !
+  topology base
+   redistribute ospf 1 metric 10000 1000 1 255 1500
+  exit-af-topology
+  network 180.10.254.0 0.0.0.255
+ exit-address-family
+!
+router ospfv3 2
+ router-id 2.2.2.2
+ !
+ address-family ipv6 unicast
+ exit-address-family
+!
+router ospf 1
+ router-id 172.16.1.2
+ redistribute eigrp 56 subnets
+!
+router bgp 100.65005
+ bgp router-id 172.16.1.2
+ bgp asnotation dot
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 44.2.5.2 remote-as 101
+ !
+ address-family ipv4
+  neighbor 44.2.5.2 activate
+ exit-address-family
+!
+!
+!
+ip forward-protocol nd
+!
+ip pim ssm range 10
+no ip http server
+no ip http secure-server
+!
+access-list 10 permit 224.16.16.16
+!
+route-map LEAK-MAP permit 10
+ match source-protocol ospf 1
+!
+!
+!
+ipv6 access-list ACL
+ deny ipv6 2001:101:101::/48 any
+ permit icmp any any nd-na
+ permit icmp any any nd-ns
+ permit tcp any any eq telnet
+ permit tcp any any eq 22
+ permit ipv6 2001:172:16::/56 any
+ permit ipv6 2001:180:10::/56 any
+ permit 89 any any
+ deny ipv6 any any
+control-plane host
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

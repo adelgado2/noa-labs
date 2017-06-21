@@ -1,0 +1,241 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 16:05:43 UTC Tue Jun 20 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R14
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 122.1.1.14 255.255.255.255
+ ipv6 address 2001:122:1:1::14/128
+ no shutdown
+!
+interface Loopback10
+ ip address 30.9.9.1 255.255.255.255
+ no shutdown
+!
+interface Loopback11
+ ip address 30.9.10.2 255.255.255.255
+ no shutdown
+!
+interface Loopback12
+ ip address 30.9.11.3 255.255.255.255
+ no shutdown
+!
+interface Loopback13
+ ip address 30.10.9.4 255.255.255.255
+ no shutdown
+!
+interface Loopback14
+ ip address 30.10.9.5 255.255.255.255
+ no shutdown
+!
+interface Loopback15
+ ip address 30.10.9.6 255.255.255.255
+ no shutdown
+!
+interface Loopback16
+ ip address 77.9.9.7 255.255.255.255
+ no shutdown
+!
+interface Loopback17
+ ip address 77.9.9.8 255.255.255.255
+ no shutdown
+!
+interface Loopback18
+ ip address 77.9.9.9 255.255.255.255
+ no shutdown
+!
+interface Loopback19
+ ip address 77.9.9.10 255.255.255.255
+ no shutdown
+!
+interface Loopback20
+ ip address 40.7.7.2 255.255.255.255
+ no shutdown
+!
+interface Loopback22
+ ip address 40.7.5.3 255.255.255.255
+ no shutdown
+!
+interface Loopback23
+ ip address 40.8.7.4 255.255.255.255
+ no shutdown
+!
+interface Loopback24
+ ip address 40.8.7.5 255.255.255.255
+ no shutdown
+!
+interface Loopback25
+ ip address 40.8.7.6 255.255.255.255
+ no shutdown
+!
+interface Loopback26
+ ip address 60.7.7.7 255.255.255.255
+ no shutdown
+!
+interface Loopback27
+ ip address 60.7.7.8 255.255.255.255
+ no shutdown
+!
+interface Loopback28
+ ip address 60.7.7.9 255.255.255.255
+ no shutdown
+!
+interface Loopback29
+ ip address 60.7.7.20 255.255.255.255
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ speed 1000
+ no negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.1314
+ encapsulation dot1Q 1314
+ ip address 54.251.1.14 255.255.255.240
+ ipv6 address 2001:54:251:1::14/64
+ no shutdown
+!
+interface GigabitEthernet2
+ no ip address
+ speed 1000
+ no negotiation auto
+ shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+router bgp 555
+ bgp router-id 122.1.1.14
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 54.251.1.13 remote-as 200
+ neighbor 54.251.1.13 password ?BGP_KEY?
+ !
+ address-family ipv4
+  redistribute connected route-map SET-COMM
+  neighbor 54.251.1.13 activate
+  neighbor 54.251.1.13 send-community
+ exit-address-family
+!
+!
+!
+ip forward-protocol nd
+!
+ip bgp-community new-format
+no ip http server
+no ip http secure-server
+!
+!
+ip prefix-list ROUTE seq 5 permit 30.9.10.2/32
+!
+route-map SET-COMM permit 10
+ match ip address prefix-list ROUTE
+ set community 200:1998
+!
+route-map SET-COMM permit 20
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

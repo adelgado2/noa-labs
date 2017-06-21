@@ -1,0 +1,181 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 14:39:36 UTC Sun Jun 11 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R12
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 122.1.1.12 255.255.255.255
+ ipv6 address 2001:122:1:1::12/128
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ speed 1000
+ no negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.123
+ encapsulation dot1Q 123
+ ip address 10.1.123.12 255.255.255.0
+ ipv6 address 2001:10:1:123::12/64
+ no shutdown
+!
+interface GigabitEthernet1.412
+ encapsulation dot1Q 412
+ ip address 10.4.12.1 255.255.255.254
+ ipv6 address 2001:10:4:12::1/127
+ no shutdown
+!
+interface GigabitEthernet2
+ no ip address
+ speed 1000
+ no negotiation auto
+ shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+!
+router eigrp CustB
+ !
+ address-family ipv4 unicast autonomous-system 20
+  !
+  topology base
+  exit-af-topology
+  neighbor 10.1.123.23 GigabitEthernet1.123
+  network 10.1.123.12 0.0.0.0
+  network 10.4.12.1 0.0.0.0
+  network 122.1.1.12 0.0.0.0
+  eigrp router-id 122.1.1.12
+ exit-address-family
+ !
+ address-family ipv6 unicast autonomous-system 20
+  !
+  topology base
+  exit-af-topology
+ exit-address-family
+!
+router bgp 200
+ bgp router-id 122.1.1.12
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 10.1.123.11 remote-as 200
+ neighbor 10.1.123.13 remote-as 200
+ !
+ address-family ipv4
+  neighbor 10.1.123.11 activate
+  neighbor 10.1.123.13 activate
+ exit-address-family
+!
+!
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

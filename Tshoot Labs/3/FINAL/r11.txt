@@ -1,0 +1,234 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 10:24:16 UTC Mon Jun 19 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R11
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+no logging buffered
+no logging console
+no logging monitor
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+crypto pki trustpoint TP-self-signed-1186837183
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-1186837183
+ revocation-check none
+ rsakeypair TP-self-signed-1186837183
+!
+!
+crypto pki certificate chain TP-self-signed-1186837183
+ certificate self-signed 01
+  3082022B 30820194 A0030201 02020101 300D0609 2A864886 F70D0101 05050030
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274
+  69666963 6174652D 31313836 38333731 3833301E 170D3137 30363139 31303234
+  31355A17 0D323030 31303130 30303030 305A3031 312F302D 06035504 03132649
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D31 31383638
+  33373138 3330819F 300D0609 2A864886 F70D0101 01050003 818D0030 81890281
+  8100998F 341BF3BD 8A9EC656 07C76CFA C00243DD C9FBD203 EABBF7D5 37E77D3A
+  B4BDF8F3 6371A99D 24C2516E AED35A4A 69EB4195 7EFE4C5B D8AE040D EB92A3FE
+  4FDE0AAC EF32D37E 232203D0 1EEB65F1 BCF321A0 E5597408 AAA29E9C 32C457FE
+  D6AD9251 666628A0 BA32BF4C A173A732 D79C9FEA 968E5A91 02629195 66B0FEA1
+  1A3B0203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 301F0603
+  551D2304 18301680 1460B248 A011A4B8 014272FB BD13784C 37FE1BA6 B4301D06
+  03551D0E 04160414 60B248A0 11A4B801 4272FBBD 13784C37 FE1BA6B4 300D0609
+  2A864886 F70D0101 05050003 8181003E D5021DF5 9FA9E629 16AB4633 289D4997
+  744DAD8A 0F927CCB 151B7E36 5CE7E171 BD574134 FBABBD10 30D5E98A AA846801
+  2A60BE48 3B8A1F23 849FE2DF F8229E73 80512013 E99B52E4 C81164A4 E8393FE1
+  E71766E2 D20B1E90 CC4533E5 24B400D3 F9824C62 935E884D 256A683B A7A0B322
+  C3A21A18 B5E523F4 D0E402FF 0EE116
+  	quit
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$7yem$FF5hC5zHJeF8N8z2iEG5X/
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.11 255.255.255.255
+ ip pim sparse-mode
+ ipv6 address ::192:122:3:11/128
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.102
+ encapsulation dot1Q 102
+ ip address 172.19.102.11 255.255.255.128
+ ip pim sparse-mode
+ ipv6 address 2001:172:19:102::11/64
+ bfd interval 150 min_rx 150 multiplier 3
+ no shutdown
+!
+interface GigabitEthernet1.113
+ encapsulation dot1Q 113
+ ip address 172.19.113.11 255.255.255.128
+ ip pim sparse-mode
+ ip ospf 5 area 5
+ ipv6 address 2001:172:19:113::11/64
+ ospfv3 5 ipv6 area 5
+ no shutdown
+!
+interface GigabitEthernet2
+ ip address 192.168.1.11 255.255.255.0
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+!
+router eigrp INE_CCIE
+ !
+ address-family ipv4 unicast autonomous-system 789
+  !
+  af-interface GigabitEthernet1.102
+   bfd
+  exit-af-interface
+  !
+  topology base
+   redistribute ospf 5 metric 1000000 100 255 1 1500
+  exit-af-topology
+  network 172.19.102.0 0.0.0.255
+  network 192.122.3.11 0.0.0.0
+ exit-address-family
+ !
+ address-family ipv6 unicast autonomous-system 789
+  !
+  af-interface GigabitEthernet1.113
+   shutdown
+  exit-af-interface
+  !
+  topology base
+   redistribute ospf 5 metric 1000000 100 255 1 1500
+  exit-af-topology
+ exit-address-family
+!
+router ospfv3 5
+ router-id 192.122.3.11
+ !
+ address-family ipv6 unicast
+  redistribute eigrp 789 include-connected
+ exit-address-family
+!
+router ospf 5
+ router-id 192.122.3.11
+!
+router bgp 651011
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 192.122.3.13 remote-as 651013
+ neighbor 192.122.3.13 ebgp-multihop 255
+ neighbor 192.122.3.13 update-source Loopback0
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv4 multicast
+  neighbor 192.122.3.13 activate
+ exit-address-family
+!
+!
+!
+ip forward-protocol nd
+!
+no ip http server
+ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ password cisco
+ logging synchronous
+ login
+ stopbits 1
+line vty 0 4
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

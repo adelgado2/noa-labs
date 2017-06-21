@@ -1,0 +1,180 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 16:05:39 UTC Tue Jun 20 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R20
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 122.1.1.20 255.255.255.255
+ ip pim sparse-mode
+ ip ospf 3 area 20
+ ipv6 address FE80::20 link-local
+ ipv6 address 2001:122:1:1::20/128
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ speed 1000
+ no negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.1820
+ encapsulation dot1Q 1820
+ ip address 172.23.20.20 255.255.255.0
+ ip pim sparse-mode
+ ip ospf 3 area 20
+ ipv6 address 2004:172:23:20::20/64
+ no shutdown
+!
+interface GigabitEthernet1.1920
+ encapsulation dot1Q 1920
+ ipv6 address 2004:172:23:19::20/64
+ pppoe enable group global
+ pppoe-client dial-pool-number 1
+ no shutdown
+!
+interface GigabitEthernet1.2021
+ encapsulation dot1Q 2021
+ ip address 172.23.212.20 255.255.255.0
+ ip pim sparse-mode
+ ip ospf 3 area 40
+ ipv6 address 2004:172:23:212::20/64
+ no shutdown
+!
+interface GigabitEthernet2
+ no ip address
+ negotiation auto
+ shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+interface Dialer1
+ mtu 1492
+ ip address 172.23.19.20 255.255.255.0
+ ip pim sparse-mode
+ encapsulation ppp
+ ip ospf 3 area 0
+ dialer pool 1
+ ppp chap password 0 PPP_CH@P!
+ no shutdown
+!
+router ospf 3
+ router-id 122.1.1.20
+!
+!
+!
+ip forward-protocol nd
+!
+ip pim rp-address 122.1.1.18
+no ip http server
+no ip http secure-server
+!
+!
+!
+control-plane host
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ length 0
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

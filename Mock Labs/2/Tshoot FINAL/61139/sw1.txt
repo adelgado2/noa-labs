@@ -1,0 +1,211 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 00:10:05 UTC Mon Mar 1 1993
+!
+version 15.0
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname SW1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no logging console
+no logging monitor
+!
+no aaa new-model
+system mtu routing 1500
+vtp file vlan.dat
+vtp domain INE
+vtp mode transparent
+no ip domain-lookup
+!
+!
+!
+!
+!
+crypto pki trustpoint TP-self-signed-1665664768
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-1665664768
+ revocation-check none
+ rsakeypair TP-self-signed-1665664768
+!
+!
+crypto pki certificate chain TP-self-signed-1665664768
+ certificate self-signed 01
+  3082022B 30820194 A0030201 02020101 300D0609 2A864886 F70D0101 05050030
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274
+  69666963 6174652D 31363635 36363437 3638301E 170D3933 30333031 30303130
+  30335A17 0D323030 31303130 30303030 305A3031 312F302D 06035504 03132649
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D31 36363536
+  36343736 3830819F 300D0609 2A864886 F70D0101 01050003 818D0030 81890281
+  8100CE8D B9391BE7 8178EABF 82BC367F 040FB4E5 0A1072F7 57C20FFA 1C70258F
+  5C416E05 F632B90C 07573744 8BD03F8A 06D930EA 91C5C1CE 4295BDAC B52F967C
+  58526D2F E0449091 917AE9BB A4CD64B1 114F5591 79A893E0 5B8E310D F89C76CF
+  DCA24973 755C71F9 D63238D5 784FA715 5BA56E2C B65E3984 18C0E44A 67ED9FBD
+  CE2D0203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 301F0603
+  551D2304 18301680 1486F16C A7069238 DAE4527F 741DF48A 11E8D8E1 47301D06
+  03551D0E 04160414 86F16CA7 069238DA E4527F74 1DF48A11 E8D8E147 300D0609
+  2A864886 F70D0101 05050003 81810063 D33AC1C4 CF6F0049 C5F270A5 B052D84B
+  09385912 766A661B F1AFC598 24137D6B 404BB048 CFA60F45 65E47580 AEB02F0D
+  4AE471BE 403BB1E1 17483569 370AB943 8250A6F7 CB27655B 170AFB56 B6E0239F
+  1C20F73E 6D8518BE 4CBF7E7C 504B4ECF 4CAEA0B5 E3F91454 A4797D6C 6B7589FD
+  BFEE151A 00110828 0BA32FC0 4EB910
+  	quit
+!
+!
+!
+!
+!
+!
+spanning-tree mode mst
+spanning-tree extend system-id
+!
+vlan internal allocation policy ascending
+!
+vlan 227-228
+!
+vlan 999
+ name CCIE_VLAN
+!
+vlan 1623,1723
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Port-channel12
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 1,227,228,1623,1723
+ switchport mode trunk
+ no shutdown
+!
+interface FastEthernet0/1
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 1,227,228,1623,1723
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree portfast trunk
+ no shutdown
+!
+interface FastEthernet0/2
+ shutdown
+!
+interface FastEthernet0/3
+ shutdown
+!
+interface FastEthernet0/4
+ shutdown
+!
+interface FastEthernet0/5
+ shutdown
+!
+interface FastEthernet0/6
+ shutdown
+!
+interface FastEthernet0/7
+ shutdown
+!
+interface FastEthernet0/8
+ shutdown
+!
+interface FastEthernet0/9
+ shutdown
+!
+interface FastEthernet0/10
+ shutdown
+!
+interface FastEthernet0/11
+ shutdown
+!
+interface FastEthernet0/12
+ shutdown
+!
+interface FastEthernet0/13
+ shutdown
+!
+interface FastEthernet0/14
+ shutdown
+!
+interface FastEthernet0/15
+ shutdown
+!
+interface FastEthernet0/16
+ shutdown
+!
+interface FastEthernet0/17
+ shutdown
+!
+interface FastEthernet0/18
+ shutdown
+!
+interface FastEthernet0/19
+ shutdown
+!
+interface FastEthernet0/20
+ shutdown
+!
+interface FastEthernet0/21
+ shutdown
+!
+interface FastEthernet0/22
+ shutdown
+!
+interface FastEthernet0/23
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 1,227,228,1623,1723
+ switchport mode trunk
+ channel-group 12 mode active
+ spanning-tree portfast trunk
+ no shutdown
+!
+interface FastEthernet0/24
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 1,227,228,1623,1723
+ switchport mode trunk
+ channel-group 12 mode active
+ spanning-tree portfast trunk
+ no shutdown
+!
+interface GigabitEthernet0/1
+ no shutdown
+!
+interface GigabitEthernet0/2
+ no shutdown
+!
+interface Vlan1
+ no ip address
+ no shutdown
+!
+interface Vlan227
+ ip address 172.31.227.21 255.255.255.0
+ no shutdown
+!
+ip http server
+ip http secure-server
+!
+!
+!
+!
+!
+!
+line vty 0 4
+ no login
+line vty 5 15
+ login
+!
+end

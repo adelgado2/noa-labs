@@ -1,0 +1,314 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 10:24:22 UTC Mon Jun 19 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R3
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+no logging buffered
+no logging console
+no logging monitor
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+mpls ldp neighbor 192.122.3.6 password CC!E_!nE
+no mpls ldp advertise-labels
+mpls ldp advertise-labels for 10
+multilink bundle-name authenticated
+!
+!
+crypto pki trustpoint TP-self-signed-2424681208
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-2424681208
+ revocation-check none
+ rsakeypair TP-self-signed-2424681208
+!
+!
+crypto pki certificate chain TP-self-signed-2424681208
+ certificate self-signed 01
+  3082022B 30820194 A0030201 02020101 300D0609 2A864886 F70D0101 05050030
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274
+  69666963 6174652D 32343234 36383132 3038301E 170D3137 30363139 31303234
+  31375A17 0D323030 31303130 30303030 305A3031 312F302D 06035504 03132649
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D32 34323436
+  38313230 3830819F 300D0609 2A864886 F70D0101 01050003 818D0030 81890281
+  8100ADA9 7EE13F7B AC2CEC25 18CCC496 8FF41DE1 8E9014B0 401B1433 0FDF5343
+  6420B1C3 9C1773A7 BE2E5AE3 E6281D4E 12B4D2F9 083D3EC2 2AB7CA08 E907FC45
+  DC97EFE0 DFA64C08 D0742F94 A0156D77 2CCAA56A 5B61DC7E 1B6FD53E 5DE43526
+  5C805120 921536BC 3B245FC6 F5E5746C 0DDB1BB4 B853AF52 7977F782 342EF8AE
+  26330203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 301F0603
+  551D2304 18301680 14CEFB58 497F140E BEBA0B1B 6B012CBF F7E2C00E 72301D06
+  03551D0E 04160414 CEFB5849 7F140EBE BA0B1B6B 012CBFF7 E2C00E72 300D0609
+  2A864886 F70D0101 05050003 818100AC 60640BBE 658191E0 4042DC27 697DC928
+  A1901C48 09D95908 B72BFA03 587805BE C369C4E5 71193A55 3C592507 22673AE0
+  089F89D5 59341692 C4FBB515 BCA64817 8EDFDA64 059CF022 7C3C89AB 273CB299
+  78798485 976133AF 26F8B3CF 0589DAE3 C8D91ACE 75858627 1DB1CE60 FBFEC4A3
+  DC2C5C31 DBA6C2C7 7E79B0FA FB584B
+  	quit
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$Vzie$sVCKvoH/icv6NoOSWuUvt/
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+!
+class-map match-all PIM
+ match access-group name PIM
+!
+policy-map COPP_POLICE_IN
+ class PIM
+  police 256000
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.3 255.255.255.255
+ ip pim sparse-mode
+ ip ospf 100 area 0
+ ipv6 address ::192:122:3:3/128
+ ipv6 rip CCIE enable
+ no shutdown
+!
+interface Loopback100
+ ip address 192.122.3.100 255.255.255.255
+ ip pim sparse-mode
+ ip ospf 100 area 0
+ no shutdown
+!
+interface Tunnel64
+ no ip address
+ ipv6 address 2001:10:0:360::1/126
+ ipv6 rip CCIE enable
+ tunnel source 2001:10:0:36::1
+ tunnel mode ipv6
+ tunnel destination 2001:10:0:36::2
+ tunnel path-mtu-discovery
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.13
+ encapsulation dot1Q 13
+ ip address 10.0.13.2 255.255.255.252
+ ip pim sparse-mode
+ ip ospf network point-to-multipoint
+ ip ospf hello-interval 10
+ ip ospf 100 area 20
+ ipv6 address 2001:10:0:13::2/126
+ no shutdown
+!
+interface GigabitEthernet1.23
+ encapsulation dot1Q 23
+ ip address 10.0.23.2 255.255.255.252
+ ip pim sparse-mode
+ ipv6 address 2001:10:0:23::2/126
+ no shutdown
+!
+interface GigabitEthernet1.34
+ encapsulation dot1Q 34
+ ip address 10.0.34.1 255.255.255.252
+ ip pim sparse-mode
+ ip ospf 100 area 0
+ ipv6 address 2001:10:0:34::1/126
+ no shutdown
+!
+interface GigabitEthernet1.35
+ encapsulation dot1Q 35
+ ip address 10.0.35.1 255.255.255.252
+ ip pim sparse-mode
+ ipv6 address 2001:10:0:35::1/126
+ ipv6 rip CCIE enable
+ mpls ip
+ no shutdown
+!
+interface GigabitEthernet1.36
+ encapsulation dot1Q 36
+ ip address 10.0.36.1 255.255.255.252
+ ip pim sparse-mode
+ ipv6 address 2001:10:0:36::1/126
+ ipv6 rip CCIE metric-offset 2
+ mpls ip
+ no shutdown
+!
+interface GigabitEthernet2
+ ip address 192.168.1.3 255.255.255.0
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+router ospf 100
+ router-id 192.122.3.3
+ fast-reroute per-prefix enable prefix-priority low
+ area 20 virtual-link 192.122.3.1
+ redistribute connected subnets route-map CONNECTED_INTO_OSPF
+ redistribute rip subnets route-map RIP_INTO_OSPF_REDISTRIBUTION
+ distribute-list route-map BLOCK_RIP_ROUTES_DISTRIBUTE_LIST_IN in
+ mpls ldp autoconfig
+!
+router rip
+ version 2
+ redistribute ospf 100 metric 1 route-map OSPF_INTO_RIP_REDISTRIBUTION
+ passive-interface default
+ no passive-interface GigabitEthernet1.35
+ no passive-interface GigabitEthernet1.36
+ network 10.0.0.0
+ no auto-summary
+!
+router bgp 65006
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor ::192:122:3:6 remote-as 65006
+ neighbor ::192:122:3:6 update-source Loopback0
+ neighbor 2001:10:0:360::2 remote-as 65006
+ neighbor 2001:10:0:360::2 update-source Tunnel64
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+  neighbor ::192:122:3:6 activate
+  neighbor 2001:10:0:360::2 activate
+ exit-address-family
+!
+!
+!
+ip forward-protocol nd
+!
+ip pim rp-candidate Loopback100
+ip msdp peer 192.122.3.4 connect-source Loopback0
+ip msdp cache-sa-state
+no ip http server
+ip http secure-server
+!
+ip access-list extended PIM
+ permit pim any any
+!
+access-list 10 permit 192.122.3.8
+access-list 10 permit 192.122.3.2
+access-list 10 permit 192.122.3.7
+access-list 10 permit 192.122.3.6
+ipv6 route ::192:122:3:66/128 Null0
+ipv6 router rip CCIE
+ timers 10 30 30 40
+!
+!
+route-map OSPF_INTO_RIP_REDISTRIBUTION deny 10
+ match tag 190
+!
+route-map OSPF_INTO_RIP_REDISTRIBUTION permit 20
+ set tag 3110
+!
+route-map RIP_INTO_OSPF_REDISTRIBUTION deny 10
+ match tag 590
+!
+route-map RIP_INTO_OSPF_REDISTRIBUTION permit 20
+ set tag 3120
+!
+route-map BLOCK_RIP_ROUTES_DISTRIBUTE_LIST_IN deny 10
+ match tag 4120
+!
+route-map BLOCK_RIP_ROUTES_DISTRIBUTE_LIST_IN permit 20
+!
+route-map CONNECTED_INTO_OSPF permit 10
+ match interface GigabitEthernet1.23
+ set metric 1000
+ set metric-type type-1
+!
+route-map CONNECTED_INTO_OSPF permit 20
+ match interface GigabitEthernet1.35 GigabitEthernet1.36
+ set tag 3120
+!
+mpls ldp router-id Loopback0 force
+!
+!
+control-plane
+ service-policy input COPP_POLICE_IN
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ password cisco
+ logging synchronous
+ login
+ stopbits 1
+line vty 0 4
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

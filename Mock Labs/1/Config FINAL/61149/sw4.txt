@@ -1,0 +1,166 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 00:46:15 UTC Mon Mar 1 1993
+!
+version 15.0
+no service pad
+no service timestamps debug uptime
+no service timestamps log uptime
+no service password-encryption
+!
+hostname SW4
+!
+boot-start-marker
+boot-end-marker
+!
+!
+no logging buffered
+!
+no aaa new-model
+system mtu routing 1500
+vtp file vlan.dat
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+spanning-tree mode pvst
+spanning-tree extend system-id
+spanning-tree vlan 1-998,1000-4094 priority 36864
+spanning-tree vlan 999 priority 53248
+!
+vlan internal allocation policy ascending
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 122.1.1.24 255.255.255.255
+ no shutdown
+!
+interface FastEthernet0/1
+ no shutdown
+!
+interface FastEthernet0/2
+ no shutdown
+!
+interface FastEthernet0/3
+ no shutdown
+!
+interface FastEthernet0/4
+ no shutdown
+!
+interface FastEthernet0/5
+ no shutdown
+!
+interface FastEthernet0/6
+ no shutdown
+!
+interface FastEthernet0/7
+ no shutdown
+!
+interface FastEthernet0/8
+ no shutdown
+!
+interface FastEthernet0/9
+ no shutdown
+!
+interface FastEthernet0/10
+ no shutdown
+!
+interface FastEthernet0/11
+ no shutdown
+!
+interface FastEthernet0/12
+ no shutdown
+!
+interface FastEthernet0/13
+ no shutdown
+!
+interface FastEthernet0/14
+ no shutdown
+!
+interface FastEthernet0/15
+ no shutdown
+!
+interface FastEthernet0/16
+ no shutdown
+!
+interface FastEthernet0/17
+ no shutdown
+!
+interface FastEthernet0/18
+ no shutdown
+!
+interface FastEthernet0/19
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no shutdown
+!
+interface FastEthernet0/20
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no shutdown
+!
+interface FastEthernet0/21
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no shutdown
+!
+interface FastEthernet0/22
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no shutdown
+!
+interface FastEthernet0/23
+ shutdown
+!
+interface FastEthernet0/24
+ shutdown
+!
+interface GigabitEthernet0/1
+ no shutdown
+!
+interface GigabitEthernet0/2
+ no shutdown
+!
+interface Vlan1
+ no ip address
+ no shutdown
+!
+interface Vlan234
+ ip address 10.1.234.24 255.255.255.0
+ no shutdown
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+!
+!
+line vty 0 4
+ no login
+line vty 5 15
+ login
+!
+end

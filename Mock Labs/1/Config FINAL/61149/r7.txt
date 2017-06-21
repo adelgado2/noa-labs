@@ -1,0 +1,237 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 16:05:44 UTC Tue Jun 20 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R7
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+crypto isakmp policy 10
+ encr aes
+ hash md5
+ authentication pre-share
+ group 5
+crypto isakmp key KEY address 122.1.1.11
+!
+!
+crypto ipsec transform-set aesset esp-aes 256 esp-sha-hmac
+ mode transport
+!
+!
+!
+crypto map MAP local-address Loopback0
+crypto map MAP 1 ipsec-isakmp
+ set peer 122.1.1.11
+ set transform-set aesset
+ match address vpn-tunnel
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 122.1.1.7 255.255.255.255
+ ipv6 address 2001:122:1:1::7/128
+ ospfv3 1 ipv4 area 50
+ no shutdown
+!
+interface Tunnel711
+ no ip address
+ ipv6 address 2001:10:7:11::7/64
+ tunnel source Loopback0
+ tunnel destination 122.1.1.11
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ speed 1000
+ no negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.57
+ encapsulation dot1Q 57
+ ip address 12.252.101.7 255.255.255.0
+ ipv6 address 2001:12:252:101::7/64
+ crypto map MAP
+ no shutdown
+!
+interface GigabitEthernet1.67
+ encapsulation dot1Q 67
+ ip unnumbered Loopback0
+ ipv6 unnumbered Loopback0
+ ospfv3 1 ipv4 area 50
+ ospfv3 1 ipv6 area 50
+ crypto map MAP
+ no shutdown
+!
+interface GigabitEthernet1.79
+ encapsulation dot1Q 79
+ ip unnumbered Loopback0
+ ipv6 unnumbered Loopback0
+ ospfv3 1 ipv4 area 50
+ ospfv3 1 ipv6 area 50
+ no shutdown
+!
+interface GigabitEthernet2
+ no ip address
+ speed 1000
+ no negotiation auto
+ shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+router ospfv3 1
+ router-id 122.1.1.7
+ !
+ address-family ipv4 unicast
+  redistribute bgp 600
+ exit-address-family
+ !
+ address-family ipv6 unicast
+  redistribute connected route-map RED-CON-V6
+ exit-address-family
+!
+router bgp 600
+ bgp router-id 122.1.1.7
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ no bgp default ipv6-nexthop
+ neighbor 12.252.101.5 remote-as 101
+ neighbor 2001:10:7:11::11 remote-as 200
+ neighbor 2001:10:7:11::11 update-source Tunnel711
+ neighbor 122.1.1.6 remote-as 600
+ neighbor 122.1.1.6 update-source Loopback0
+ !
+ address-family ipv4
+  redistribute ospfv3 1 match internal external 1 external 2 nssa-external 1 nssa-external 2
+  neighbor 12.252.101.5 activate
+  neighbor 12.252.101.5 route-map SET-LP in
+  neighbor 122.1.1.6 activate
+  neighbor 122.1.1.6 send-community both
+  neighbor 122.1.1.6 next-hop-self
+ exit-address-family
+ !
+ address-family ipv6
+  redistribute ospf 1 include-connected
+  neighbor 2001:10:7:11::11 activate
+ exit-address-family
+!
+!
+!
+ip forward-protocol nd
+!
+ip extcommunity-list 1 permit rt 200:200
+ip bgp-community new-format
+ip community-list expanded AS200 permit 200:[0-9]+_
+no ip http server
+no ip http secure-server
+!
+ip access-list extended vpn-tunnel
+ permit gre host 122.1.1.7 host 122.1.1.11
+!
+!
+route-map RED-CON-V6 permit 10
+ match interface Loopback0
+!
+route-map SET-LP permit 10
+ match extcommunity 1
+ set local-preference 200
+!
+route-map SET-LP permit 20
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+line vty 11 98
+ login
+!
+!
+end

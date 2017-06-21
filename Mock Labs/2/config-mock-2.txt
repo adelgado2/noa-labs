@@ -1,0 +1,1799 @@
+------------------------------------------------------------
+
+1.1
+
+SW1
+
+!NOTA!!! Port-security lo he incrementado a 500 al estar cambiando de rack.
+
+!
+int Fa0/1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ udld port aggressive
+ switchport port-security
+ switchport port-security maximum 50
+ switchport port-security mac-address sticky 
+ switchport port-security aging time 5
+ switchport port-security aging inactivity
+!
+
+------------------------------------------------------------
+
+1.2
+
+SW3:
+
+int range Fa0/19-22
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+
+SW2:
+
+int range Fa0/19-22
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ 
+SW1:
+
+int range Fa0/19-22
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+
+SW4:
+
+int range Fa0/19-22 
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ 
+------------------------------------------------------------
+
+1.3
+
+SW4:
+
+interface Po34
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+
+int range Fa0/23-24
+ channel-group 34 mode active
+ 
+lacp system-priority 32765
+
+port-channel load-balance src-dst-mac 
+ 
+SW3:
+
+interface Po34
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+int range Fa0/23-24
+ channel-group 34 mode passive 
+! 
+interface Fa0/23
+ lacp port-priority 0
+! 
+port-channel load-balance src-dst-mac  
+ 
+------------------------------------------------------------
+
+1.4
+
+SW1:
+
+!
+vtp domain SW1-SW3_INE_ML
+vtp version 3
+vtp password CCIE_VTP
+vtp mode server
+!
+
+vtp primary 
+
+!
+vlan 1321
+ name SW1_R13
+!
+vlan 1521
+ name SW1_R15
+!
+vlan 1322
+ name SW3_R13
+!
+vlan 1522
+ name SW2_R15
+!
+vlan 678
+ name SW3_LONDON
+!
+vlan 1234
+ name SW_AGG
+!
+vlan 1111
+ name TEST_VLAN
+!
+
+SW2:
+
+!
+vtp domain SW2-SW4_INE_ML
+vtp version 3
+vtp password CCIE_VTP
+vtp mode server
+!
+
+vtp primary 
+
+!
+vlan 1321
+ name SW1_R13
+!
+vlan 1521
+ name SW1_R15
+!
+vlan 1322
+ name SW3_R13
+!
+vlan 1522
+ name SW2_R15
+!
+vlan 678
+ name SW3_LONDON
+!
+vlan 1234
+ name SW_AGG
+!
+vlan 1111
+ name TEST_VLAN
+!
+
+SW3:
+
+!
+vtp domain SW1-SW3_INE_ML
+vtp version 3
+vtp password CCIE_VTP
+vtp mode client
+!
+
+SW4:
+
+!
+vtp domain SW2-SW4_INE_ML
+vtp version 3
+vtp password CCIE_VTP
+vtp mode client
+!
+
+------------------------------------------------------------
+
+1.5
+
+!No hay que poner instance 0 porque automaticamente todas las vlans pertenecen a esa instancia.
+
+SW1:
+
+!
+spanning-tree mode mst
+vtp mode server mst
+!
+
+vtp primary mst
+
+!
+spanning-tree mst configuration
+ instance 21 vlan 1321,1521
+ instance 22 vlan 1322,1522
+ name SW1_SW3
+ revision 1
+!
+
+!
+spanning-tree mst 21 root primary
+!
+
+SW3:
+
+!
+spanning-tree mode mst
+vtp mode client mst
+!
+spanning-tree logging 
+!
+
+SW2:
+
+!
+spanning-tree mode mst
+vtp mode server mst
+!
+
+vtp primary mst
+
+!
+spanning-tree mst configuration
+ instance 22 vlan 1321,1521
+ instance 21 vlan 1322,1522
+ name SW2_SW4
+ revision 1
+!
+
+SW4:
+
+!
+spanning-tree mode mst
+vtp mode client mst
+!
+spanning-tree logging 
+!
+interface FastEthernet0/22
+ spanning-tree mst 0 cost 10000
+!
+
+------------------------------------------------------------
+
+1.6
+
+SW4:
+
+!
+spanning-tree mst 21 root primary
+spanning-tree mst 22 root primary
+!
+
+SW1:
+
+!Asegurarse SW1 es root STP Instance 0:
+
+!
+spanning-tree mst 0 priority 0
+!
+
+OPTIONAL
+!Se puede hacer que machee el output exacto en Fa0/19 haciendo que SW2 tenga una prioridad alta para que
+!SW4 se convierta en el Regional Root Bridge. NO hace falta, no lo piden, por ej las mac del output son !diferentes!
+
+!
+spanning-tree mst 0,21,22 priority 61440
+!
+
+------------------------------------------------------------
+
+2.1
+
+SW1:
+
+!
+ip routing
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+router eigrp CCIE
+ address-family ipv4 autonomous-system 56
+  eigrp router-id 172.16.1.21
+  network 180.10.0.0 0.0.255.255  
+  topology base
+   redistribute connected route-map RED-CONN
+!
+
+SW2:
+
+!
+ip routing
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+router eigrp CCIE
+ address-family ipv4 autonomous-system 56
+  eigrp router-id 172.16.1.22
+  network 180.10.0.0 0.0.255.255 
+  topology base
+   redistribute connected route-map RED-CONN  
+!
+
+R13:
+
+!
+router eigrp CCIE
+ address-family ipv4 autonomous-system 56
+  eigrp router-id 172.16.1.13 
+  network 172.16.1.13 0.0.0.0
+  network 180.10.0.0 0.0.255.255  
+!
+
+R15:
+
+!
+router eigrp CCIE
+ address-family ipv4 autonomous-system 56
+  eigrp router-id 172.16.1.15
+  network 172.16.1.15 0.0.0.0  
+  network 180.10.0.0 0.0.255.255  
+!
+
+R19:
+
+!
+router eigrp CCIE
+ address-family ipv4 autonomous-system 56
+  eigrp router-id 172.16.1.19
+  network 172.16.1.19 0.0.0.0  
+  network 180.10.0.0 0.0.255.255  
+  af-interface Gi1.1719
+   passive-interface
+!
+
+R20:
+
+!
+router eigrp CCIE
+ address-family ipv4 autonomous-system 56
+  eigrp router-id 172.16.1.20
+  network 172.16.1.20 0.0.0.0  
+  network 180.10.0.0 0.0.255.255 
+  af-interface Gi1.1120
+   passive-interface
+!
+
+------------------------------------------------------------
+
+2.2
+
+R6:
+
+!
+router eigrp LONDON
+ address-family ipv4 autonomous-system 56
+  eigrp router-id 172.16.1.6
+  network 180.10.0.0 0.0.255.255
+  network 172.16.1.6 0.0.0.0
+  af-interface Gi1.618
+   passive-interface
+!
+
+R7:
+
+!
+router eigrp LONDON
+ address-family ipv4 autonomous-system 56
+  eigrp router-id 172.16.1.7
+  network 180.10.0.0 0.0.255.255 
+  network 172.16.1.7 0.0.0.0  
+  af-interface Gi1.714
+   passive-interface   
+!
+
+R8:
+
+!
+router eigrp LONDON
+ address-family ipv4 autonomous-system 56
+  eigrp router-id 172.16.1.8
+  network 180.10.0.0 0.0.255.255
+  network 172.16.1.8 0.0.255.255
+  af-interface Gi1.678
+   no split-horizon
+!
+
+SW3:
+
+!
+ip routing
+!
+router eigrp LONDON
+ address-family ipv4 autonomous-system 56
+  eigrp router-id 172.16.1.23
+  network 180.10.0.0 0.0.255.255
+  network 172.16.1.23 0.0.0.0
+  eigrp stub receive-only
+!
+
+------------------------------------------------------------
+
+2.3
+
+R1:
+
+!
+interface Loopback0
+ ip ospf 1 area 0
+!
+interface Gi1.12
+ ip ospf 1 area 0
+ ip ospf network point-to-point
+!
+interface Gi1.13
+ ip ospf 1 area 0
+ ip ospf network point-to-point
+!
+int Gi1.116
+ ip ospf 1 area 20
+!
+router ospf 1
+ router-id 172.16.1.1
+!
+
+R2:
+
+!
+interface Loopback0
+ ip ospf 1 area 0
+!
+interface Gi1.12
+ ip ospf 1 area 0
+ ip ospf network point-to-point
+!
+interface Gi1.24
+ ip ospf 1 area 0
+ ip ospf network point-to-point
+!
+int Gi1.216
+ ip ospf 1 area 20
+!
+router ospf 1
+ router-id 172.16.1.2
+!
+
+R3:
+
+!
+interface Loopback0
+ ip ospf 1 area 0
+!
+interface Gi1.13
+ ip ospf 1 area 0
+ ip ospf network point-to-point 
+!
+router ospf 1
+ router-id 172.16.1.3
+!
+
+R4:
+
+!
+interface Loopback0
+ ip ospf 1 area 0
+!
+interface Gi1.24
+ ip ospf 1 area 0
+ ip ospf network point-to-point 
+!
+router ospf 1
+ router-id 172.16.1.4
+!
+
+R16:
+
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+int Gi1.116
+ ip ospf 1 area 20
+!
+int Gi1.216
+ ip ospf 1 area 20
+!
+router ospf 1
+ router-id 172.16.1.16
+ redistribute connected route-map RED-CONN
+!
+
+
+------------------------------------------------------------
+
+2.4
+
+!En cram session y solucion se decantan por nssa no-summary, no veo necesario no-summary, obtengo los mismos !resultados.
+
+R3:
+
+!
+interface Gi1.35
+ ip ospf 1 area 34
+!
+router ospf 1
+ area 34 nssa default-information originate
+ area 34 nssa translate type7 always 
+!
+
+R4:
+
+!
+interface Gi1.45
+ ip ospf 1 area 34
+!
+router ospf 1
+ area 34 nssa default-information-originate
+!
+
+R5:
+
+!
+ip prefix-list default seq 5 permit 0.0.0.0/0
+!
+route-map CONDITION permit 10
+ match ip address prefix-list default
+ match ip next-hop 180.10.45.4 180.10.35.3
+!
+interface Gi1.35
+ ip ospf 1 area 34
+!
+interface Gi1.45
+ ip ospf 1 area 34
+!
+router ospf 1 
+ router-id 172.16.1.5
+ redistribute rip subnets
+ area 34 nssa
+!
+router rip
+ default-information originate route-map CONDITION
+!
+
+------------------------------------------------------------
+
+2.5
+
+!OJO que aqui solo dejan un default-information-originate
+
+R1:
+
+!
+interface Gi1.114
+ ip ospf 1 area 51
+!
+router ospf 1
+ area 51 nssa no-summary
+!
+ 
+!Default  route Type 5 LSA. NSSA totally no deja pasar LSA Type 3 and Type 4, pero sí Type 7.
+ 
+R3:
+
+!
+interface Gi1.314
+ ip ospf 1 area 51
+!
+router ospf 1
+ area 51 nssa default-information-originate
+!
+
+!Default route Type 7 LSA + Leaking Interarea routes.
+
+R14:
+
+!
+route-map RED-CONN permit 10
+ match interface Loopback1
+!
+interface Gi1.114
+ ip ospf 1 area 51
+ ip ospf cost 10
+!
+interface Gi1.314
+ ip ospf 1 area 51
+!
+router ospf 1 vrf HQ
+ router-id 172.16.1.14
+ redistribute connected route-map RED-CONN
+ area 51 nssa
+ capability vrf-lite
+!
+
+------------------------------------------------------------
+
+3.1
+
+R17:
+
+!
+mpls ldp router-id loopback0 force
+mpls ldp neighbor 199.8.2.200 password !LDP! 
+mpls label mode all protocol bgp-vpnv4 per-vrf 
+!
+router ospf 65000
+ mpls ldp autoconfig area 65000
+ prefix-suppression
+!
+
+R18:
+
+!
+mpls ldp router-id loopback0 force
+mpls ldp neighbor 199.8.2.100 password !LDP! 
+mpls label mode all protocol bgp-vpnv4 per-vrf 
+!
+router ospf 65000
+ mpls ldp autoconfig area 65000
+ prefix-suppression 
+!
+
+R11:
+
+!
+mpls ldp router-id loopback0 force
+mpls label mode all protocol bgp-vpnv4 per-vrf 
+!
+router ospf 65001
+ mpls ldp autoconfig area 65001
+ prefix-suppression 
+!
+
+R14:
+
+!
+mpls ldp router-id loopback0 force
+mpls label mode all protocol bgp-vpnv4 per-vrf 
+!
+router ospf 65001
+ mpls ldp autoconfig area 65001
+ prefix-suppression 
+!
+
+------------------------------------------------------------
+
+3.2
+
+*************************************************************
+Forma Brian RT y route-maps RED:
+
+R17:
+
+!
+vrf definition Colo-Site
+ address-family ipv4 
+  route-target import 18:1
+  route-target import 14:1  
+  route-target import 11:3  
+  route-target import 11:4   
+  route-target import 11:2    
+  route-target import 17:2     
+  route-target export 17:4
+!
+vrf definition SiteB
+ address-family ipv4 
+  route-target import 18:1
+  route-target import 14:1  
+  route-target import 11:3  
+  route-target import 11:4   
+  route-target import 17:4 
+  route-target export 17:2
+!
+
+R18:
+
+!
+vrf definition SiteA
+ address-family ipv4 
+  route-target import 11:3  
+  route-target import 11:4   
+  route-target import 11:2    
+  route-target import 17:2 
+  route-target import 17:4
+  route-target export 18:1
+!
+
+R11:
+
+!
+vrf definition Colo-Site
+ address-family ipv4 
+  route-target import 18:1
+  route-target import 14:1  
+  route-target import 11:3  
+  route-target import 11:2   
+  route-target import 17:2     
+  route-target import 17:4  
+  route-target export 11:4  
+!
+vrf definition SiteB
+ address-family ipv4 
+  route-target import 18:1
+  route-target import 14:1  
+  route-target import 11:4   
+  route-target import 17:4 
+  route-target import 11:3
+  route-target export 11:2  
+!
+vrf definition SiteC
+ address-family ipv4 
+  route-target import 18:1
+  route-target import 14:1  
+  route-target import 11:4  
+  route-target import 11:2   
+  route-target import 17:2     
+  route-target import 17:4
+  route-target export 11:3   
+!
+
+R14:
+
+!
+vrf definition SiteA
+ address-family ipv4 
+  route-target import 11:4  
+  route-target import 11:3   
+  route-target import 11:2   
+  route-target import 17:2     
+  route-target import 17:4
+  route-target export 14:1
+!
+
+R19:
+
+!
+route-map RED-BGP-TO-EIGRP permit 10
+ set tag 19
+!
+route-map RED-EIGRP-TO-BGP deny 10
+ match tag 20
+route-map RED-EIGRP-TO-BGP permit 20 
+!
+router eigrp CCIE
+ !
+ address-family ipv4 unicast autonomous-system 56
+  !
+  topology base
+   redistribute bgp 65002 metric 10000 1000 1 255 1500 route-map RED-BGP-TO-EIGRP
+!
+router bgp 65002
+ address-family ipv4
+  redistribute eigrp 56 route-map RED-EIGRP-TO-BGP
+!
+
+R20:
+
+!
+route-map RED-BGP-TO-EIGRP permit 10
+ set tag 20
+!
+route-map RED-EIGRP-TO-BGP deny 10
+ match tag 19
+route-map RED-EIGRP-TO-BGP permit 20 
+!
+router eigrp CCIE
+ !
+ address-family ipv4 unicast autonomous-system 56
+  !
+  topology base
+   redistribute bgp 65002 metric 10000 1000 1 255 1500 route-map RED-BGP-TO-EIGRP
+!
+router bgp 65002
+ address-family ipv4
+  redistribute eigrp 56 route-map RED-EIGRP-TO-BGP
+!
+
+R6:
+
+!
+route-map RED-BGP-TO-EIGRP permit 10
+ set tag 6
+!
+route-map RED-EIGRP-TO-BGP deny 10
+ match tag 7
+route-map RED-EIGRP-TO-BGP permit 20 
+!
+router eigrp LONDON
+ !
+ address-family ipv4 unicast autonomous-system 56
+  !
+  topology base
+   redistribute bgp 65004 metric 10000 1000 1 255 1500 route-map RED-BGP-TO-EIGRP
+!
+router bgp 65004
+ address-family ipv4
+  redistribute eigrp 56 route-map RED-EIGRP-TO-BGP
+!
+
+R7:
+
+!
+route-map RED-BGP-TO-EIGRP permit 10
+ set tag 7
+!
+route-map RED-EIGRP-TO-BGP deny 10
+ match tag 6
+route-map RED-EIGRP-TO-BGP permit 20 
+!
+router eigrp LONDON
+ !
+ address-family ipv4 unicast autonomous-system 56
+  !
+  topology base
+   redistribute bgp 65004 metric 10000 1000 1 255 1500 route-map RED-BGP-TO-EIGRP
+!
+router bgp 65004
+ address-family ipv4
+  redistribute eigrp 56 route-map RED-EIGRP-TO-BGP
+!
+
+------------------------------------------------------------
+
+Lo siguiente hace que RT policy import/export sea el mismo en todos los routes (para pruebas):
+
+R17:
+
+!
+vrf definition Colo-Site
+ address-family ipv4 
+!
+vrf definition SiteB
+ address-family ipv4 
+  route-target import 11:2
+!
+
+R18:
+
+!
+vrf definition SiteA
+ address-family ipv4 
+  route-target import 14:1
+!
+
+R11:
+
+!
+vrf definition Colo-Site
+ address-family ipv4 
+!
+vrf definition SiteB
+ address-family ipv4 
+  route-target import 17:2
+!
+vrf definition SiteC
+ address-family ipv4 
+  route-target import 17:1
+!
+
+R14:
+
+!
+vrf definition SiteA
+ address-family ipv4 
+  route-target import 18:1
+!
+
+*************************************************************
+
+R17:
+
+!
+router bgp 65000
+ bgp router-id 199.8.2.100
+ no bgp default ipv4-unicast
+ neighbor 199.8.2.200  remote-as 65000
+ neighbor 199.8.2.200  update-source Loopback0
+ address-family ipv4
+  neighbor 199.8.2.200 activate
+  network 199.8.2.16 mask 255.255.255.252 
+ address-family vpnv4 
+  neighbor 199.8.2.200  activate 
+  neighbor 199.8.2.200  next-hop-self
+!
+
+
+R18:
+
+!
+router bgp 65000
+ bgp router-id 199.8.2.200
+ no bgp default ipv4-unicast
+ neighbor 199.8.2.100  remote-as 65000
+ neighbor 199.8.2.100  update-source Loopback0
+ address-family ipv4
+  neighbor 199.8.2.100 activate
+  network 199.8.2.16 mask 255.255.255.252
+ address-family ipv4 vrf SiteA
+  no network 199.8.2.0 mask 255.255.255.0 
+ address-family vpnv4 
+  neighbor 199.8.2.100  activate 
+  neighbor 199.8.2.100  next-hop-self
+!
+
+
+R11:
+
+!
+ip tcp mss 710
+!
+router bgp 65001
+ bgp router-id 172.69.0.100
+ no bgp default ipv4-unicast
+ neighbor 172.69.0.200 remote-as 65001
+ neighbor 172.69.0.200 update-source Loopback0
+ address-family vpnv4 
+  neighbor 172.69.0.200 activate 
+  neighbor 172.69.0.200 next-hop-self
+!
+
+R14:
+
+!
+ip tcp mss 710
+!
+router bgp 65001
+ bgp router-id 172.69.0.200
+ no bgp default ipv4-unicast
+ neighbor 172.69.0.100 remote-as 65001
+ neighbor 172.69.0.100 update-source Loopback0
+ address-family vpnv4 
+  neighbor 172.69.0.100 activate
+  neighbor 172.69.0.100 next-hop-self
+!
+
+------------------------------------------------------------
+
+3.3
+
+R17:
+
+!
+router bgp 65000
+ address-family ipv4 vrf SiteB
+  neighbor 180.10.197.1 remote-as 65002
+  neighbor 180.10.197.1 activate
+ address-family ipv4 vrf Colo-Site
+  neighbor 180.10.179.0 remote-as 65003 
+  neighbor 180.10.179.0 activate  
+  neighbor 180.10.179.0 send-community both 
+  neighbor 180.10.179.0 fall-over bfd
+!
+interface GigabitEthernet1.917
+ bfd interval 999 min_rx 999 multiplier 3
+!
+
+R9:
+
+!
+router bgp 65003
+ bgp router-id 172.16.1.9
+ no bgp default ipv4-unicast
+ neighbor 180.10.179.1 fall-over bfd
+ neighbor 180.10.119.1 fall-over bfd
+ address-family ipv4
+  neighbor 180.10.179.1 remote-as 65000
+  neighbor 180.10.179.1 activate
+  neighbor 180.10.179.1 send-community
+  neighbor 180.10.119.1 remote-as 65001
+  neighbor 180.10.119.1 activate
+  neighbor 180.10.119.1 send-community both
+!
+int Gi1.917
+ bfd interval 999 min_rx 999 multiplier 3
+!
+int Gi1.911
+ bfd interval 999 min_rx 999 multiplier 3
+!
+ 
+R19:
+
+!
+router bgp 65002
+ bgp router-id 172.16.1.19
+ no bgp default ipv4-unicast
+ address-family ipv4
+  neighbor 180.10.197.0 remote-as 65000
+  neighbor 180.10.197.0 activate
+  neighbor 180.10.197.0 send-community both
+!
+ 
+R18:
+
+!
+router bgp 65000
+ address-family ipv4 vrf SiteA
+  neighbor 180.10.186.0 remote-as 65004
+  neighbor 180.10.186.0 activate
+  neighbor 180.10.186.0 send-community both
+!
+
+R6:
+
+!
+router bgp 65004
+ bgp router-id 172.16.1.6
+ no bgp default ipv4-unicast
+ address-family ipv4
+  neighbor 180.10.186.1 remote-as 65000  
+  neighbor 180.10.186.1 activate
+  neighbor 180.10.186.1 send-community both
+  neighbor 180.10.186.1 advertisement-interval 0
+!
+
+R11:
+
+!
+router bgp 65001
+ address-family ipv4 vrf SiteB
+  neighbor 180.10.112.1 remote-as 65002 
+  neighbor 180.10.112.1 activate
+  neighbor 180.10.112.1 send-community both
+ address-family ipv4 vrf SiteC
+  neighbor 180.10.121.1 remote-as 65003 
+  neighbor 180.10.121.1 activate  
+  neighbor 180.10.121.1 send-community both
+ address-family ipv4 vrf Colo-Site
+  neighbor 180.10.119.0 remote-as 65003  
+  neighbor 180.10.119.0 activate
+  neighbor 180.10.119.0 send-community both
+  neighbor 180.10.119.0 fall-over bfd
+!
+interface GigabitEthernet1.911
+ bfd interval 999 min_rx 999 multiplier 3
+!
+
+R20:
+
+!
+router bgp 65002
+ bgp router-id 172.16.1.20
+ no bgp default ipv4-unicast
+ address-family ipv4
+  neighbor 180.10.112.0 remote-as 65001
+  neighbor 180.10.112.0 activate
+  neighbor 180.10.112.0 send-community both
+!
+
+R12:
+
+!
+router bgp 65003
+ bgp router-id 172.16.1.12
+ no bgp default ipv4-unicast
+ address-family ipv4
+  neighbor 180.10.121.0 remote-as 65001
+  neighbor 180.10.121.0 activate
+  neighbor 180.10.121.0 send-community both
+!
+
+Útil para pruebas:
+R12(config)#router bgp 65003
+R12(config-router)#address-family ipv4
+R12(config-router-af)#network 172.16.1.12 mask 255.255.255.255
+
+R14:
+
+!
+router bgp 65001
+ address-family ipv4 vrf SiteA
+  neighbor 180.10.147.0 remote-as 65004
+  neighbor 180.10.147.0 activate  
+  neighbor 180.10.147.0 send-community both
+!
+
+R7:
+
+!
+router bgp 65004
+ bgp router-id 172.16.1.7
+ no bgp default ipv4-unicast
+ address-family ipv4
+  neighbor 180.10.147.1 remote-as 65001
+  neighbor 180.10.147.1 activate
+  neighbor 180.10.147.1 send-community both
+  neighbor 180.10.147.1 advertisement-interval 0
+!
+
+------------------------------------------------------------
+
+3.4
+
+R19:
+
+router eigrp CCIE
+ !
+ address-family ipv4 unicast autonomous-system 56
+  !
+  topology base
+   redistribute bgp 65002 metric 10000 1000 1 255 1500
+!
+router bgp 65002
+ !
+ address-family ipv4
+  redistribute eigrp 56
+!
+
+R20:
+
+router eigrp CCIE
+ !
+ address-family ipv4 unicast autonomous-system 56
+  !
+  topology base
+   redistribute bgp 65002 metric 10000 1000 1 255 1500
+!
+router bgp 65002
+ !
+ address-family ipv4
+  redistribute eigrp 56
+!
+
+R9:
+
+!
+router bgp 65003
+ address-family ipv4
+  network 172.16.1.9 mask 255.255.255.255
+!
+
+R6:
+
+router eigrp LONDON
+ !
+ address-family ipv4 unicast autonomous-system 56
+  topology base
+   redistribute bgp 65004 metric 10000 1000 1 255 1500
+!
+router bgp 65004
+ !
+ address-family ipv4
+  redistribute eigrp 56
+!
+
+R7:
+
+router eigrp LONDON
+ !
+ address-family ipv4 unicast autonomous-system 56
+  topology base
+   redistribute bgp 65004 metric 10000 1000 1 255 1500
+!
+router bgp 65004
+ !
+ address-family ipv4
+  redistribute eigrp 56
+!
+
+R12:
+
+!
+router rip
+ redistribute bgp 65003 metric 3
+!
+router bgp 65003
+ address-family ipv4
+  redistribute rip 
+!
+
+R11:
+
+!
+router bgp 65001
+ address-family ipv4 vrf Colo-Site
+  neighbor 180.10.119.0 as-override
+ address-family ipv4 vrf SiteC 
+  neighbor 180.10.121.1 as-override
+!
+
+------------------------------------------------------------
+
+3.5
+
+!Forma hecha en videos
+
+R7:
+
+!
+ip as-path access-list 1 permit _65004$
+!
+route-map AS-PREPEND permit 10
+ match as-path 1
+ set as prepend 65004 65004 65004
+route-map AS-PREPEND permit 20
+!
+router bgp 65001
+ address-family ipv4 vrf SiteA
+  neighbor 180.10.147.0 route-map AS-PREPEND in
+!
+
+------------------------------------------------------------
+
+4.1
+
+R6:
+
+!
+ip route vrf FVRF 0.0.0.0 0.0.0.0 44.2.5.4 205
+!
+
+R7:
+
+!
+ip route vrf FVRF 0.0.0.0 0.0.0.0 44.2.5.6 205
+!
+
+R12:
+
+!
+ip route vrf FVRF 0.0.0.0 0.0.0.0 44.2.5.8 205
+!
+
+R19:
+
+!
+ip route vrf FVRF 0.0.0.0 0.0.0.0 44.2.5.10 205
+!
+
+R20:
+
+!
+ip route vrf FVRF 0.0.0.0 0.0.0.0 44.2.5.12 205
+!
+
+R1:
+
+!
+router bgp 100.65005
+ bgp asnotation dot 
+ bgp router-id 172.16.1.1
+ no bgp default ipv4-unicast
+ neighbor 44.2.5.0 remote-as 101
+ address-family ipv4 
+  neighbor 44.2.5.0 activate
+!
+
+R2:
+
+!
+router bgp 100.65005
+ bgp asnotation dot 
+ bgp router-id 172.16.1.2
+ no bgp default ipv4-unicast
+ neighbor 44.2.5.2 remote-as 101
+ address-family ipv4 
+  neighbor 44.2.5.2 activate
+! 
+
+------------------------------------------------------------
+
+4.2
+
+Nota:
+
+Next command is ip nhrp holdtime that specifies the hold-time value set in NHRP registration requests. The NHS will keep the registration request cached for the duration of the hold-time, and then, if no registration update is receive, will time it out. The NHS will also send the same hold-time in NHRP resolution responses, if queried for the respective NHRP association. Note that you configure the ip nhrp holdtime command on spokes, and spoke will send registration requests every 1/3 of the hold-time seconds. However, if you also configure the ip nhrp registration timeout [Timeout] on a spoke, the NHRP registration requests will be sent every [Timeout] sends, not 1/3 of the configured hold-time. The hold-time value sent in NHRP Registration Requests will remain the same, of course. 
+
+Por eso no configuro 'ip nhrp holdtime x' en HUBs.
+
+R1:
+
+!
+interface Tunnel0
+ ip nhrp network-id 10
+ tunnel key 10
+ ip nhrp authentication NHRP_
+ ip mtu 1300
+ ip tcp adjust-mss 1260
+ ip nhrp map multicast dynamic
+ tunnel source Gi1.110
+ tunnel mode gre multipoint 
+!
+
+R2:
+
+!
+interface Tunnel0
+ ip nhrp network-id 10
+ tunnel key 10
+ ip nhrp authentication NHRP_
+ ip mtu 1300
+ ip tcp adjust-mss 1260
+ ip nhrp map multicast dynamic
+ tunnel source Gi1.210
+ tunnel mode gre multipoint 
+!
+
+R6:
+
+!
+interface Tunnel0 
+ ip nhrp network-id 10
+ tunnel key 10
+ ip nhrp authentication NHRP_
+ ip mtu 1300
+ ip tcp adjust-mss 1260
+ ip nhrp nhs 180.10.254.1 nbma 44.2.5.1 multicast 
+ ip nhrp nhs 180.10.254.2 nbma 44.2.5.3 multicast
+ ip nhrp holdtime 60
+ tunnel source Gi1.610
+ tunnel vrf FVRF
+ tunnel mode gre multipoint 
+!
+
+R7:
+
+!
+interface Tunnel0 
+ ip nhrp network-id 10
+ tunnel key 10
+ ip nhrp authentication NHRP_
+ ip mtu 1300
+ ip tcp adjust-mss 1260
+ ip nhrp nhs 180.10.254.1 nbma 44.2.5.1 multicast 
+ ip nhrp nhs 180.10.254.2 nbma 44.2.5.3 multicast
+ ip nhrp holdtime 60
+ tunnel source Gi1.710
+ tunnel vrf FVRF
+ tunnel mode gre multipoint 
+!
+
+R12:
+
+!
+interface Tunnel0 
+ ip nhrp network-id 10
+ tunnel key 10
+ ip nhrp authentication NHRP_
+ ip mtu 1300
+ ip tcp adjust-mss 1260
+ ip nhrp nhs 180.10.254.1 nbma 44.2.5.1 multicast 
+ ip nhrp nhs 180.10.254.2 nbma 44.2.5.3 multicast
+ ip nhrp holdtime 60
+ tunnel source Gi1.1012
+ tunnel vrf FVRF
+ tunnel mode gre multipoint 
+!
+
+R19:
+
+!
+interface Tunnel0 
+ ip nhrp network-id 10
+ tunnel key 10
+ ip nhrp authentication NHRP_
+ ip mtu 1300
+ ip tcp adjust-mss 1260
+ ip nhrp nhs 180.10.254.1 nbma 44.2.5.1 multicast 
+ ip nhrp nhs 180.10.254.2 nbma 44.2.5.3 multicast
+ ip nhrp holdtime 60
+ tunnel source Gi1.1019
+ tunnel vrf FVRF
+ tunnel mode gre multipoint 
+!
+
+R20:
+
+!
+interface Tunnel0 
+ ip nhrp network-id 10
+ tunnel key 10
+ ip nhrp authentication NHRP_
+ ip mtu 1300
+ ip tcp adjust-mss 1260
+ ip nhrp nhs 180.10.254.1 nbma 44.2.5.1 multicast 
+ ip nhrp nhs 180.10.254.2 nbma 44.2.5.3 multicast
+ ip nhrp holdtime 60
+ tunnel source Gi1.1020
+ tunnel vrf FVRF
+ tunnel mode gre multipoint 
+!
+
+------------------------------------------------------------
+
+4.3
+
+R1,R2:
+
+!
+crypto isakmp policy 10
+ authentication pre-share
+ group 14
+ encryption aes
+!
+crypto isakmp key SK_HU address 0.0.0.0 0.0.0.0 
+!
+crypto ipsec transform-set 3DES-SHA esp-3des esp-sha-hmac 
+ mode transport
+!
+crypto ipsec profile DMVPN-PROFILE 
+ set transform-set 3DES-SHA
+!
+int tunnel0
+ tunnel protection ipsec profile DMVPN-PROFILE
+!
+
+R6,R7,R12,R19,R20:
+
+!
+crypto isakmp policy 10
+ authentication pre-share
+ group 14
+ encryption aes
+!
+crypto keyring KEY vrf FVRF 
+  pre-shared-key address 0.0.0.0 0.0.0.0 key SK_HU
+!
+crypto ipsec transform-set 3DES-SHA esp-3des esp-sha-hmac 
+ mode transport
+!
+crypto ipsec profile DMVPN-PROFILE 
+ set transform-set 3DES-SHA
+!
+int tunnel0
+ tunnel protection ipsec profile DMVPN-PROFILE
+!
+
+------------------------------------------------------------
+
+4.4
+
+R12:
+
+!
+router eigrp CCIE
+ address-family ipv4 autonomous-system 56
+  eigrp router-id 172.16.1.12
+  network 180.10.254.0 255.255.255.0
+!
+
+R1,R2:
+
+!
+route-map LEAK-MAP permit 10
+ match source-protocol ospf 1
+!
+router eigrp HQ
+ address-family ipv4 autonomous-system 56
+  network 180.10.254.0 255.255.255.0
+ topology base
+  redistribute ospf 1 metric 10000 1000 1 255 1500
+ af-interface Tunnel0
+  no split-horizon   
+  summary-address 0.0.0.0/0 leak-map LEAK-MAP   
+!
+router ospf 1
+ redistribute eigrp 56 subnets 
+!
+
+Spokes:
+
+!
+int tu0
+ ip nhrp shortcut
+!
+
+Hubs:
+
+!
+int tu0
+ ip nhrp redirect
+!
+
+------------------------------------------------------------
+
+5.1
+
+!Mal en dibujo, entre R1-R2 es area 0
+
+R1:
+
+!
+int Loopback0 
+ ospfv3 2 ipv6 area 0 
+!
+int Gi1.13
+ ospfv3 2 ipv6 area 0 
+!
+int Gi1.114
+ ospfv3 2 ipv6 area 51
+!
+int Gi1.12
+ ospfv3 2 ipv6 area 0 
+!
+router ospfv3 2
+ router-id 1.1.1.1
+ address-family ipv6
+  area 0 range 2001:180:10::/58
+  area 51 nssa translate type7 always suppress-fa
+!
+
+R2:
+
+!
+int Loopback0 
+ ospfv3 2 ipv6 area 0 
+!
+int Gi1.12
+ ospfv3 2 ipv6 area 0 
+!
+int Gi1.24
+ ospfv3 2 ipv6 area 0
+!
+router ospfv3 2
+ router-id 2.2.2.2
+ address-family ipv6 
+!
+
+R3:
+
+!
+int Loopback0 
+ ospfv3 2 ipv6 area 0 
+!
+int Gi1.13
+ ospfv3 2 ipv6 area 0 
+!
+int Gi1.34
+ ospfv3 2 ipv6 area 0
+!
+int Gi1.314
+ ospfv3 2 ipv6 area 51
+!
+router ospfv3 2
+ router-id 3.3.3.3
+ address-family ipv6
+  area 0 range 2001:180:10::/58
+  area 51 nssa
+!
+
+R4:
+
+!
+int Loopback0 
+ ospfv3 2 ipv6 area 0 
+!
+int Gi1.24
+ ospfv3 2 ipv6 area 0 
+!
+int Gi1.34
+ ospfv3 2 ipv6 area 0
+!
+router ospfv3 2
+ router-id 4.4.4.4
+ address-family ipv6
+!
+
+R14:
+
+!
+int Loopback1
+ ospfv3 2 ipv6 area 51
+!
+int Gi1.114
+ ospfv3 2 ipv6 area 51 
+!
+int Gi1.314
+ ospfv3 2 ipv6 area 51
+!
+router ospfv3 2
+ router-id 14.14.14.14
+ address-family ipv6 unicast vrf HQ
+  capability vrf-lite
+  area 51 nssa
+!
+
+------------------------------------------------------------
+
+5.2
+
+R14:
+
+!
+router ospfv3 2
+ address-family ipv6 unicast vrf HQ
+  redistribute bgp 65001
+!
+router bgp 65001
+ address-family ipv6 vrf HQ
+  redistribute ospf 2 include-connected 
+!
+
+------------------------------------------------------------
+
+6.1
+
+!Si restringes interfaces con PIM a las que usa el protocolo unicast, tb vale.
+
+R1:
+
+!
+ip multicast-routing distributed
+!
+int Gi1.12 
+ ip pim sparse-mode
+!
+int Gi1.13
+ ip pim sparse-mode
+!
+int Gi1.116
+ ip pim sparse-mode
+!
+access-list 10 permit 224.16.16.16
+!
+ip pim ssm range 10 
+!
+
+R2:
+
+!
+ip multicast-routing distributed
+!
+int Gi1.12 
+ ip pim sparse-mode
+!
+int Gi1.24
+ ip pim sparse-mode
+!
+int Gi1.216
+ ip pim sparse-mode
+!
+access-list 10 permit 224.16.16.16
+!
+ip pim ssm range 10 
+!
+
+R3:
+
+!
+ip multicast-routing distributed
+!
+int Gi1.34
+ ip pim sparse-mode
+!
+int Gi1.13
+ ip pim sparse-mode
+!
+int Gi1.35
+ ip pim sparse-mode
+!
+access-list 10 permit 224.16.16.16
+!
+ip pim ssm range 10 
+!
+
+R4:
+
+!
+ip multicast-routing distributed
+!
+int Gi1.24
+ ip pim sparse-mode
+!
+int Gi1.34
+ ip pim sparse-mode
+!
+int Gi1.45
+ ip pim sparse-mode
+!
+access-list 10 permit 224.16.16.16
+!
+ip pim ssm range 10 
+!
+
+R5:
+
+!
+ip multicast-routing distributed
+!
+int Gi1.35
+ ip pim sparse-mode
+!
+int Gi1.45
+ ip pim sparse-mode
+!
+int Gi1.105
+ ip pim sparse-mode
+!
+access-list 10 permit 224.16.16.16
+!
+ip pim ssm range 10 
+!
+
+R16:
+
+!
+ip multicast-routing distributed
+!
+int Loopback0
+ ip igmp join-group 224.16.16.16 source 180.10.105.100
+ ip pim sparse-mode
+!
+int Gi1.116
+ ip pim sparse-mode
+!
+int Gi1.216
+ ip pim sparse-mode
+!
+access-list 10 permit 224.16.16.16
+!
+ip pim ssm range 10 
+!
+
+------------------------------------------------------------
+
+7.1
+
+R8:
+
+!
+ip access-list extended SSH
+ permit tcp any any eq 22
+!
+class-map match-any SSH 
+ match access-group name SSH
+!
+policy-map POLICY
+ class SSH 
+  police 8000 conform-action transmit exceed-action drop violate-action drop 
+ class class-default
+   
+!
+control-plane
+ service-policy input POLICY 
+!
+
+!
+username cisco privilege 15 password 0 cisco
+!
+ip domain name ccie.com
+!
+crypto key generate rsa   
+!
+
+
+1024
+
+
+!
+line vty 0 15
+ login local
+!
+
+------------------------------------------------------------
+
+7.2
+
+R2:
+
+!
+ipv6 access-list ACL
+ deny ip 2001:101:101::/48 any
+ permit icmp  any any nd-na
+ permit icmp  any any nd-ns
+ permit tcp any any eq 23
+ permit tcp any any eq 22
+ permit ip 2001:172:16::/56 any 
+ permit ip 2001:180:10::/56 any
+ permit 89 any any 
+ deny ipv6 any any
+!
+int Gi1.12
+ ipv6 traffic-filter ACL in
+!
+
+------------------------------------------------------------
+
+7.3
+
+------------------------------------------------------------
+
+SW3:
+
+!
+username routes privilege 0 password 0 server
+!
+privilege interface level 0 ip address
+privilege configure level 0 interface 
+privilege exec level 0 configure terminal
+privilege exec level 0 show running-config
+privilege exec level 0 show ip route
+!
+service password-encryption
+!
+line vty 0 15
+ login local
+!
+
+
+
+
+
+
+
+
+
+

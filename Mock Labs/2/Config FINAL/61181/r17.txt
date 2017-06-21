@@ -1,0 +1,239 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 07:58:38 UTC Wed Jun 21 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R17
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition Colo-Site
+ rd 65000:65001
+ !
+ address-family ipv4
+  route-target export 17:4
+  route-target import 18:1
+  route-target import 14:1
+  route-target import 11:3
+  route-target import 11:2
+  route-target import 17:2
+  route-target import 11:4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+vrf definition SiteB
+ rd 65000:65000
+ !
+ address-family ipv4
+  route-target export 17:2
+  route-target import 18:1
+  route-target import 14:1
+  route-target import 11:3
+  route-target import 11:4
+  route-target import 17:4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+enable secret 5 $1$sN9T$kLfWQEY6SLFNWsPU/i5Hd0
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+mpls label mode all-vrfs protocol bgp-vpnv4 per-vrf
+mpls ldp neighbor 199.8.2.200 password !LDP!
+multilink bundle-name authenticated
+!
+!
+!
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Null0
+ no ip unreachables
+ no shutdown
+!
+interface Loopback0
+ description SP_A Loopback
+ ip address 199.8.2.100 255.255.255.255
+ ip ospf 65000 area 65000
+ ipv6 address 2001:199:8:2::100/128
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.917
+ encapsulation dot1Q 917
+ vrf forwarding Colo-Site
+ ip address 180.10.179.1 255.255.255.254
+ ipv6 address 2001:180:10:179::1/127
+ bfd interval 999 min_rx 999 multiplier 3
+ no shutdown
+!
+interface GigabitEthernet1.1718
+ encapsulation dot1Q 1718
+ ip address 199.8.2.17 255.255.255.252
+ ip ospf network point-to-point
+ ip ospf 65000 area 65000
+ ipv6 address 2001:199:8:2::1/126
+ no shutdown
+!
+interface GigabitEthernet1.1719
+ encapsulation dot1Q 1719
+ vrf forwarding SiteB
+ ip address 180.10.197.0 255.255.255.254
+ ipv6 address 2001:180:10:197::/127
+ no shutdown
+!
+interface GigabitEthernet2
+ no ip address
+ negotiation auto
+ shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+router ospf 65000
+ router-id 199.8.2.100
+ prefix-suppression
+ mpls ldp autoconfig
+ mpls ldp autoconfig area 65000
+!
+router bgp 65000
+ bgp router-id 199.8.2.100
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 199.8.2.200 remote-as 65000
+ neighbor 199.8.2.200 update-source Loopback0
+ !
+ address-family ipv4
+  network 199.8.2.16 mask 255.255.255.252
+  neighbor 199.8.2.200 activate
+ exit-address-family
+ !
+ address-family vpnv4
+  neighbor 199.8.2.200 activate
+  neighbor 199.8.2.200 send-community extended
+  neighbor 199.8.2.200 next-hop-self
+ exit-address-family
+ !
+ address-family ipv4 vrf Colo-Site
+  neighbor 180.10.179.0 remote-as 65003
+  neighbor 180.10.179.0 fall-over bfd
+  neighbor 180.10.179.0 activate
+  neighbor 180.10.179.0 send-community both
+ exit-address-family
+ !
+ address-family ipv4 vrf SiteB
+  neighbor 180.10.197.1 remote-as 65002
+  neighbor 180.10.197.1 activate
+ exit-address-family
+!
+!
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+!
+!
+mpls ldp router-id Loopback0 force
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ length 0
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+line vty 11 98
+ no login
+!
+!
+end

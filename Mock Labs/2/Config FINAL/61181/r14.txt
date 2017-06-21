@@ -1,0 +1,286 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 07:58:45 UTC Wed Jun 21 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R14
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition HQ
+ rd 14:14
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+vrf definition SiteA
+ rd 65001:65001
+ !
+ address-family ipv4
+  route-target export 14:1
+  route-target import 11:4
+  route-target import 11:3
+  route-target import 11:2
+  route-target import 17:2
+  route-target import 17:4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+enable secret 5 $1$BJIP$8HTU9yVB7gtRSh9OTSBnV1
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+mpls label mode all-vrfs protocol bgp-vpnv4 per-vrf
+multilink bundle-name authenticated
+!
+!
+!
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+bfd slow-timers 30000
+!
+!
+!
+!
+!
+!
+ip tcp mss 710
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description SP_B Loopback
+ ip address 172.69.0.200 255.255.255.255
+ ip ospf 65001 area 65001
+ ipv6 address 2001:172:69::200/128
+ no shutdown
+!
+interface Loopback1
+ description Coorporate Loopback
+ vrf forwarding HQ
+ ip address 172.16.1.14 255.255.255.255
+ ip pim sparse-mode
+ ipv6 address 2001:172:16:1::14/128
+ ospfv3 2 ipv6 area 51
+ no shutdown
+!
+interface Loopback2
+ description IPv6 Loopback
+ vrf forwarding HQ
+ no ip address
+ ipv6 address 2001:192:168:1::1/128
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.114
+ encapsulation dot1Q 114
+ vrf forwarding HQ
+ ip address 180.10.114.14 255.255.255.0
+ ip ospf 1 area 51
+ ip ospf cost 10
+ ipv6 address 2001:180:10:114::14/64
+ ospfv3 2 ipv6 area 51
+ no shutdown
+!
+interface GigabitEthernet1.314
+ encapsulation dot1Q 314
+ vrf forwarding HQ
+ ip address 180.10.143.14 255.255.255.0
+ ip ospf 1 area 51
+ ipv6 address 2001:180:10:143::14/64
+ ospfv3 2 ipv6 area 51
+ no shutdown
+!
+interface GigabitEthernet1.714
+ encapsulation dot1Q 714
+ vrf forwarding SiteA
+ ip address 180.10.147.1 255.255.255.254
+ ipv6 address 2001:180:10:147::1/127
+ no shutdown
+!
+interface GigabitEthernet1.1014
+ encapsulation dot1Q 1014
+ vrf forwarding HQ
+ ip address 54.1.254.14 255.255.255.0
+ ipv6 address 2001:54:1:254::E/64
+ no shutdown
+!
+interface GigabitEthernet1.1114
+ encapsulation dot1Q 1114
+ ip address 172.69.0.1 255.255.255.254
+ ip ospf network point-to-point
+ ip ospf 65001 area 65001
+ ipv6 address 2001:172:69::1/127
+ no shutdown
+!
+interface GigabitEthernet2
+ no ip address
+ negotiation auto
+ shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+router ospfv3 2
+ router-id 14.14.14.14
+ !
+ address-family ipv6 unicast vrf HQ
+  redistribute bgp 65001
+  capability vrf-lite
+  area 51 nssa
+ exit-address-family
+!
+router ospf 1 vrf HQ
+ router-id 172.16.1.14
+ capability vrf-lite
+ area 51 nssa
+ redistribute connected subnets route-map RED-CONN
+!
+router ospf 65001
+ router-id 172.69.0.200
+ prefix-suppression
+ mpls ldp autoconfig
+ mpls ldp autoconfig area 65001
+!
+router bgp 65001
+ bgp router-id 172.69.0.200
+ bgp asnotation dot
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 172.69.0.100 remote-as 65001
+ neighbor 172.69.0.100 update-source Loopback0
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family vpnv4
+  neighbor 172.69.0.100 activate
+  neighbor 172.69.0.100 send-community extended
+  neighbor 172.69.0.100 next-hop-self
+ exit-address-family
+ !
+ address-family ipv6 vrf HQ
+  redistribute ospf 2 include-connected
+  neighbor 2001:54:1:254::A remote-as 5454
+  neighbor 2001:54:1:254::A local-as 100.65005 no-prepend replace-as
+  neighbor 2001:54:1:254::A activate
+ exit-address-family
+ !
+ address-family ipv4 vrf SiteA
+  neighbor 180.10.147.0 remote-as 65004
+  neighbor 180.10.147.0 activate
+  neighbor 180.10.147.0 send-community both
+  neighbor 180.10.147.0 route-map AS-PREPEND in
+ exit-address-family
+!
+!
+!
+ip forward-protocol nd
+!
+ip as-path access-list 1 permit _65004$
+no ip http server
+no ip http secure-server
+!
+!
+route-map AS-PREPEND permit 10
+ match as-path 1
+ set as-path prepend 65004 65004 65004
+!
+route-map AS-PREPEND permit 20
+!
+route-map RED-CONN permit 10
+ match interface Loopback1
+!
+mpls ldp router-id Loopback0 force
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

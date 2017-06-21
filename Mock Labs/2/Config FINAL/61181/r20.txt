@@ -1,0 +1,242 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 07:38:39 UTC Wed Jun 21 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R20
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition FVRF
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+enable secret 5 $1$.Vi5$OB8Tm5HIMIYqJMAyVte4v0
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+!
+crypto keyring KEY vrf FVRF
+  pre-shared-key address 0.0.0.0 0.0.0.0 key SK_HU
+!
+!
+!
+!
+!
+crypto isakmp policy 10
+ encr aes
+ authentication pre-share
+ group 14
+!
+!
+crypto ipsec transform-set 3DES-SHA esp-3des esp-sha-hmac
+ mode transport
+!
+crypto ipsec profile DMVPN-PROFILE
+ set transform-set 3DES-SHA
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description Coorporate Loopback
+ ip address 172.16.1.20 255.255.255.255
+ ipv6 address 2001:172:16:1::20/128
+ no shutdown
+!
+interface Tunnel0
+ ip address 180.10.254.20 255.255.255.0
+ no ip redirects
+ ip mtu 1300
+ ip nhrp authentication NHRP_
+ ip nhrp network-id 10
+ ip nhrp holdtime 60
+ ip nhrp nhs 180.10.254.1 nbma 44.2.5.1 multicast
+ ip nhrp nhs 180.10.254.2 nbma 44.2.5.3 multicast
+ ip nhrp shortcut
+ ip tcp adjust-mss 1260
+ tunnel source GigabitEthernet1.1020
+ tunnel mode gre multipoint
+ tunnel key 10
+ tunnel vrf FVRF
+ tunnel protection ipsec profile DMVPN-PROFILE
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.1020
+ encapsulation dot1Q 1020
+ vrf forwarding FVRF
+ ip address 44.2.5.13 255.255.255.254
+ ipv6 address 2001:44:2:5::D/127
+ no shutdown
+!
+interface GigabitEthernet1.1120
+ encapsulation dot1Q 1120
+ ip address 180.10.112.1 255.255.255.254
+ ipv6 address 2001:180:10:112::1/127
+ no shutdown
+!
+interface GigabitEthernet1.1320
+ encapsulation dot1Q 1320
+ ip address 180.10.132.20 255.255.255.192
+ ipv6 address 2001:180:10:132::14/124
+ no shutdown
+!
+interface GigabitEthernet1.1520
+ encapsulation dot1Q 1520
+ ip address 180.10.152.20 255.255.255.192
+ ipv6 address 2001:180:10:152::16/123
+ no shutdown
+!
+interface GigabitEthernet2
+ no ip address
+ negotiation auto
+ shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+!
+router eigrp CCIE
+ !
+ address-family ipv4 unicast autonomous-system 56
+  !
+  af-interface GigabitEthernet1.1120
+   passive-interface
+  exit-af-interface
+  !
+  topology base
+   redistribute bgp 65002 metric 10000 1000 1 255 1500 route-map RED-BGP-TO-EIGRP
+  exit-af-topology
+  network 172.16.1.20 0.0.0.0
+  network 180.10.0.0
+  eigrp router-id 172.16.1.20
+ exit-address-family
+!
+router bgp 65002
+ bgp router-id 172.16.1.20
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 180.10.112.0 remote-as 65001
+ !
+ address-family ipv4
+  redistribute eigrp 56 route-map RED-EIGRP-TO-BGP
+  neighbor 180.10.112.0 activate
+  neighbor 180.10.112.0 send-community both
+ exit-address-family
+!
+!
+!
+ip nat inside source list 10 interface Loopback0 overload
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+ip route vrf FVRF 0.0.0.0 0.0.0.0 44.2.5.12 205
+!
+!
+route-map RED-BGP-TO-EIGRP permit 10
+ set tag 20
+!
+route-map RED-EIGRP-TO-BGP deny 10
+ match tag 19
+!
+route-map RED-EIGRP-TO-BGP permit 20
+!
+!
+control-plane host
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ length 0
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

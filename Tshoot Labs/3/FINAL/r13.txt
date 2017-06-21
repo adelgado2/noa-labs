@@ -1,0 +1,217 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 10:24:14 UTC Mon Jun 19 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R13
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+no logging buffered
+no logging console
+no logging monitor
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+crypto pki trustpoint TP-self-signed-2829076952
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-2829076952
+ revocation-check none
+ rsakeypair TP-self-signed-2829076952
+!
+!
+crypto pki certificate chain TP-self-signed-2829076952
+ certificate self-signed 01
+  3082022B 30820194 A0030201 02020101 300D0609 2A864886 F70D0101 05050030
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274
+  69666963 6174652D 32383239 30373639 3532301E 170D3137 30363139 31303234
+  31335A17 0D323030 31303130 30303030 305A3031 312F302D 06035504 03132649
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D32 38323930
+  37363935 3230819F 300D0609 2A864886 F70D0101 01050003 818D0030 81890281
+  8100B2D1 9E9E724E 64D4C395 E6415AAD C9B0A9BA 2B63DBF7 C451B53B 07FA1311
+  5162DE5C 8BDA9107 F5E4589B 1B24CC8A B31AF62F 93DAF9A5 F94662B1 844D960E
+  4DB7E1B3 1C334386 C497026F FC0AE284 B1F89C37 D6DF51D9 A1E3C077 7C24A6F8
+  2E476DE7 FF680263 7C39D2DE 8F7CA615 3CD2F374 860763BE 794CBB9E D946F4C3
+  A9030203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 301F0603
+  551D2304 18301680 141291D6 0FAE6039 00450DC8 DB89E072 4606CA74 F0301D06
+  03551D0E 04160414 1291D60F AE603900 450DC8DB 89E07246 06CA74F0 300D0609
+  2A864886 F70D0101 05050003 8181003B D8D1F7BA 9E7BD623 A6DE9C65 AE60EAF2
+  CC58A556 010DF15A 861F392F E823272B 1607D9CA 9D78171E 42951776 EA984B7C
+  5C7BD3F1 01D186AE 86E5B27A 09132B5D 1689944E 1BE5FF03 0DA02672 7FF5B15F
+  A6E04ED3 28FEBC12 5226161C 4A0C7D84 A424EEE5 507E0D3B 31BB33BE FB934DE2
+  50B37F54 E2051E7C EC9C829A 703A87
+  	quit
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$xFIu$OGtcO1NjQrHx.wFJ159pX0
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.13 255.255.255.255
+ ip pim sparse-mode
+ ip ospf 5 area 5
+ ipv6 address ::192:122:3:13/128
+ ospfv3 5 ipv6 area 5
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.113
+ encapsulation dot1Q 113
+ ip address 172.19.113.13 255.255.255.128
+ ip pim sparse-mode
+ ip ospf 5 area 5
+ ipv6 address 2001:172:19:113::13/64
+ ospfv3 5 ipv6 area 5
+ no shutdown
+!
+interface GigabitEthernet1.134
+ encapsulation dot1Q 134
+ ip address 172.19.134.13 255.255.255.128
+ ip pim sparse-mode
+ ip ospf 5 area 5
+ ipv6 address 2001:172:19:134::13/64
+ ospfv3 5 ipv6 area 5
+ no shutdown
+!
+interface GigabitEthernet2
+ ip address 192.168.1.13 255.255.255.0
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+router ospfv3 5
+ router-id 192.122.3.13
+ !
+ address-family ipv6 unicast
+ exit-address-family
+!
+router ospf 5
+ router-id 192.122.3.13
+ redistribute eigrp 789 subnets
+!
+router bgp 651013
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 192.122.3.11 remote-as 651011
+ neighbor 192.122.3.11 ebgp-multihop 255
+ neighbor 192.122.3.11 update-source Loopback0
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv4 multicast
+  redistribute connected
+  neighbor 192.122.3.11 activate
+  neighbor 192.122.3.11 route-map default1 out
+ exit-address-family
+!
+!
+!
+ip forward-protocol nd
+!
+ip pim bsr-candidate Loopback0 0
+ip pim rp-candidate Loopback0
+no ip http server
+ip http secure-server
+!
+!
+route-map default1 deny 10
+ set ip next-hop 192.122.3.12
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ password cisco
+ logging synchronous
+ login
+ stopbits 1
+line vty 0 4
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

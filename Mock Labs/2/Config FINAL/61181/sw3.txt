@@ -1,0 +1,213 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 00:26:48 UTC Mon Mar 1 1993
+!
+version 15.0
+no service pad
+no service timestamps debug uptime
+no service timestamps log uptime
+service password-encryption
+!
+hostname SW3
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+username routes privilege 0 password 7 06150A335A4B1B
+no aaa new-model
+system mtu routing 1500
+vtp file vlan.dat
+ip routing
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+port-channel load-balance src-dst-mac
+!
+spanning-tree mode mst
+spanning-tree logging
+spanning-tree extend system-id
+!
+spanning-tree mst configuration
+ name SW1_SW3
+ revision 1
+ instance 21 vlan 1321, 1521
+ instance 22 vlan 1322, 1522
+!
+spanning-tree vlan 2 priority 24576
+!
+vlan internal allocation policy ascending
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description Coorporate Loopback
+ ip address 172.16.1.23 255.255.255.255
+ no shutdown
+!
+interface Port-channel34
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no shutdown
+!
+interface FastEthernet0/1
+ no shutdown
+!
+interface FastEthernet0/2
+ no shutdown
+!
+interface FastEthernet0/3
+ no shutdown
+!
+interface FastEthernet0/4
+ no shutdown
+!
+interface FastEthernet0/5
+ no shutdown
+!
+interface FastEthernet0/6
+ no shutdown
+!
+interface FastEthernet0/7
+ no shutdown
+!
+interface FastEthernet0/8
+ no shutdown
+!
+interface FastEthernet0/9
+ no shutdown
+!
+interface FastEthernet0/10
+ no shutdown
+!
+interface FastEthernet0/11
+ no shutdown
+!
+interface FastEthernet0/12
+ no shutdown
+!
+interface FastEthernet0/13
+ no shutdown
+!
+interface FastEthernet0/14
+ no shutdown
+!
+interface FastEthernet0/15
+ no shutdown
+!
+interface FastEthernet0/16
+ no shutdown
+!
+interface FastEthernet0/17
+ no shutdown
+!
+interface FastEthernet0/18
+ no shutdown
+!
+interface FastEthernet0/19
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no shutdown
+!
+interface FastEthernet0/20
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no shutdown
+!
+interface FastEthernet0/21
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no shutdown
+!
+interface FastEthernet0/22
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no shutdown
+!
+interface FastEthernet0/23
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ lacp port-priority 0
+ channel-group 34 mode passive
+ no shutdown
+!
+interface FastEthernet0/24
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 34 mode passive
+ no shutdown
+!
+interface GigabitEthernet0/1
+ no shutdown
+!
+interface GigabitEthernet0/2
+ no shutdown
+!
+interface Vlan1
+ no ip address
+ no shutdown
+!
+interface Vlan678
+ ip address 180.10.123.23 255.255.255.128
+ no shutdown
+!
+!
+router eigrp LONDON
+ !
+ address-family ipv4 unicast autonomous-system 56
+  !
+  topology base
+  exit-af-topology
+  network 172.16.1.23 0.0.0.0
+  network 180.10.0.0
+  eigrp router-id 172.16.1.23
+  eigrp stub receive-only
+ exit-address-family
+!
+no ip classless
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+!
+privilege interface level 0 ip address
+privilege interface level 0 ip
+privilege configure level 0 interface
+privilege exec level 0 configure terminal
+privilege exec level 0 configure
+privilege exec level 0 show ip route
+privilege exec level 0 show ip
+privilege exec level 0 show running-config
+privilege exec level 0 show
+!
+line vty 0 4
+ login local
+ transport input ssh
+line vty 5 15
+ login local
+ transport input ssh
+!
+end

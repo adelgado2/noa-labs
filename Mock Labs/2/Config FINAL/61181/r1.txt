@@ -1,0 +1,263 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 06:41:35 UTC Wed Jun 21 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+logging discriminator a facility drops NHRP|QOS|Priority
+enable secret 5 $1$YeQ2$I4qeist9jzw7KzVSv1R1F.
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+crypto isakmp policy 10
+ encr aes
+ authentication pre-share
+ group 14
+crypto isakmp key SK_HU address 0.0.0.0
+!
+!
+crypto ipsec transform-set 3DES-SHA esp-3des esp-sha-hmac
+ mode transport
+!
+crypto ipsec profile DMVPN-PROFILE
+ set transform-set 3DES-SHA
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description Coorporate Loopback
+ ip address 172.16.1.1 255.255.255.255
+ ip ospf 1 area 0
+ ipv6 address 2001:172:16:1::1/128
+ ospfv3 2 ipv6 area 0
+ no shutdown
+!
+interface Loopback2
+ description IPv6 Loopback
+ no ip address
+ ipv6 address 2001:192:168:1::1/128
+ no shutdown
+!
+interface Tunnel0
+ ip address 180.10.254.1 255.255.255.0
+ no ip redirects
+ ip mtu 1300
+ ip nhrp authentication NHRP_
+ ip nhrp map multicast dynamic
+ ip nhrp network-id 10
+ ip nhrp redirect
+ ip tcp adjust-mss 1260
+ tunnel source GigabitEthernet1.110
+ tunnel mode gre multipoint
+ tunnel key 10
+ tunnel protection ipsec profile DMVPN-PROFILE
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.12
+ encapsulation dot1Q 12
+ ip address 180.10.12.1 255.255.255.0
+ ip pim sparse-mode
+ ip ospf network point-to-point
+ ip ospf 1 area 0
+ ipv6 address 2001:180:10:12::1/64
+ ipv6 mtu 1500
+ ospfv3 2 ipv6 area 0
+ no shutdown
+!
+interface GigabitEthernet1.13
+ encapsulation dot1Q 13
+ ip address 180.10.13.1 255.255.255.0
+ ip pim sparse-mode
+ ip ospf network point-to-point
+ ip ospf 1 area 0
+ ipv6 address 2001:180:10:13::1/64
+ ospfv3 2 ipv6 area 0
+ no shutdown
+!
+interface GigabitEthernet1.110
+ encapsulation dot1Q 110
+ ip address 44.2.5.1 255.255.255.254
+ ip summary-address eigrp 100 0.0.0.0 0.0.0.0
+ ipv6 address 2001:44:2:5::1/127
+ no shutdown
+!
+interface GigabitEthernet1.114
+ encapsulation dot1Q 114
+ ip address 180.10.114.1 255.255.255.0
+ ip ospf 1 area 51
+ ipv6 address 2001:180:10:114::1/64
+ ospfv3 2 ipv6 area 51
+ no shutdown
+!
+interface GigabitEthernet1.116
+ encapsulation dot1Q 116
+ ip address 180.10.116.1 255.255.255.0
+ ip pim sparse-mode
+ ip ospf 1 area 20
+ ipv6 address 2001:180:10:116::1/64
+ no shutdown
+!
+interface GigabitEthernet2
+ no ip address
+ negotiation auto
+ shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+!
+router eigrp HQ
+ !
+ address-family ipv4 unicast autonomous-system 56
+  !
+  af-interface Tunnel0
+   no split-horizon
+   summary-address 0.0.0.0 0.0.0.0 leak-map LEAK-MAP
+  exit-af-interface
+  !
+  topology base
+   redistribute ospf 1 metric 10000 1000 1 255 1500
+  exit-af-topology
+  network 180.10.254.0 0.0.0.255
+ exit-address-family
+!
+router ospfv3 2
+ router-id 1.1.1.1
+ !
+ address-family ipv6 unicast
+  area 0 range 2001:180:10::/58
+  area 51 nssa translate type7 always suppress-fa
+ exit-address-family
+!
+router ospf 1
+ router-id 172.16.1.1
+ area 51 nssa no-summary
+ redistribute eigrp 56 subnets
+!
+router bgp 100.65005
+ bgp router-id 172.16.1.1
+ bgp asnotation dot
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 44.2.5.0 remote-as 101
+ !
+ address-family ipv4
+  neighbor 44.2.5.0 activate
+ exit-address-family
+!
+!
+!
+ip forward-protocol nd
+!
+ip pim ssm range 10
+no ip http server
+no ip http secure-server
+!
+access-list 10 permit 224.16.16.16
+!
+route-map LEAK-MAP permit 10
+ match source-protocol ospf 1
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ length 0
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

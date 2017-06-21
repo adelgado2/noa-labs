@@ -1,0 +1,199 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 10:24:11 UTC Mon Jun 19 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R19
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+no logging buffered
+no logging console
+no logging monitor
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+crypto pki trustpoint TP-self-signed-1424269876
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-1424269876
+ revocation-check none
+ rsakeypair TP-self-signed-1424269876
+!
+!
+crypto pki certificate chain TP-self-signed-1424269876
+ certificate self-signed 01
+  3082022B 30820194 A0030201 02020101 300D0609 2A864886 F70D0101 05050030
+  31312F30 2D060355 04031326 494F532D 53656C66 2D536967 6E65642D 43657274
+  69666963 6174652D 31343234 32363938 3736301E 170D3137 30363139 31303234
+  31305A17 0D323030 31303130 30303030 305A3031 312F302D 06035504 03132649
+  4F532D53 656C662D 5369676E 65642D43 65727469 66696361 74652D31 34323432
+  36393837 3630819F 300D0609 2A864886 F70D0101 01050003 818D0030 81890281
+  8100A339 2AC18AEC 32AAFCFF 33A17A7E B6DD034F BEE4677B 808C3828 64FD40F5
+  975C0832 549C89A9 E533784A 61CCCE58 260B7061 31FE0F22 AD9F9CA0 2C5786EF
+  06D5210C D8025D71 6C06E876 1C413305 60A277C7 83899D17 12F343C2 85E7DA10
+  33C15B48 43694B10 8205E04E 6907CD54 CE21F72B 3EEC70D0 AF9C989D 1E72572E
+  D6D50203 010001A3 53305130 0F060355 1D130101 FF040530 030101FF 301F0603
+  551D2304 18301680 14B59D51 950700C5 A5199986 94190F0E DA3F236B 6F301D06
+  03551D0E 04160414 B59D5195 0700C5A5 19998694 190F0EDA 3F236B6F 300D0609
+  2A864886 F70D0101 05050003 8181008C 76C1539E 14544960 21A1699A 54CDEF09
+  3DD94042 FF0FDEF3 AA1AA4F7 FEAD7124 C2E53479 640974CF 844F372B 6C5C7773
+  AE299C7F 172B225C 4F81EC84 0CB53E4D 3AD0751F 19795A86 D1ACAF52 152B8E63
+  866A17A8 63CEE045 0FEF3EA9 9C6D18D5 B3F0E082 AFE47D67 33A93A69 414E00DE
+  BA96EC50 984526FF F8417C04 5E9F87
+  	quit
+spanning-tree extend system-id
+!
+username cisco privilege 15 secret 5 $1$3CFZ$arROYO/si4TTNuyW4SQ2I0
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+ip tcp synwait-time 5
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description Local Loopback
+ ip address 192.122.3.19 255.255.255.255
+ ipv6 address ::192:122:3:19/128
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ standby use-bia
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.181
+ encapsulation dot1Q 181
+ ip address 172.27.181.19 255.255.255.0
+ ipv6 address 2001:172:27:181::19/64
+ no shutdown
+!
+interface GigabitEthernet1.192
+ encapsulation dot1Q 192
+ ip address 172.27.192.19 255.255.255.0
+ standby version 2
+ standby 192 ip 172.27.192.254
+ standby 192 priority 150
+ standby 192 preempt
+ standby 192 authentication md5 key-string SERVER_VIP
+ ipv6 address 2001:172:27:192::19/64
+ no shutdown
+!
+interface GigabitEthernet2
+ ip address 192.168.1.19 255.255.255.0
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+!
+router eigrp INE_CCIE
+ !
+ address-family ipv4 unicast autonomous-system 123
+  !
+  af-interface GigabitEthernet1.192
+   passive-interface
+  exit-af-interface
+  !
+  topology base
+  exit-af-topology
+  network 172.27.181.0 0.0.0.255
+  network 172.27.192.0 0.0.0.255
+  network 192.122.3.19 0.0.0.0
+ exit-address-family
+!
+!
+!
+ip forward-protocol nd
+!
+no ip http server
+ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ privilege level 15
+ password cisco
+ logging synchronous
+ login
+ length 0
+ stopbits 1
+line vty 0 4
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

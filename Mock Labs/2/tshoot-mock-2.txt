@@ -1,0 +1,252 @@
+1
+
+OJO CON LAS RESTRICCIONES. Lo siguiente NO se puede hacer:
+
+SW4(config)#int Po34
+SW4(config-if)#switchport mode trunk 
+
+ESTO SI:
+
+SW4(config)#vtp domain INE
+
+2
+
+R1(config)#router bgp 1.20000
+R1(config-router-af)#redistribute ospf 1 match internal external  
+
+R7(config)#int gi1.78
+R7(config-subif)#ip ospf 1 area 0
+
+3
+
+-----
+!Lo siguiente Brian lo considera como borrar config. Lo que hace es crear un filtro para
+!denegar a la entrada todo lo que pertenezca a 10.255.255.0/24 en EIGRP:
+
+R18(config)#router eigrp SITE_W
+R18(config-router)#address-family ipv4 unicast autonomous-system 1831
+R18(config-router-af)#no  network 10.255.255.0 0.0.0.255
+-----
+
+!Lo correcto de Brian:
+
+R18:
+
+!
+ip prefix-list STOP_LOOP deny 10.255.255.16/32
+ip prefix-list STOP_LOOP deny 10.255.255.17/32
+ip prefix-list STOP_LOOP deny 10.255.255.18/32
+ip prefix-list STOP_LOOP deny 10.255.255.19/32
+ip prefix-list STOP_LOOP permit 0.0.0.0/0 le 32
+!
+router eigrp SITE_W
+ address-family ipv4 unicast autonomous-system 1831
+ !
+ topology base
+  distribute-list prefix STOP_LOOP out Tunnel1
+  distribute-list prefix STOP_LOOP in Tunnel1  
+  distribute-list prefix STOP_LOOP out Tunnel2
+  distribute-list prefix STOP_LOOP in Tunnel2 
+! 
+ 
+!Lo siguiente sí que vale. 
+
+R16(config)#ip prefix-list 18 seq 10 permit 1.1.1.1/32
+R16(config)#no ip prefix-list 18 seq 5 permit 10.255.255.18/32
+ 
+!Otra forma abajo.
+
+R16:
+
+!
+router bgp 1831
+ address-family ipv4
+  no neighbor 169.254.160.1 advertise-map am non-exist-map nem
+  neighbor 169.254.160.1 advertise-map am exist-map nem
+!    
+ 
+4
+
+!Para que este ticket funcione hay que arreglar un problema en CORE. Está en la cram session.. Lo importante era captar lo de NAT de abajo.
+-------
+R5:
+
+int gi1.25
+ ospfv3 2 ipv6 area 0
+ ospfv3 2 ipv6 network point-to-point
+ ospfv3 2 ipv4 area 0
+ ospfv3 2 ipv4 network point-to-point
+ no ospfv3 1 ipv4 network point-to-point
+ 
+int gi1.35
+ ospfv3 2 ipv6 area 0
+ ospfv3 2 ipv6 network point-to-point
+ ospfv3 2 ipv4 area 0
+ ospfv3 2 ipv4 network point-to-point
+ no ospfv3 1 ipv4 network point-to-point
+
+int gi1.56
+ ospfv3 2 ipv6 area 0
+ ospfv3 2 ipv6 network point-to-point
+ ospfv3 2 ipv4 area 0
+ ospfv3 2 ipv4 network point-to-point
+ no ospfv3 1 ipv4 network point-to-point
+ 
+int gi1.45 
+ ospfv3 2 ipv6 area 0
+ ospfv3 2 ipv6 network point-to-point
+ ospfv3 2 ipv4 area 0
+ ospfv3 2 ipv4 network point-to-point
+ no ospfv3 1 ipv4 area 0
+ no ospfv3 1 ipv4 network point-to-point
+ no ospfv3 1 ipv6 area 0
+ no ospfv3 1 ipv6 network point-to-point
+ 
+interface GigabitEthernet1.15
+ ospfv3 2 ipv6 area 0
+ ospfv3 2 ipv6 network point-to-point
+ ospfv3 2 ipv4 area 0
+ ospfv3 2 ipv4 network point-to-point
+ no ospfv3 1 ipv4 area 0
+ no ospfv3 1 ipv4 network point-to-point
+ no ospfv3 1 ipv6 area 0
+ no ospfv3 1 ipv6 network point-to-point
+ 
+interface Loopback0
+ ospfv3 2 ipv6 area 0
+ ospfv3 2 ipv6 network point-to-point
+ ospfv3 2 ipv4 area 0
+ ospfv3 2 ipv4 network point-to-point
+ no ospfv3 1 ipv4 network point-to-point
+ no ospfv3 1 ipv6 network point-to-point 
+ 
+R2:
+
+interface Loopback0
+ ospfv3 2 ipv6 area 0
+ ospfv3 2 ipv6 network point-to-point
+ ospfv3 2 ipv4 area 0
+ ospfv3 2 ipv4 network point-to-point
+ no ospfv3 1 ipv4 network point-to-point
+ no ospfv3 1 ipv6 network point-to-point
+
+int gi1.12
+ ospfv3 2 ipv6 area 0
+ ospfv3 2 ipv6 network point-to-point
+ ospfv3 2 ipv4 area 0
+ ospfv3 2 ipv4 network point-to-point
+ no ospfv3 1 ipv4 network point-to-point
+ no ospfv3 1 ipv6 network point-to-point
+ 
+int gi1.24
+ ospfv3 2 ipv6 area 0
+ ospfv3 2 ipv6 network point-to-point
+ ospfv3 2 ipv4 area 0
+ ospfv3 2 ipv4 network point-to-point
+ no ospfv3 1 ipv4 network point-to-point
+ no ospfv3 1 ipv6 network point-to-point
+
+int gi1.25
+ ospfv3 2 ipv6 area 0
+ ospfv3 2 ipv6 network point-to-point
+ ospfv3 2 ipv4 area 0
+ ospfv3 2 ipv4 network point-to-point
+ no ospfv3 1 ipv4 network point-to-point
+ 
+-----
+
+ R20#sh ip access-list
+Standard IP access list 10
+    2 deny   10.255.255.0, wildcard bits 0.0.0.255
+    3 deny   169.254.200.0, wildcard bits 0.0.0.1
+    10 permit 10.255.255.0, wildcard bits 0.0.0.255
+    20 permit 183.20.100.0, wildcard bits 0.0.0.255
+    30 permit 128.0.0.0, wildcard bits 1.0.0.0
+    40 permit 0.0.0.0, wildcard bits 1.0.0.0
+    50 permit 128.0.0.0, wildcard bits 1.255.255.255
+    60 permit 0.0.0.0, wildcard bits 1.255.255.255
+    70 permit any
+	
+5
+
+R2(config)#ip mroute 10.255.255.100 255.255.255.255 10.255.4.2
+
+6
+
+R2
+
+int gi1.26
+ ospfv3 2 ipv6 network point-to-point
+
+  
+R6 
+
+
+R6(config)#router bgp 1.20000
+R6(config-router)#address-family ipv6
+R6(config-router-af)# neighbor 2001:10:255:255::4  next-hop-self
+ 
+7
+
+En SW3 ha habido que hacer
+
+sdm prefer dual-ipv4-and-ipv6 default
+reload	
+
+ipv6 unicast-routing 
+
+!
+interface Vlan1623
+ ip address 183.16.23.23 255.255.255.0
+ ipv6 address 2001:183:16:23::23/64
+!
+interface Vlan1723
+ ip address 183.17.23.23 255.255.255.0
+ ipv6 address 2001:183:17:23::23/64
+!
+
+!
+router eigrp SITE_W
+ !
+ address-family ipv6 unicast autonomous-system 1831
+  !
+  topology base
+  exit-af-topology
+ exit-address-family
+!
+
+Del ticket:
+
+vlan 1723
+ state active
+
+8
+
+Original: ntp authentication-key 123 md5 080F0D7E223C3C 7
+R13(config)#ntp authentication-key 123 md5 NTPK3Y 0 
+	
+R5
+
+R5(config)#ip access-list extended test
+R5(config-ext-nacl)#4 permit ip host 10.255.255.9 host 10.255.255.13
+R5(config-ext-nacl)#5 permit ip host 10.255.255.13 host 10.255.255.9	
+	
+9
+
+SW2
+
+SW2(config-router)#router ospf 1 vrf A
+SW2(config-router)#redistribute ospf 2 subnets
+
+SW2(config)#router ospf 1 vrf A
+SW2(config-router)#capability vrf-lite 
+ 
+10
+
+R9(config)#policy-map CHILD_QUEUING
+R9(config-pmap)#class VOIP_SIGNALING
+R9(config-pmap-c)#police cir 10000 conform-action transmit
+
+ 
+ 
+ 

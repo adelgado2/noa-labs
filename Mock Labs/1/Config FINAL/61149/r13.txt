@@ -1,0 +1,198 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 17:28:00 UTC Tue Jun 20 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R13
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+no ip domain lookup
+
+ip cef load-sharing algorithm include-ports source destination
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 122.1.1.13 255.255.255.255
+ ipv6 address 2001:122:1:1::13/128
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ speed 1000
+ no negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.123
+ encapsulation dot1Q 123
+ ip address 10.1.123.13 255.255.255.0
+ ip nat outside
+ ipv6 address 2001:10:1:123::13/64
+ no shutdown
+!
+interface GigabitEthernet1.1314
+ encapsulation dot1Q 1314
+ ip address 54.251.1.13 255.255.255.240
+ ip nat inside
+ ipv6 address 2001:54:251:1::13/64
+ no shutdown
+!
+interface GigabitEthernet2
+ no ip address
+ speed 1000
+ no negotiation auto
+ shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+router bgp 200
+ bgp router-id 122.1.1.13
+ bgp log-neighbor-changes
+ bgp listen range 10.1.123.0/24 peer-group IBGP
+ no bgp default ipv4-unicast
+ neighbor IBGP peer-group
+ neighbor IBGP remote-as 200
+ neighbor IBGP update-source Loopback0
+ neighbor 54.251.1.14 remote-as 555
+ neighbor 54.251.1.14 password ?BGP_KEY?
+ !
+ address-family ipv4
+  network 122.1.1.13
+  aggregate-address 122.0.0.0 255.0.0.0 summary-only
+  neighbor IBGP activate
+  neighbor IBGP next-hop-self
+  neighbor IBGP route-map NO-SUMM out
+  neighbor IBGP unsuppress-map UNSUPPRESS_MAP
+  neighbor 54.251.1.14 activate
+  neighbor 54.251.1.14 send-community
+ exit-address-family
+!
+!
+!
+ip nat inside source list NAT interface GigabitEthernet1.123 overload
+ip forward-protocol nd
+!
+ip bgp-community new-format
+no ip http server
+no ip http secure-server
+!
+ip access-list extended NAT
+ permit tcp host 54.251.1.14 host 122.1.1.23 eq telnet
+!
+!
+ip prefix-list 122-0-0-0-8 seq 5 permit 122.0.0.0/8
+!
+ip prefix-list R14 seq 5 permit 122.1.1.14/32
+!
+ip prefix-list SPECIFIC seq 5 permit 122.0.0.0/9 le 32
+!
+route-map UNSUPPRESS_MAP permit 10
+ match ip address prefix-list R14
+!
+route-map NO-SUMM deny 10
+ match ip address prefix-list 122-0-0-0-8
+!
+route-map NO-SUMM permit 20
+!
+route-map ONLY-SUMM deny 10
+ match ip address prefix-list SPECIFIC
+!
+route-map ONLY-SUMM permit 20
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+!
+!
+end

@@ -1,0 +1,207 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 00:34:29 UTC Mon Mar 1 1993
+!
+version 15.0
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname SW4
+!
+boot-start-marker
+boot-end-marker
+!
+!
+logging discriminator log msg-body drops VTP
+logging buffered discriminator log
+no logging console
+no logging monitor
+!
+no aaa new-model
+system mtu routing 1500
+vtp file vlan.dat
+vtp domain INE
+vtp mode transparent
+no ip domain-lookup
+!
+!
+!
+!
+!
+crypto pki trustpoint TP-self-signed-731856256
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-731856256
+ revocation-check none
+ rsakeypair TP-self-signed-731856256
+!
+!
+crypto pki certificate chain TP-self-signed-731856256
+ certificate self-signed 01
+  30820229 30820192 A0030201 02020101 300D0609 2A864886 F70D0101 05050030
+  30312E30 2C060355 04031325 494F532D 53656C66 2D536967 6E65642D 43657274
+  69666963 6174652D 37333138 35363235 36301E17 0D393330 33303130 30313030
+  315A170D 32303031 30313030 30303030 5A303031 2E302C06 03550403 1325494F
+  532D5365 6C662D53 69676E65 642D4365 72746966 69636174 652D3733 31383536
+  32353630 819F300D 06092A86 4886F70D 01010105 0003818D 00308189 02818100
+  AC08AABF 886F4B8F 735C54FF 2142FEA3 05C2C884 F4C06D5A 64BA1418 D1DE3380
+  24D5347C B4E1CA53 8DF34F8F 81F07D30 3F553738 4F4693D3 06041968 1ACAC54E
+  6E94294F 7436212F ECE6BCAE 64647C06 503827CC 2694E67D 7403D7CE 95AAECC0
+  048CF97F A2EBE2CD BE34CB7A 3C70AAB5 1ED052DA A71CC867 23DAFC54 A0003753
+  02030100 01A35330 51300F06 03551D13 0101FF04 05300301 01FF301F 0603551D
+  23041830 1680147E BFAC18F6 022A3757 2910522B AC933F07 B3B5DF30 1D060355
+  1D0E0416 04147EBF AC18F602 2A375729 10522BAC 933F07B3 B5DF300D 06092A86
+  4886F70D 01010505 00038181 003B15DB 45844658 A7A198CA 8DEFD16A 2A044198
+  49E48EDD CBBFF913 4AA80380 FC41F7DE 8FE8CB9E C9D21333 1AADE869 B2BD5789
+  C325D1D6 B50E9742 6A0C96D5 F5BCA03E 378D7DEA D89D66CE 5EA450B4 DE703179
+  6B02F109 CCB82261 558BF4D9 14A27500 84A6EDED 3957CFDA 4EBCA945 D1708CB9
+  9B8D1BF6 BD81BF23 A4D1DA73 6A
+  	quit
+!
+!
+!
+!
+!
+!
+spanning-tree mode mst
+spanning-tree extend system-id
+!
+vlan internal allocation policy ascending
+!
+vlan 227-228
+!
+vlan 999
+ name CCIE_VLAN
+!
+vlan 1623,1723
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Port-channel24
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no shutdown
+!
+interface Port-channel34
+ switchport trunk encapsulation dot1q
+ no shutdown
+!
+interface FastEthernet0/1
+ shutdown
+!
+interface FastEthernet0/2
+ shutdown
+!
+interface FastEthernet0/3
+ shutdown
+!
+interface FastEthernet0/4
+ shutdown
+!
+interface FastEthernet0/5
+ shutdown
+!
+interface FastEthernet0/6
+ shutdown
+!
+interface FastEthernet0/7
+ shutdown
+!
+interface FastEthernet0/8
+ shutdown
+!
+interface FastEthernet0/9
+ shutdown
+!
+interface FastEthernet0/10
+ shutdown
+!
+interface FastEthernet0/11
+ shutdown
+!
+interface FastEthernet0/12
+ shutdown
+!
+interface FastEthernet0/13
+ shutdown
+!
+interface FastEthernet0/14
+ shutdown
+!
+interface FastEthernet0/15
+ shutdown
+!
+interface FastEthernet0/16
+ shutdown
+!
+interface FastEthernet0/17
+ shutdown
+!
+interface FastEthernet0/18
+ shutdown
+!
+interface FastEthernet0/19
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 24 mode active
+ no shutdown
+!
+interface FastEthernet0/20
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ channel-group 24 mode active
+ no shutdown
+!
+interface FastEthernet0/21
+ no shutdown
+!
+interface FastEthernet0/22
+ no shutdown
+!
+interface FastEthernet0/23
+ switchport trunk encapsulation dot1q
+ channel-group 34 mode active
+ no shutdown
+!
+interface FastEthernet0/24
+ switchport trunk encapsulation dot1q
+ channel-group 34 mode active
+ no shutdown
+!
+interface GigabitEthernet0/1
+ no shutdown
+!
+interface GigabitEthernet0/2
+ no shutdown
+!
+interface Vlan1
+ no ip address
+ no shutdown
+!
+ip http server
+ip http secure-server
+!
+!
+!
+!
+!
+!
+line vty 0 4
+ no login
+line vty 5 15
+ login
+!
+end

@@ -1,0 +1,398 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 00:26:19 UTC Mon Mar 1 1993
+!
+version 15.0
+no service pad
+no service timestamps debug uptime
+no service timestamps log uptime
+no service password-encryption
+!
+hostname SW1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+system mtu routing 1500
+vtp file vlan.dat
+udld aggressive
+
+ip routing
+!
+!
+!
+!
+scripting tcl low-memory 7000000
+!
+!
+!
+!
+!
+!
+!
+!
+spanning-tree mode mst
+spanning-tree extend system-id
+!
+spanning-tree mst configuration
+ name SW1_SW3
+ revision 1
+ instance 21 vlan 1321, 1521
+ instance 22 vlan 1322, 1522
+!
+spanning-tree mst 0 priority 0
+spanning-tree mst 21 priority 24576
+!
+vlan internal allocation policy ascending
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description Coorporate Loopback
+ ip address 172.16.1.21 255.255.255.255
+ no shutdown
+!
+interface FastEthernet0/1
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ switchport port-security maximum 500
+ switchport port-security
+ switchport port-security aging time 5
+ switchport port-security aging type inactivity
+ switchport port-security mac-address sticky
+ switchport port-security mac-address sticky 0011.203e.b108
+ switchport port-security mac-address sticky 0011.203e.b109
+ switchport port-security mac-address sticky 0011.203e.b10a
+ switchport port-security mac-address sticky 0011.bbfa.2a0a
+ switchport port-security mac-address sticky 0050.568d.00fc
+ switchport port-security mac-address sticky 0050.568d.0773
+ switchport port-security mac-address sticky 0050.568d.0d64
+ switchport port-security mac-address sticky 0050.568d.0d6c
+ switchport port-security mac-address sticky 0050.568d.0ee2
+ switchport port-security mac-address sticky 0050.568d.11c0
+ switchport port-security mac-address sticky 0050.568d.11e4
+ switchport port-security mac-address sticky 0050.568d.1331
+ switchport port-security mac-address sticky 0050.568d.1c98
+ switchport port-security mac-address sticky 0050.568d.1dc5
+ switchport port-security mac-address sticky 0050.568d.23cd
+ switchport port-security mac-address sticky 0050.568d.25db
+ switchport port-security mac-address sticky 0050.568d.2e2e
+ switchport port-security mac-address sticky 0050.568d.31d7
+ switchport port-security mac-address sticky 0050.568d.3449
+ switchport port-security mac-address sticky 0050.568d.34c8
+ switchport port-security mac-address sticky 0050.568d.3922
+ switchport port-security mac-address sticky 0050.568d.3f08
+ switchport port-security mac-address sticky 0050.568d.418a
+ switchport port-security mac-address sticky 0050.568d.4422
+ switchport port-security mac-address sticky 0050.568d.467d
+ switchport port-security mac-address sticky 0050.568d.471d
+ switchport port-security mac-address sticky 0050.568d.4c2b
+ switchport port-security mac-address sticky 0050.568d.56c8
+ switchport port-security mac-address sticky 0050.568d.5893
+ switchport port-security mac-address sticky 0050.568d.5bb3
+ switchport port-security mac-address sticky 0050.568d.5df7
+ switchport port-security mac-address sticky 0050.568d.5f75
+ switchport port-security mac-address sticky 0050.568d.60b6
+ switchport port-security mac-address sticky 0050.568d.6928
+ switchport port-security mac-address sticky 0050.568d.6ab7
+ switchport port-security mac-address sticky 0050.568d.6b6f
+ switchport port-security mac-address sticky 0050.568d.6ce0
+ switchport port-security mac-address sticky 0050.568d.6db5
+ switchport port-security mac-address sticky 0050.568d.6deb
+ switchport port-security mac-address sticky 0050.568d.709b
+ switchport port-security mac-address sticky 0050.568d.7309
+ switchport port-security mac-address sticky 0050.568d.7952
+ switchport port-security mac-address sticky 0050.568d.79d3
+ switchport port-security mac-address sticky 0050.568d.7c34
+ switchport port-security mac-address sticky 0050.56af.00db
+ switchport port-security mac-address sticky 0050.56af.012c
+ switchport port-security mac-address sticky 0050.56af.0134
+ switchport port-security mac-address sticky 0050.56af.01bf
+ switchport port-security mac-address sticky 0050.56af.0275
+ switchport port-security mac-address sticky 0050.56af.0743
+ switchport port-security mac-address sticky 0050.56af.07be
+ switchport port-security mac-address sticky 0050.56af.0909
+ switchport port-security mac-address sticky 0050.56af.0981
+ switchport port-security mac-address sticky 0050.56af.09e4
+ switchport port-security mac-address sticky 0050.56af.0a58
+ switchport port-security mac-address sticky 0050.56af.0c54
+ switchport port-security mac-address sticky 0050.56af.0c5b
+ switchport port-security mac-address sticky 0050.56af.0cd8
+ switchport port-security mac-address sticky 0050.56af.0cff
+ switchport port-security mac-address sticky 0050.56af.0db7
+ switchport port-security mac-address sticky 0050.56af.1023
+ switchport port-security mac-address sticky 0050.56af.106c
+ switchport port-security mac-address sticky 0050.56af.1082
+ switchport port-security mac-address sticky 0050.56af.121b
+ switchport port-security mac-address sticky 0050.56af.1305
+ switchport port-security mac-address sticky 0050.56af.157c
+ switchport port-security mac-address sticky 0050.56af.15ed
+ switchport port-security mac-address sticky 0050.56af.167e
+ switchport port-security mac-address sticky 0050.56af.16ff
+ switchport port-security mac-address sticky 0050.56af.189a
+ switchport port-security mac-address sticky 0050.56af.1acc
+ switchport port-security mac-address sticky 0050.56af.1b70
+ switchport port-security mac-address sticky 0050.56af.1d8a
+ switchport port-security mac-address sticky 0050.56af.1e55
+ switchport port-security mac-address sticky 0050.56af.1e9d
+ switchport port-security mac-address sticky 0050.56af.1eaf
+ switchport port-security mac-address sticky 0050.56af.1f85
+ switchport port-security mac-address sticky 0050.56af.2194
+ switchport port-security mac-address sticky 0050.56af.21fc
+ switchport port-security mac-address sticky 0050.56af.224f
+ switchport port-security mac-address sticky 0050.56af.23d3
+ switchport port-security mac-address sticky 0050.56af.23fa
+ switchport port-security mac-address sticky 0050.56af.2515
+ switchport port-security mac-address sticky 0050.56af.25a5
+ switchport port-security mac-address sticky 0050.56af.2679
+ switchport port-security mac-address sticky 0050.56af.269f
+ switchport port-security mac-address sticky 0050.56af.27a4
+ switchport port-security mac-address sticky 0050.56af.2850
+ switchport port-security mac-address sticky 0050.56af.2867
+ switchport port-security mac-address sticky 0050.56af.2c06
+ switchport port-security mac-address sticky 0050.56af.2c09
+ switchport port-security mac-address sticky 0050.56af.2c72
+ switchport port-security mac-address sticky 0050.56af.2d01
+ switchport port-security mac-address sticky 0050.56af.2e6f
+ switchport port-security mac-address sticky 0050.56af.2f3d
+ switchport port-security mac-address sticky 0050.56af.2f5b
+ switchport port-security mac-address sticky 0050.56af.315d
+ switchport port-security mac-address sticky 0050.56af.3205
+ switchport port-security mac-address sticky 0050.56af.3230
+ switchport port-security mac-address sticky 0050.56af.331e
+ switchport port-security mac-address sticky 0050.56af.3352
+ switchport port-security mac-address sticky 0050.56af.3486
+ switchport port-security mac-address sticky 0050.56af.352d
+ switchport port-security mac-address sticky 0050.56af.3532
+ switchport port-security mac-address sticky 0050.56af.3548
+ switchport port-security mac-address sticky 0050.56af.358c
+ switchport port-security mac-address sticky 0050.56af.36d4
+ switchport port-security mac-address sticky 0050.56af.3757
+ switchport port-security mac-address sticky 0050.56af.3836
+ switchport port-security mac-address sticky 0050.56af.3a4e
+ switchport port-security mac-address sticky 0050.56af.3cf9
+ switchport port-security mac-address sticky 0050.56af.3d5f
+ switchport port-security mac-address sticky 0050.56af.3d94
+ switchport port-security mac-address sticky 0050.56af.3e04
+ switchport port-security mac-address sticky 0050.56af.409e
+ switchport port-security mac-address sticky 0050.56af.412e
+ switchport port-security mac-address sticky 0050.56af.4167
+ switchport port-security mac-address sticky 0050.56af.431b
+ switchport port-security mac-address sticky 0050.56af.4510
+ switchport port-security mac-address sticky 0050.56af.451a
+ switchport port-security mac-address sticky 0050.56af.4584
+ switchport port-security mac-address sticky 0050.56af.458d
+ switchport port-security mac-address sticky 0050.56af.4730
+ switchport port-security mac-address sticky 0050.56af.4779
+ switchport port-security mac-address sticky 0050.56af.4840
+ switchport port-security mac-address sticky 0050.56af.4876
+ switchport port-security mac-address sticky 0050.56af.491e
+ switchport port-security mac-address sticky 0050.56af.4c5b
+ switchport port-security mac-address sticky 0050.56af.4e31
+ switchport port-security mac-address sticky 0050.56af.4e39
+ switchport port-security mac-address sticky 0050.56af.4eb2
+ switchport port-security mac-address sticky 0050.56af.503e
+ switchport port-security mac-address sticky 0050.56af.5071
+ switchport port-security mac-address sticky 0050.56af.5144
+ switchport port-security mac-address sticky 0050.56af.51dd
+ switchport port-security mac-address sticky 0050.56af.53c7
+ switchport port-security mac-address sticky 0050.56af.5549
+ switchport port-security mac-address sticky 0050.56af.5601
+ switchport port-security mac-address sticky 0050.56af.5795
+ switchport port-security mac-address sticky 0050.56af.5899
+ switchport port-security mac-address sticky 0050.56af.58a1
+ switchport port-security mac-address sticky 0050.56af.5983
+ switchport port-security mac-address sticky 0050.56af.59b1
+ switchport port-security mac-address sticky 0050.56af.59bc
+ switchport port-security mac-address sticky 0050.56af.5a0f
+ switchport port-security mac-address sticky 0050.56af.5a1b
+ switchport port-security mac-address sticky 0050.56af.5f76
+ switchport port-security mac-address sticky 0050.56af.6086
+ switchport port-security mac-address sticky 0050.56af.62af
+ switchport port-security mac-address sticky 0050.56af.6316
+ switchport port-security mac-address sticky 0050.56af.6479
+ switchport port-security mac-address sticky 0050.56af.668a
+ switchport port-security mac-address sticky 0050.56af.669b
+ switchport port-security mac-address sticky 0050.56af.66ac
+ switchport port-security mac-address sticky 0050.56af.66ed
+ switchport port-security mac-address sticky 0050.56af.6ad8
+ switchport port-security mac-address sticky 0050.56af.6b39
+ switchport port-security mac-address sticky 0050.56af.6b5d
+ switchport port-security mac-address sticky 0050.56af.6e9a
+ switchport port-security mac-address sticky 0050.56af.6f1f
+ switchport port-security mac-address sticky 0050.56af.6f38
+ switchport port-security mac-address sticky 0050.56af.70a6
+ switchport port-security mac-address sticky 0050.56af.70fe
+ switchport port-security mac-address sticky 0050.56af.72ee
+ switchport port-security mac-address sticky 0050.56af.76bb
+ switchport port-security mac-address sticky 0050.56af.788a
+ switchport port-security mac-address sticky 0050.56af.79a5
+ switchport port-security mac-address sticky 0050.56af.7b6b
+ switchport port-security mac-address sticky 0050.56af.7c3d
+ switchport port-security mac-address sticky 0050.56af.7d4b
+ switchport port-security mac-address sticky 0050.56af.7da3
+ switchport port-security mac-address sticky 0050.56af.7f12
+ switchport port-security mac-address sticky 0050.56af.7ff9
+ switchport port-security mac-address sticky 0050.568d.3449 vlan 678
+ switchport port-security mac-address sticky 0050.568d.5893 vlan 678
+ switchport port-security mac-address sticky 0050.568d.6ab7 vlan 678
+ switchport port-security mac-address sticky 0050.56af.1b70 vlan 678
+ switchport port-security mac-address sticky 0050.56af.23fa vlan 678
+ switchport port-security mac-address sticky 0050.56af.352d vlan 678
+ switchport port-security mac-address sticky 0050.56af.3cf9 vlan 678
+ switchport port-security mac-address sticky 0050.56af.451a vlan 678
+ switchport port-security mac-address sticky 0050.56af.7f12 vlan 678
+ switchport port-security mac-address sticky 0050.568d.11c0 vlan 1321
+ switchport port-security mac-address sticky 0050.56af.358c vlan 1321
+ switchport port-security mac-address sticky 0050.56af.51dd vlan 1321
+ switchport port-security mac-address sticky 0050.568d.11c0 vlan 1322
+ switchport port-security mac-address sticky 0050.56af.358c vlan 1322
+ switchport port-security mac-address sticky 0050.56af.51dd vlan 1322
+ switchport port-security mac-address sticky 0050.568d.709b vlan 1521
+ switchport port-security mac-address sticky 0050.56af.1d8a vlan 1521
+ switchport port-security mac-address sticky 0050.56af.3d5f vlan 1521
+ switchport port-security mac-address sticky 0050.568d.709b vlan 1522
+ switchport port-security mac-address sticky 0050.56af.1d8a vlan 1522
+ switchport port-security mac-address sticky 0050.56af.3d5f vlan 1522
+ udld port aggressive
+ no shutdown
+!
+interface FastEthernet0/2
+ no shutdown
+!
+interface FastEthernet0/3
+ no shutdown
+!
+interface FastEthernet0/4
+ no shutdown
+!
+interface FastEthernet0/5
+ no shutdown
+!
+interface FastEthernet0/6
+ no shutdown
+!
+interface FastEthernet0/7
+ no shutdown
+!
+interface FastEthernet0/8
+ no shutdown
+!
+interface FastEthernet0/9
+ no shutdown
+!
+interface FastEthernet0/10
+ no shutdown
+!
+interface FastEthernet0/11
+ no shutdown
+!
+interface FastEthernet0/12
+ no shutdown
+!
+interface FastEthernet0/13
+ no shutdown
+!
+interface FastEthernet0/14
+ no shutdown
+!
+interface FastEthernet0/15
+ no shutdown
+!
+interface FastEthernet0/16
+ no shutdown
+!
+interface FastEthernet0/17
+ no shutdown
+!
+interface FastEthernet0/18
+ no shutdown
+!
+interface FastEthernet0/19
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no shutdown
+!
+interface FastEthernet0/20
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no shutdown
+!
+interface FastEthernet0/21
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no shutdown
+!
+interface FastEthernet0/22
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no shutdown
+!
+interface FastEthernet0/23
+ shutdown
+!
+interface FastEthernet0/24
+ shutdown
+!
+interface GigabitEthernet0/1
+ no shutdown
+!
+interface GigabitEthernet0/2
+ no shutdown
+!
+interface Vlan1
+ no ip address
+ no shutdown
+!
+interface Vlan1321
+ ip address 180.10.213.21 255.255.255.192
+ no shutdown
+!
+interface Vlan1521
+ ip address 180.10.215.21 255.255.255.192
+ no shutdown
+!
+!
+router eigrp CCIE
+ !
+ address-family ipv4 unicast autonomous-system 56
+  !
+  topology base
+   redistribute connected route-map RED-CONN
+  exit-af-topology
+  network 180.10.0.0
+  eigrp router-id 172.16.1.21
+ exit-address-family
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+route-map RED-CONN permit 10
+ match interface Loopback0
+!
+!
+!
+!
+line vty 0 4
+ login
+line vty 5 15
+ login
+!
+end

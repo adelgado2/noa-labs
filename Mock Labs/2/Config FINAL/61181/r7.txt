@@ -1,0 +1,236 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 07:38:33 UTC Wed Jun 21 2017
+!
+version 15.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname R7
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition FVRF
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+vrf definition MGMT_DO_NOT_CHANGE
+ !
+ address-family ipv4
+ exit-address-family
+!
+enable secret 5 $1$5mON$mj0bYA.KQnwtNeebPDUAb0
+!
+no aaa new-model
+!
+!
+!
+!
+!
+!
+!
+!
+!
+
+
+ip multicast-routing distributed
+no ip domain lookup
+
+!
+!
+!
+ipv6 unicast-routing
+!
+!
+!
+!
+!
+!
+!
+subscriber templating
+!
+multilink bundle-name authenticated
+!
+!
+!
+spanning-tree extend system-id
+!
+!
+redundancy
+ mode none
+!
+!
+!
+!
+!
+!
+!
+crypto keyring KEY vrf FVRF
+  pre-shared-key address 0.0.0.0 0.0.0.0 key SK_HU
+!
+!
+!
+!
+!
+crypto isakmp policy 10
+ encr aes
+ authentication pre-share
+ group 14
+!
+!
+crypto ipsec transform-set 3DES-SHA esp-3des esp-sha-hmac
+ mode transport
+!
+crypto ipsec profile DMVPN-PROFILE
+ set transform-set 3DES-SHA
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ description Coorporate Loopback
+ ip address 172.16.1.7 255.255.255.255
+ ipv6 address 2001:172:16:1::7/128
+ no shutdown
+!
+interface Tunnel0
+ ip address 180.10.254.7 255.255.255.0
+ no ip redirects
+ ip mtu 1300
+ ip nhrp authentication NHRP_
+ ip nhrp network-id 10
+ ip nhrp holdtime 60
+ ip nhrp nhs 180.10.254.1 nbma 44.2.5.1 multicast
+ ip nhrp nhs 180.10.254.2 nbma 44.2.5.3 multicast
+ ip nhrp shortcut
+ ip tcp adjust-mss 1260
+ tunnel source GigabitEthernet1.710
+ tunnel mode gre multipoint
+ tunnel key 10
+ tunnel vrf FVRF
+ tunnel protection ipsec profile DMVPN-PROFILE
+ no shutdown
+!
+interface GigabitEthernet1
+ no ip address
+ negotiation auto
+ no shutdown
+!
+interface GigabitEthernet1.678
+ encapsulation dot1Q 678
+ ip address 180.10.123.7 255.255.255.128
+ ipv6 address 2001:180:10:123::7/65
+ no shutdown
+!
+interface GigabitEthernet1.710
+ encapsulation dot1Q 710
+ vrf forwarding FVRF
+ ip address 44.2.5.7 255.255.255.254
+ ipv6 address 2001:44:2:5::7/127
+ no shutdown
+!
+interface GigabitEthernet1.714
+ encapsulation dot1Q 714
+ ip address 180.10.147.0 255.255.255.254
+ ipv6 address 2001:180:10:147::/127
+ no shutdown
+!
+interface GigabitEthernet2
+ no ip address
+ negotiation auto
+ shutdown
+!
+interface GigabitEthernet3
+ no ip address
+ negotiation auto
+ shutdown
+!
+!
+!
+router eigrp LONDON
+ !
+ address-family ipv4 unicast autonomous-system 56
+  !
+  af-interface GigabitEthernet1.714
+   passive-interface
+  exit-af-interface
+  !
+  topology base
+   redistribute bgp 65004 metric 10000 1000 1 255 1500 route-map RED-BGP-TO-EIGRP
+  exit-af-topology
+  network 172.16.1.7 0.0.0.0
+  network 180.10.0.0
+  eigrp router-id 172.16.1.7
+ exit-address-family
+!
+router bgp 65004
+ bgp router-id 172.16.1.7
+ bgp log-neighbor-changes
+ no bgp default ipv4-unicast
+ neighbor 180.10.147.1 remote-as 65001
+ !
+ address-family ipv4
+  redistribute eigrp 56 route-map RED-EIGRP-TO-BGP
+  neighbor 180.10.147.1 activate
+  neighbor 180.10.147.1 send-community both
+  neighbor 180.10.147.1 advertisement-interval 0
+ exit-address-family
+!
+!
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+ip route vrf FVRF 0.0.0.0 0.0.0.0 44.2.5.6 205
+!
+!
+route-map RED-BGP-TO-EIGRP permit 10
+ set tag 7
+!
+route-map RED-EIGRP-TO-BGP deny 10
+ match tag 6
+!
+route-map RED-EIGRP-TO-BGP permit 20
+!
+!
+!
+control-plane
+!
+!
+line con 0
+ exec-timeout 0 0
+ logging synchronous
+ stopbits 1
+line vty 0
+ privilege level 15
+ no login
+line vty 1
+ no login
+ length 0
+line vty 2 4
+ privilege level 15
+ no login
+line vty 5 10
+ privilege level 15
+ logging synchronous
+ no login
+ rotary 1
+line vty 11 98
+ login
+!
+!
+end

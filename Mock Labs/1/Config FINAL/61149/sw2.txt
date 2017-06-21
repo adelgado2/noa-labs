@@ -1,0 +1,201 @@
+! Copyright (C) 2017 INE, Inc. -- All rights reserved
+!
+! Last configuration change at 01:36:18 UTC Mon Mar 1 1993
+!
+version 15.0
+no service pad
+no service timestamps debug uptime
+no service timestamps log uptime
+no service password-encryption
+!
+hostname SW2
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+system mtu routing 1500
+vtp file vlan.dat
+ip routing
+no ip domain-lookup
+!
+!
+!
+ip multicast-routing distributed
+!
+!
+!
+!
+!
+!
+!
+!
+!
+spanning-tree mode rapid-pvst
+spanning-tree extend system-id
+!
+spanning-tree mst configuration
+ name SW2_SW4
+ revision 1
+ instance 21 vlan 1322, 1522
+ instance 22 vlan 1321, 1521
+!
+!
+vlan internal allocation policy ascending
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 122.1.1.22 255.255.255.255
+ ip pim sparse-mode
+ ip igmp join-group 239.1.1.22
+ ip ospf 3 area 40
+ no shutdown
+!
+interface FastEthernet0/1
+ no shutdown
+!
+interface FastEthernet0/2
+ no shutdown
+!
+interface FastEthernet0/3
+ no shutdown
+!
+interface FastEthernet0/4
+ no shutdown
+!
+interface FastEthernet0/5
+ no shutdown
+!
+interface FastEthernet0/6
+ no shutdown
+!
+interface FastEthernet0/7
+ no shutdown
+!
+interface FastEthernet0/8
+ no shutdown
+!
+interface FastEthernet0/9
+ no shutdown
+!
+interface FastEthernet0/10
+ no shutdown
+!
+interface FastEthernet0/11
+ no shutdown
+!
+interface FastEthernet0/12
+ no shutdown
+!
+interface FastEthernet0/13
+ no shutdown
+!
+interface FastEthernet0/14
+ no shutdown
+!
+interface FastEthernet0/15
+ no shutdown
+!
+interface FastEthernet0/16
+ no shutdown
+!
+interface FastEthernet0/17
+ no shutdown
+!
+interface FastEthernet0/18
+ no shutdown
+!
+interface FastEthernet0/19
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no shutdown
+!
+interface FastEthernet0/20
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no shutdown
+!
+interface FastEthernet0/21
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no shutdown
+!
+interface FastEthernet0/22
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no shutdown
+!
+interface FastEthernet0/23
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no shutdown
+!
+interface FastEthernet0/24
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no shutdown
+!
+interface GigabitEthernet0/1
+ no shutdown
+!
+interface GigabitEthernet0/2
+ no shutdown
+!
+interface Vlan1
+ no ip address
+ no shutdown
+!
+interface Vlan1064
+ ip address 172.23.221.22 255.255.255.0
+ ip pim sparse-mode
+ ip ospf 3 area 40
+ no shutdown
+!
+interface Vlan1722
+ ip address 172.23.227.22 255.255.255.0
+ ip pim sparse-mode
+ ip ospf 3 area 40
+ no shutdown
+!
+interface Vlan1922
+ ip address 172.23.229.22 255.255.255.0
+ ip pim sparse-mode
+ ip ospf 3 area 40
+ no shutdown
+!
+router ospf 3
+ router-id 122.1.1.22
+ max-metric router-lsa
+!
+no ip http server
+no ip http secure-server
+!
+!
+ip pim rp-address 122.1.1.17
+ip pim spt-threshold infinity
+ip mroute 122.1.1.17 255.255.255.255 172.23.227.17
+!
+!
+!
+!
+line vty 0 4
+ login
+line vty 5 15
+ no login
+!
+end
