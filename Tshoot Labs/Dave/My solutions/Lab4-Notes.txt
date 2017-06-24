@@ -1,0 +1,262 @@
+sh run | i access|nat|filter|kron|manager|policy|police|control
+
+***************************
+Ticket 1
+***************************
+
+From the topology:
+
+R5:
+
+!
+control-plane transit
+ service-policy input default
+!
+
+Del ticket:
+
+sh ip pim int
+sh ip pim neigh
+sh ip pim rp mapping
+sh ip mroute
+
+sh ip igmp group
+
+R16:
+
+!
+ip msdp peer 10.1.116.1
+!
+
+R5: (no se simula bien este trozo)
+
+R5(config)#ip access-list extended default
+R5(config-ext-nacl)#no 30
+
+***************************
+Ticket 2
+***************************
+
+From the topology:
+
+R13:
+
+!
+int Serial1/1
+ ip address 10.1.123.13 255.255.255.0
+!  
+
+R12:
+
+!
+int Se1/1
+ ip address 10.1.123.12 255.255.255.0
+!
+
+SW1(config)#line vty 0 4 
+SW1(config-line)#transport input telnet
+
+R22:
+
+R22(config)#router bgp 10
+R22(config-router)#address-family ipv4 vrf A
+R22(config-router-af)#redistribute connected
+
+R22(config)#no mpls ip propagate-ttl forwarded 
+
+***************************
+Ticket 3
+***************************
+
+From the topology:
+
+R18:
+
+
+R18(config)#int tunnel 0
+R18(config-if)#tunnel source Se1/0
+
+!
+int Se1/0
+ ip address 204.186.88.18 255.255.255.0
+ encapsulation ppp
+!
+
+R28:
+
+!
+int Se1/0
+ ip address 204.186.88.28 255.255.255.0
+ encapsulation ppp
+!
+int Se1/1
+ ip address 204.186.89.28 255.255.255.0
+!
+
+R19:
+
+R19(config)#int tu0
+R19(config-if)#tunnel source Se1/1
+
+!
+int Se1/1
+ ip address 204.186.89.19 255.255.255.0
+!
+
+Del ticket:
+
+R18:
+
+R18(config)#int tu0
+R18(config-if)#ip ospf network point-to-multipoint non-broadcast 
+
+R28:
+
+R28(config)#int tu0
+R28(config-if)#ip ospf network point-to-multipoint non-broadcast 
+
+R28(config)#router ospf 65100
+R28(config-router)#neighbor 172.17.2.18
+
+R19:
+
+R28(config)#int tu0
+R28(config-if)#ip ospf network point-to-multipoint non-broadcast 
+
+R28(config)#router ospf 65100
+R28(config-router)#neighbor 172.17.2.18
+
+Otra forma en video. Aunque routers se quejen de los neighbor statements incompatibles, se come los comandos cambiando a multicast aunque dejes lo de 'neighbor blah' y funciona.
+
+***************************
+Ticket 4
+***************************
+
+From the topology:
+
+SW4:
+
+!
+int e0/1
+ no shut
+!
+
+Del ticket:
+
+SW1:
+
+SW1(config)#router bgp 65179
+SW1(config-router)#  network 192.168.179.40 mask 255.255.255.248
+
+SW2:
+
+!
+router bgp 65179
+ no aggregate-address 192.168.179.0 255.255.255.192 summary-only
+ aggregate-address 192.168.179.0 255.255.255.192 
+!
+
+La primera parte de este ticket se puede hacer de otra forma, cambiando la AD de la static route que apunta a NULL0.
+
+R11:
+
+no ip nat outside source static tcp 192.168.179.41 23 192.168.179.42 23 extendable
+no ip nat outside source static tcp 192.168.179.42 23 192.168.179.41 23 extendable
+
+ip nat outside source static tcp 192.168.179.41 23 192.168.179.41 23 extendable
+ip nat outside source static tcp 192.168.179.42 23 192.168.179.42 23 extendable
+
+***************************
+Ticket 5
+***************************
+
+In this topology the metric, delay and bw differs in one 0 more, asumible.
+
+Hay un problema de nivel 2 que no se ha podido simular.
+
+R7:
+
+!
+router eigrp 179
+ variance 2
+!
+int e0/1
+ delay 1400
+!
+
+***************************
+Ticket 6
+***************************
+
+No se puede simular, ver video.
+
+***************************
+Ticket 7
+***************************
+
+R18:
+
+R18(config)#service dhcp
+
+***************************
+Ticket 8
+***************************
+
+R24:
+
+R24(config)#router bgp 10
+R24(config-router)#address-family ipv4 vrf A
+R24(config-router)#network 10.12.24.0 mask 255.255.255.0
+
+R24(config)#ip access-list standard  51
+R24(config-std-nacl)#50 permit 10.12.24.0 0.0.0.255
+
+
+***************************
+Ticket 9
+***************************
+
+R14:
+
+
+R14(config)#ip prefix-list default seq 2 permit 172.16.13.0/25
+R14(config)#no ip prefix-list default  seq 5 permit 172.16.13.0/24  
+
+***************************
+Ticket 10
+***************************
+
+From the topology:
+
+R9(config)#line vty 0 4 
+R9(config-line)#transport input telnet
+
+Del ticket:
+
+SW1:
+
+route-map RED-CONN permit 10
+ match interface e0/1
+!
+router eigrp 179
+ redistribute connected route-map RED-CONN
+!
+
+sh run | i access|nat|filter|police|policy|kron|manager|control
+
+R10:
+
+!
+policy-map LIMIT
+ class TELNET
+  police cir 768000
+   no conform-action drop
+!
+
+
+
+
+
+
+
+

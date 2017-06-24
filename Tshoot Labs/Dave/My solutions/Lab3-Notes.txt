@@ -1,0 +1,225 @@
+
+sh run | i access|nat|filter|kron|manager|policy|police|control
+
+***************************
+Ticket 1
+***************************
+
+From the topology:
+
+R12:
+
+!
+int Se1/1
+ ip address 10.1.123.12 255.255.255.0
+!
+
+R13:
+
+!
+int Se1/1
+ ip address 10.1.123.13 255.255.255.0
+!
+
+Del ticket:
+
+Primera parte era L2 que no se ha podido simular.
+Video 2 muy bueno para MST!
+
+R14:
+
+!
+router bgp 65111
+ network 10.1.143.0 mask 255.255.255.254
+!
+
+***************************
+Ticket 2
+***************************
+
+From the topology:
+
+R17(config)#line vty 0 4 
+R17(config-line)#transport input telnet
+
+Del ticket:
+
+Habia una cosa de L2 tb. no simulada.
+
+R16:
+
+!
+ip local pool default 172.16.101.17
+!
+
+***************************
+Ticket 3
+***************************
+
+From the topology:
+
+R17:
+
+!
+tftp-server flash:c1841-advernterprisek9-mz.124-15.T17.bin
+!
+
+Del ticket:
+
+R1:
+
+R1(config)#policy-map system
+R1(config-pmap)#class default
+R1(config-pmap-c)#no drop
+
+***************************
+Ticket 4
+***************************
+
+R21:
+
+!
+interface Loopback0
+ ip address 21.21.21.21 255.255.255.255
+ ip ospf 10 area 0
+!
+
+***************************
+Ticket 5
+***************************
+
+Hay un problema de L2 no simulado.
+
+R15:
+
+R15(config)#router bgp 65111
+R15(config-router)#neighbor 172.16.100.14 next-hop-self 
+
+***************************
+Ticket 6
+***************************
+
+Hay un problema de L2 no simulado.
+
+R7:
+
+R7(config)#router eigrp 179
+R7(config-router)#router-id 192.168.179.7
+
+O lo cambias en el otro router.
+
+***************************
+Ticket 7
+***************************
+
+From the topology:
+
+R18:
+
+!
+int Se1/0
+ ip address 204.186.88.18 255.255.255.0
+!
+
+R19:
+
+!
+int Se1/1
+ ip address 204.186.89.19 255.255.255.0
+ tunnel source Se1/1
+!
+
+R28:
+
+R28(config)#int se1/0
+R28(config-if)#ip address 204.186.88.28 255.255.255.0
+R28(config-if)#int se1/1
+R28(config-if)# ip address 204.186.89.28 255.255.255.0 
+
+Lo siguiente es de otro ticket seguro xD:
+(exacto, es del ticket 10, eso que gano)
+
+R19:
+
+!
+int tu0
+ tunnel protection ipsec profile IPSEC_DMVPN
+!
+
+Del ticket ya:
+
+R17:
+
+R17(config)#router bgp 65222
+R17(config-router)#network 172.16.101.17 mask 255.255.255.255
+R17(config-router)#no network 172.16.101.0 mask 255.255.255.224
+
+Hay otra forma sin tocar BGP explicado en video, para que se anuncie la red que hay en BGP con la mascara. Lo explica por si con las restricciones hubiera que hacerlo, involucra dhcp y ppp. Mi forma tal y como esta el ticket vale.
+
+R27:
+
+R27(config)#int e0/0
+R27(config-if)#ip ospf network point-to-multipoint non-broadcast 
+R27(config-if)#router ospf 65100
+R27(config-router)#neighbor 172.17.3.28 cost 10
+
+R20:
+
+R20(config)#int e0/0
+R20(config-if)#ip ospf network point-to-multipoint non-broadcast 
+R20(config-if)#router ospf 65100
+R20(config-router)#neighbor 172.17.3.28 cost 10
+
+R28:
+
+R28(config)#int e0/0
+R28(config-if)#ip ospf network point-to-multipoint non-broadcast 
+
+R28(config-if)#router ospf 65100
+R28(config-router)#neighbor 172.17.3.27 cost 10
+R28(config-router)#neighbor 172.17.3.20 cost 10
+
+***************************
+Ticket 8
+***************************
+
+R7:
+
+R7(config)#ip sla schedule 1 start-time now life 4000
+
+R10:
+
+!
+ip sla responder
+!
+
+***************************
+Ticket 9
+***************************
+
+R17:
+
+R17(config)#policy-map 1285
+R17(config-pmap-c)#police 8000 conform-action transmit exceed-action transmit
+
+***************************
+Ticket 10
+***************************
+
+R19:
+
+!
+int tu0
+ tunnel protection ipsec profile IPSEC_DMVPN
+!
+
+Tb. hay service policy aplicada en el tunel, pero por algun motivo eve no lo coge y no lo hemos podido simular.
+
+
+
+
+
+
+
+
+

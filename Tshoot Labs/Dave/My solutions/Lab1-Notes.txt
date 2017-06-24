@@ -2,6 +2,8 @@
 Ticket 1
 ***************************
 
+Esto es problema topología:
+
 R18:
 
 !
@@ -43,7 +45,7 @@ router ospf 10 vrf B
  capability vrf-lite
 !
 
-Hasta aquí es problema topología, no del ticket.
+A partir de aquí del ticket.
  
 R23:
  
@@ -229,20 +231,25 @@ line vty 0 4
  transport input telnet
 !
 
-Esto ya del ticket:
-R26:
+R21:
 
 !
 int e0/0
- ip ospf cost 12
+ no mpls ip
 !
 
-R23:
+Esto ya del ticket:
+
+R26:
 
 !
-int e0/1
- ip ospf cost 12
+router bpg 10 
+ address-family ipv4 vrf A
+  neighbor 10.2.0.129 route-map AS-PREPEND out
+  neighbor 10.2.0.129 route-map AS-PREPEND in   
 !
+
+La segunda línea es para el tráfico de vuelta de R23 a R17.
 
 ***************************
 Ticket 8

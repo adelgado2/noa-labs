@@ -1,0 +1,370 @@
+GENERICO PARA TSHOOT:
+
+sh run | s access|policy|police|control|nat|filter|kron|manager
+
+(Access engloba access-list, access-group, vlan access-map
+
+***************************
+Ticket 1
+***************************
+
+De la topología:
+Esto es para conseguir que output inicial ticket en R7 coincida con el lab, que está basado en rack.
+
+Rack1SW2:
+
+!
+int e0/1
+ bandwidth 100000
+ delay 1
+!
+
+Rack1R10, Rack1R8, Rack1R9, Rack1R7:
+
+!
+int e0/0
+ bandwidth 100000
+ delay 10
+!
+int e0/1
+ bandwidth 100000
+ delay 10
+!
+
+Del ticket:
+
+R7:
+
+!
+interface Ethernet0/0
+ delay 206
+!
+
+Aunque no machee el delay exacto (se va 5 us) no pasa nada porque te pide el enunciado que machees el traffic share count, no el output entero!!!
+
+***************************
+Ticket 2
+***************************
+
+Chequear: http://www.cisco.com/c/en/us/support/docs/ip/enhanced-interior-gateway-routing-protocol-eigrp/8606-redist.html
+
+De la topología:
+R7:
+
+!
+line vty 0 4 
+ transport input telnet
+!
+
+sh run | sec access|control|filter|group|police|policy|nat
+
+R11:
+
+!
+router bgp 65179
+ network 11.11.11.11 mask 255.255.255.255
+!
+
+***************************
+Ticket 3
+***************************
+
+---------------------------
+R4:
+
+!
+int e0/1
+ ip pim sparse-mode
+!
+
+R5:
+
+!
+int e0/1
+ ip ospf cost 12
+!
+
+Esto arregla este Ticket haciendo R4 un RP, pero luego viola restricción ticket 5!
+Hay que buscar otra solución.
+---------------------------
+
+Primera forma:
+
+R5:
+
+!
+int e0/0
+ ip pim dr-priority 2
+!
+
+Además he cambiado el 'ip igmp join-group 227.7.7.7' en R2 de la loopback a la interfaz e0/0,
+me parece que es tema del EVE que se raya con el igmp en la loopback. Así sí que va como en vídeo.
+
+Segunda forma:
+
+R3:
+
+!
+ip pim send-rp-discovery lo0 scope 3
+!
+
+Lo que buscamos es conseguir que R6 aprenda un RP porque no le llegan los mensajes de R1 por el scope, y lo tiene puesto estático, y no lo podemos tocar. Así que hacemos que todos los mensajes de RP desde R3 lleguen a nuestra red para cumplir las restricciones et voilá. También funciona sin cambiar el DR de la primera forma.
+
+***************************
+Ticket 4
+***************************
+
+R26:
+
+!
+router bgp 10
+ bgp always-compare-med
+! 
+
+***************************
+Ticket 5
+***************************
+
+R4:
+
+!
+router bgp 65123
+ address-family ipv4 multicast
+  neighbor 10.1.1.2 activate
+!
+
+R2:
+
+!
+route-map NH-TO-R4 permit 10
+ set ip next-hop 172.16.123.5
+!
+router bgp 65123
+ address-family ipv4 multicast
+  network 10.1.1.1 mask 255.255.255.255
+  neighbor 10.1.1.4 activate
+  neighbor 10.1.1.4 route-reflector-client
+  neighbor 10.1.1.4 route-map NH-TO-R4 out
+!
+
+OJO en EVE hay que forzar el cambio de distancia administrativa, no lo coge solo como en equipos reales del video:
+
+Rack1R4(config)#router bgp 65123
+Rack1R4(config-router)#address-family ipv4 multicast 
+Rack1R4(config-router-af)#distance bgp 20 105 1
+
+
+***************************
+Ticket 6
+***************************
+
+De la topología:
+
+R13:
+
+!
+interface Loopback1
+ no ip address
+ ip address 3.3.3.3 255.255.255.255
+!
+line vty 0 4 
+ transport input telnet
+!
+
+Del ticket:
+
+sh run | i access|filter|nat|police|policy|control
+
+R13:
+
+Rack1R13(config)#ip access-list extended default
+Rack1R13(config-ext-nacl)#5 deny ip host 172.16.100.15 host 3.3.3.3
+
+***************************
+Ticket 7
+***************************
+
+De la topología:
+
+R18:
+
+!
+int se1/0
+ encapsulation ppp
+!
+
+R19:
+
+!
+int Se1/1 
+ ip address 204.186.88.19 255.255.255.0
+!
+int tu0
+ tunnel source Se1/1
+ ip ospf network point-to-multipoint
+!
+
+R28:
+
+!
+int Se1/0
+ ip address 204.186.88.28 255.255.255.0
+ encapsulation ppp
+!
+int Se1/1
+ ip address 204.186.89.28 255.255.255.0
+!
+
+Del ticket:
+
+sh ip pim int
+sh ip pim neigh
+sh ip pim rp mapping
+
+sh run | i access|filter|nat|police|policy|control
+
+R18:
+
+!
+int tu0
+ ip pim nbma-mode
+!
+
+***************************
+Ticket 8
+***************************
+
+De la topología:
+
+R27:
+
+!
+Rack1R27(config)#kron policy-list default
+Rack1R27(config-kron-policy)#no  cli clear ip eigrp neighbors fa0/1
+Rack1R27(config-kron-policy)#cli clear ip eigrp neighbors e0/1
+!
+
+Del ticket:
+
+R27:
+
+!
+kron occurrence default in 1 oneshot
+!
+
+sh run | i access|filter|nat|police|policy|control
+
+R27:
+
+!
+kron occurrence default in 1 oneshot
+!
+
+***************************
+Ticket 9
+***************************
+
+De la topologia:
+
+R12:
+
+!
+int se1/0
+ ip address 10.1.112.12 255.255.255.0
+!
+int se1/1
+ ip address 10.1.123.12 255.255.255.0 
+!
+
+R13:
+
+!
+int se1/1
+ ip address 10.1.123.13 255.255.255.0 
+!
+
+R11:
+
+!
+int se1/0
+ ip address 10.1.112.11 255.255.255.0
+!
+
+Del ticket:
+
+sh run | s access|policy|police|control|nat|filter|kron|manager
+
+R10:
+
+Rack1R10(config)#ip access-list standard default
+Rack1R10(config-std-nacl)#no 10
+Rack1R10(config-std-nacl)#10 deny 10.1.1.13
+
+O Tb vale:
+
+!
+policy-map default
+ class default
+  no drop
+!
+
+***************************
+Ticket 10
+***************************
+
+R18:
+
+!
+track 1 ip route 10.1.1.20 255.255.255.255 reachability 
+!
+!Tb vale un ip sla con icmp-echo.
+!
+event manager applet T10
+ event track 1 state down 
+ action 100 syslog msg "R20's Loopback 0 is down"
+!
+
+***************************
+Ticket 11
+***************************
+
+R13:
+
+!
+router bgp 65013
+ bgp bestpath compare-routerid 
+!
+
+***************************
+Ticket 12
+***************************
+
+De la topologia:
+
+SW4:
+
+!
+router eigrp 300 
+ auto-summary
+!
+
+R27:
+
+!
+ip prefix-list LEAK seq 5 permit 10.1.1.18/32
+!
+route-map LEAK-MAP permit 10
+ match ip address prefix-list LEAK
+!
+int e0/1
+ ip summary-address eigrp 300 10.0.0.0 255.0.0.0 5 leak-map LEAK-MAP
+!
+
+
+
+
+
+
+
+
+
